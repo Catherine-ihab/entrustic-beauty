@@ -1,5 +1,5 @@
 /**
- * Vercel Serverless Function — Entrustic Dental API
+ * Vercel Serverless Function — Entrustic Beauty API
  * ─────────────────────────────────────────────────────────────────────────────
  * Vercel's routing sends /api/v1/* here (see vercel.json). The Nest application
  * is booted once per cold start and kept warm across invocations, then every
@@ -7,7 +7,7 @@
  *
  * This keeps the API on the very same origin as the compiled React app, so the
  * browser never needs CORS and the tenant slug is derived from the hostname
- * (entrustic-dental.vercel.app → "entrustic-dental") exactly like it is in the
+ * (entrustic-beauty.vercel.app → "entrustic-beauty") exactly like it is in the
  * Docker deployment.
  */
 
