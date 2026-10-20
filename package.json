@@ -1,0 +1,22 @@
+{
+  "name": "clinic-dermatology",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "@esbuild/win32-x64": "^0.28.2",
+    "prettier": "^3.5.0",
+    "turbo": "^2.4.4",
+    "typescript": "^5.7.3"
+  },
+  "packageManager": "pnpm@12.9.1",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

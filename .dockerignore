@@ -1,0 +1,23 @@
+# Keep the Docker build context small and free of local state / secrets.
+.git
+.gitignore
+.github
+
+**/node_modules
+**/dist
+**/.turbo
+**/coverage
+**/*.log
+
+**/.env
+**/.env.*
+!**/.env.example
+
+# Demo/video production leftovers — not part of the shipped web app.
+apps/web/public/_demo
+
+# Local build artefact copied from apps/web/dist (regenerated inside the image).
+apps/api/public
+
+README.md
+AGENTS.md
