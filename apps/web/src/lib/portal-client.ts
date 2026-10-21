@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { API_BASE_URL } from './api-client';
+import { API_BASE_URL, normalizeApiError } from './api-client';
 
 export const PORTAL_TOKEN_KEY = 'portal_token';
 export const PORTAL_SESSION_KEY = 'portal_session';
@@ -26,7 +26,5 @@ portalClient.interceptors.request.use((config) => {
 
 portalClient.interceptors.response.use(
   (response) => response.data,
-  (error) => {
-    return Promise.reject(error.response?.data || error.message);
-  },
+  (error) => Promise.reject(normalizeApiError(error)),
 );

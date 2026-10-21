@@ -43,9 +43,34 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
+/**
+ * Converts an axios error into a stable shape for UI code.
+ *
+ * The API wraps failures as
+ *   { success:false, data:null, errors:[{code,message,details}], timestamp }
+ * Callers check `statusCode`/`status` to tell "wrong password" (401) apart from
+ * "server unreachable", so surface the HTTP status and a readable message.
+ * Rejecting with the raw body left both undefined, which meant a failed login
+ * rendered no message at all — the form just stopped loading.
+ */
+export function normalizeApiError(error: any) {
+  const body = error?.response?.data;
+  const status = error?.response?.status;
+  const firstError = Array.isArray(body?.errors) ? body.errors[0] : undefined;
+
+  return {
+    statusCode: status,
+    status,
+    code: firstError?.code,
+    message:
+      firstError?.message ??
+      (typeof body === 'string' && body ? body : undefined) ??
+      error?.message,
+    errors: body?.errors,
+  };
+}
+
 apiClient.interceptors.response.use(
   (response) => response.data,
-  (error) => {
-    return Promise.reject(error.response?.data || error.message);
-  },
+  (error) => Promise.reject(normalizeApiError(error)),
 );
