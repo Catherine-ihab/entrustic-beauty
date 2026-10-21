@@ -15,16 +15,15 @@
 // to be named here:
 //   • TypeORM loads the Postgres driver at RUNTIME with require('pg'),
 //   • argon2 is a native binding that would otherwise be dropped from the bundle.
-// They are reached through the workspace layout (pnpm) that apps/api uses.
 try {
-  require('../apps/api/node_modules/pg');
+  require('pg');
 } catch (err) {
   // Unresolvable at runtime is not fatal: the tracer already copied the path.
 }
 try {
-  require('../apps/api/node_modules/argon2');
+  require('argon2');
 } catch (err) {
-  // Same as above — password hashing still works from apps/api's own copy.
+  // Same as above — password hashing still works from its own copy.
 }
 
 let handlerPromise = null;

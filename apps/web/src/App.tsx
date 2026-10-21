@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { isRTL } from './lib/i18n';
 import { useAuthStore } from './store/auth-store';
 import { IS_PLATFORM_OWNER } from './store/platform-owner';
-import { apiClient } from './lib/api-client';
+import { apiClient, DEFAULT_TENANT_SLUG } from './lib/api-client';
 import { getAppTheme } from './design-system/theme';
 import './design-system/styles.css';
 
@@ -87,7 +87,11 @@ export function App() {
     if (parts.length > 2 && parts[0] !== 'www') {
       return parts[0];
     }
-    return localStorage.getItem('dev_tenant_slug') || 'demo';
+    // Single-origin deploys (e.g. entrustic-beauty.vercel.app) have a bare
+    // two-label host, so there is no subdomain to read. Fall back to the
+    // configured slug rather than a hardcoded "demo", which no longer exists
+    // in the database and would make the public config 404.
+    return localStorage.getItem('dev_tenant_slug') || DEFAULT_TENANT_SLUG;
   };
 
   // Single-specialty program build (SPECIALTY_LOCK) → drives branding fallbacks.
@@ -109,7 +113,7 @@ export function App() {
         setClinic({
           id: 'demo-tenant-id',
           name: lockedName || 'Entrustic Beauty',
-          slug: 'demo',
+          slug: DEFAULT_TENANT_SLUG,
           clinicType: lockedType,
           specialties: [lockedType],
           status: 'active' as any,

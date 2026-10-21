@@ -1,5 +1,12 @@
 import axios from 'axios';
 
+/**
+ * Tenant slug used when the host has no usable subdomain — typical of the
+ * single-origin Vercel deployment (e.g. `entrustic-beauty.vercel.app`), which
+ * only has two hostname labels. Configurable per deployment via VITE_TENANT_SLUG.
+ */
+export const DEFAULT_TENANT_SLUG = import.meta.env.VITE_TENANT_SLUG || 'entrustic-beauty';
+
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1',
   headers: {

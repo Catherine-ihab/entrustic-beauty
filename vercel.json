@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "pnpm --filter @clinic/shared-types build && pnpm --filter @clinic/api build && pnpm --filter @clinic/web build",
+  "buildCommand": "pnpm --filter @clinic/shared-types build && pnpm --filter @clinic/api build && pnpm run bundle:api && pnpm --filter @clinic/web build",
   "outputDirectory": "apps/web/dist",
   "functions": {
     "api/index.js": {

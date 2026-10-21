@@ -47,6 +47,7 @@ import {
 } from '../../lib/portal-client';
 import { TelemedRoom } from '../telemedicine/TelemedRoom';
 import { VitalsTrendsGrid } from '../vitals/VitalsTrends';
+import { DEFAULT_TENANT_SLUG } from '../../lib/api-client';
 
 const errMsg = (e: any) => e?.errors?.[0]?.message ?? e?.message ?? 'Something went wrong';
 
@@ -63,7 +64,7 @@ function deriveSlug(): string {
   } catch {
     /* ignore */
   }
-  return localStorage.getItem('dev_tenant_slug') || 'demo';
+  return localStorage.getItem('dev_tenant_slug') || DEFAULT_TENANT_SLUG;
 }
 
 const STATUS_COLOR: Record<string, string> = {

@@ -34,7 +34,7 @@ import { TelemedicineModule } from './modules/telemedicine/telemedicine.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env', '.env.example'],
+      envFilePath: ['.env', '.env.production', '.env.example'],
       validate,
     }),
     ClsModule.forRoot({
@@ -52,6 +52,12 @@ import { TelemedicineModule } from './modules/telemedicine/telemedicine.module';
         password: config.get<string>('DATABASE_PASSWORD', 'postgres'),
         database: config.get<string>('DATABASE_NAME', 'clinic_platform_dev'),
         autoLoadEntities: true,
+        // Managed Postgres (Neon, Render, Supabase, RDS) requires TLS; without
+        // this the serverless deployment cannot reach the database at all.
+        ssl:
+          config.get<string>('DATABASE_SSL', 'false') === 'true'
+            ? { rejectUnauthorized: false }
+            : false,
         // ConfigService returns raw strings from env — 'false' is truthy, so
         // compare explicitly (schema comes from migrations, not synchronize).
         synchronize: config.get<string>('DATABASE_SYNCHRONIZE', 'false') === 'true',

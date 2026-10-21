@@ -39,23 +39,30 @@ async function seed() {
       { type: argon2.argon2id, memoryCost: 65536, timeCost: 3, parallelism: 4 },
     );
 
+    // `ON CONFLICT (clinic_id, email)` cannot dedupe the platform admin: its
+    // clinic_id is NULL and NULL never matches in a unique index, so every run
+    // inserted another copy. The guard below keys off the email alone, and the
+    // password is refreshed on each run so the seeded credentials always match
+    // SEED_ADMIN_PASSWORD instead of drifting from an earlier invocation.
+    const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@entrusticbeauty.app';
     await qr.query(`
       INSERT INTO users (
         id, clinic_id, email, password_hash,
         first_name, last_name, status, is_platform_admin
-      ) VALUES (
-        uuid_generate_v4(),
-        NULL,
-        $1,
-        $2,
-        'Platform', 'Administrator',
-        'active', true
-      ) ON CONFLICT (clinic_id, email) DO NOTHING
-    `, [
-      process.env.SEED_ADMIN_EMAIL || 'admin@yourplatform.com',
-      adminPasswordHash,
-    ]);
-    console.log(`   ✓ Platform admin: ${process.env.SEED_ADMIN_EMAIL || 'admin@yourplatform.com'}`);
+      )
+      SELECT uuid_generate_v4(), NULL, $1, $2, 'Platform', 'Administrator', 'active', true
+      WHERE NOT EXISTS (
+        SELECT 1 FROM users WHERE email = $1 AND clinic_id IS NULL
+      )
+    `, [adminEmail, adminPasswordHash]);
+
+    // Keep the stored hash in step with the configured password.
+    await qr.query(
+      `UPDATE users SET password_hash = $2, status = 'active', deleted_at = NULL
+       WHERE email = $1 AND clinic_id IS NULL`,
+      [adminEmail, adminPasswordHash],
+    );
+    console.log(`   ✓ Platform admin: ${process.env.SEED_ADMIN_EMAIL || 'admin@entrusticbeauty.app'}`);
 
     console.log('\n🏥 Step 2: Demo Clinic');
     const [clinic] = await qr.query(`
@@ -283,10 +290,22 @@ async function seed() {
     `, [
       clinicId,
       ownerRole.id,
-      process.env.SEED_CLINIC_OWNER_EMAIL || 'owner@demo.yourplatform.com',
+      process.env.SEED_CLINIC_OWNER_EMAIL || 'owner@demo.entrusticbeauty.app',
       ownerPasswordHash,
     ]);
-    console.log(`   ✓ Demo owner: ${process.env.SEED_CLINIC_OWNER_EMAIL || 'owner@demo.yourplatform.com'}`);
+
+    // Refresh the hash so the documented password keeps working even when the
+    // account already existed from an earlier run with different settings.
+    await qr.query(
+      `UPDATE users SET password_hash = $3, status = 'active', deleted_at = NULL
+       WHERE clinic_id = $1 AND email = $2`,
+      [
+        clinicId,
+        process.env.SEED_CLINIC_OWNER_EMAIL || 'owner@demo.entrusticbeauty.app',
+        ownerPasswordHash,
+      ],
+    );
+    console.log(`   ✓ Demo owner: ${process.env.SEED_CLINIC_OWNER_EMAIL || 'owner@demo.entrusticbeauty.app'}`);
 
     // Link the owner to the clinic_owner role — User.roles is an eager
     // ManyToMany through user_roles, and auth.service builds the JWT
@@ -294,7 +313,7 @@ async function seed() {
     // zero roles/permissions).
     const [ownerUser] = await qr.query(
       `SELECT id FROM users WHERE clinic_id = $1 AND email = $2`,
-      [clinicId, process.env.SEED_CLINIC_OWNER_EMAIL || 'owner@demo.yourplatform.com'],
+      [clinicId, process.env.SEED_CLINIC_OWNER_EMAIL || 'owner@demo.entrusticbeauty.app'],
     );
     if (ownerUser?.id) {
       await qr.query(
@@ -669,7 +688,7 @@ async function seed() {
     // Two demo requests: #1 completed with results, #2 still in progress.
     const [seededOwner] = await qr.query(
       `SELECT id FROM users WHERE clinic_id = $1 AND email = $2 LIMIT 1`,
-      [clinicId, process.env.SEED_CLINIC_OWNER_EMAIL || 'owner@demo.yourplatform.com'],
+      [clinicId, process.env.SEED_CLINIC_OWNER_EMAIL || 'owner@demo.entrusticbeauty.app'],
     );
     let patients: any[] = await qr.query(
       `SELECT id FROM patients WHERE clinic_id = $1 ORDER BY created_at LIMIT 2`,
@@ -1008,10 +1027,10 @@ async function seed() {
     console.log('\n✅ Seed completed successfully!\n');
     console.log('═══════════════════════════════════════════════');
     console.log('  Platform Admin:');
-    console.log(`    Email:    ${process.env.SEED_ADMIN_EMAIL || 'admin@yourplatform.com'}`);
+    console.log(`    Email:    ${process.env.SEED_ADMIN_EMAIL || 'admin@entrusticbeauty.app'}`);
     console.log(`    Password: ${process.env.SEED_ADMIN_PASSWORD || 'ChangeMe#Admin2026!'}`);
     console.log('  Demo Clinic Owner (subdomain: demo):');
-    console.log(`    Email:    ${process.env.SEED_CLINIC_OWNER_EMAIL || 'owner@demo.yourplatform.com'}`);
+    console.log(`    Email:    ${process.env.SEED_CLINIC_OWNER_EMAIL || 'owner@demo.entrusticbeauty.app'}`);
     console.log(`    Password: ${process.env.SEED_CLINIC_OWNER_PASSWORD || 'Demo#Owner2026!'}`);
     console.log('═══════════════════════════════════════════════');
     console.log('  ⚠️  Change all passwords immediately in production!');
