@@ -7,8 +7,22 @@ import axios from 'axios';
  */
 export const DEFAULT_TENANT_SLUG = import.meta.env.VITE_TENANT_SLUG || 'entrustic-beauty';
 
+/**
+ * API base URL.
+ *
+ * Defaults to the relative `/api/v1` so the browser always calls whatever
+ * origin served the page. This is what makes the single-origin deploy work
+ * (Vercel serves both the SPA and the API). The previous default was an
+ * absolute `http://localhost:3001/...`, which got baked into the production
+ * bundle and made every visitor's browser call *their own* machine, so login
+ * and the clinic config silently failed with CORS/connection errors.
+ *
+ * Set VITE_API_URL only when the API lives on a genuinely different origin.
+ */
+export const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
+
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import { API_BASE_URL } from './api-client';
+
 export const PORTAL_TOKEN_KEY = 'portal_token';
 export const PORTAL_SESSION_KEY = 'portal_session';
 
@@ -8,7 +10,7 @@ export const PORTAL_SESSION_KEY = 'portal_session';
  * but a separate token namespace so staff and patient sessions never collide.
  */
 export const portalClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
