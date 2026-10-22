@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Entrustic Beauty — مشاهد الفيديو</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#0a0a24;color:#fff;font-family:'Cairo',sans-serif}
+  header{padding:28px 40px;display:flex;align-items:center;gap:18px;border-bottom:1px solid rgba(255,255,255,.12)}
+  header img{height:52px;background:#fff;border-radius:12px;padding:6px 12px}
+  h1{font-size:26px;margin:0;font-weight:900}
+  .hint{color:#9FB0E8;font-size:15px;font-weight:600;margin-top:4px}
+  .grid{padding:26px 40px;display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+  a.card{display:block;text-decoration:none;color:#fff;border:1px solid rgba(255,255,255,.14);border-radius:16px;overflow:hidden;background:#12123f}
+  a.card:hover{border-color:#3838DA;box-shadow:0 12px 40px -18px rgba(56,56,218,.9)}
+  .thumb{aspect-ratio:16/9;background:#080826;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:900;color:#3d3d8f}
+  .meta{padding:14px 18px}
+  .id{color:#12B4C8;font-weight:900;font-size:14px}
+  .t{font-weight:800;font-size:18px;margin-top:2px}
+  footer{padding:20px 40px 50px;color:#7f8cc4;font-size:14px}
+  code{background:rgba(255,255,255,.1);padding:2px 8px;border-radius:6px}
+</style>
+</head>
+<body>
+<header>
+  <img src="../brand/entrustic-logo.png" alt="Entrustic">
+  <div>
+    <h1>Entrustic Beauty — مشاهد الفيديو</h1>
+    <div class="hint">اضغط على أي مشهد لعرضه بحركة كاملة. للمونتاج النهائي شوف <code>_demo/RECORDING-GUIDE.md</code></div>
+  </div>
+</header>
+<div class="grid" id="grid"></div>
+<footer>المشاهد متحركة بالكامل (CSS animations) — كل مشهد له مدة محددة في <code>manifest.json</code> والمجموع 62.4 ثانية.</footer>
+<script>
+  fetch('manifest.json').then(r => r.json()).then(list => {
+    document.getElementById('grid').innerHTML = list.map(s => `
+      <a class="card" href="scenes/${s.file}" target="_blank">
+        <div class="thumb">${s.id}</div>
+        <div class="meta">
+          <div class="id">${s.id} / ${list.length} — ${s.dur}s — ${s.kind}</div>
+          <div class="t">${s.media ? s.media.replace(/\+/g,' + ') : (s.kind === 'hero' ? 'غلاف' : 'ختام')}</div>
+        </div>
+      </a>`).join('');
+  });
+</script>
+</body>
+</html>

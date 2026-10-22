@@ -1,0 +1,86 @@
+[
+  {
+    "id": "01",
+    "file": "scene-01.html",
+    "dur": 6,
+    "kind": "hero",
+    "media": null
+  },
+  {
+    "id": "02",
+    "file": "scene-02.html",
+    "dur": 5.4,
+    "kind": "two",
+    "media": "dashboard.png"
+  },
+  {
+    "id": "03",
+    "file": "scene-03.html",
+    "dur": 5.2,
+    "kind": "two",
+    "media": "patients.png"
+  },
+  {
+    "id": "04",
+    "file": "scene-04.html",
+    "dur": 5.2,
+    "kind": "two",
+    "media": "laser.png"
+  },
+  {
+    "id": "05",
+    "file": "scene-05.html",
+    "dur": 5.2,
+    "kind": "two",
+    "media": "injectables.png"
+  },
+  {
+    "id": "06",
+    "file": "scene-06.html",
+    "dur": 5,
+    "kind": "two",
+    "media": "skincare.png"
+  },
+  {
+    "id": "07",
+    "file": "scene-07.html",
+    "dur": 5,
+    "kind": "two",
+    "media": "packages.png"
+  },
+  {
+    "id": "08",
+    "file": "scene-08.html",
+    "dur": 5,
+    "kind": "two",
+    "media": "appointments.png"
+  },
+  {
+    "id": "09",
+    "file": "scene-09.html",
+    "dur": 5,
+    "kind": "two",
+    "media": "invoices.png"
+  },
+  {
+    "id": "10",
+    "file": "scene-10.html",
+    "dur": 5,
+    "kind": "two",
+    "media": "inventory.png"
+  },
+  {
+    "id": "11",
+    "file": "scene-11.html",
+    "dur": 5.4,
+    "kind": "wide",
+    "media": "reports.png+audit.png"
+  },
+  {
+    "id": "12",
+    "file": "scene-12.html",
+    "dur": 5,
+    "kind": "outro",
+    "media": null
+  }
+]
