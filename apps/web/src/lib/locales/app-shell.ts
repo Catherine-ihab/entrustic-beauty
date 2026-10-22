@@ -1,7 +1,7 @@
 // App shell screens: dashboard, login, appointments. Keys merge into `common`.
 export const appShell = {
   en: {
-    appTitle: 'Entrustic Dental',
+    appTitle: 'Entrustic Beauty',
     // Dashboard — mock service labels
     appServiceSpecialistAssessment: 'Specialist Assessment',
     appServiceTherapeuticSession: 'Therapeutic Session',
@@ -43,7 +43,7 @@ export const appShell = {
     appDemoAccountFilled: 'Filled: {{name}} ({{role}})',
   },
   ar: {
-    appTitle: 'Entrustic Dental',
+    appTitle: 'Entrustic Beauty',
     // لوحة التحكم — خدمات البيانات التجريبية
     appServiceSpecialistAssessment: 'تقييم متخصص',
     appServiceTherapeuticSession: 'جلسة علاجية',

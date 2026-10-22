@@ -123,21 +123,36 @@ export function LoginView({ clinicName, clinicColor, clinicInitial, onLoggedIn }
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div
             style={{
-              width: 68,
-              height: 68,
-              borderRadius: 18,
-              backgroundColor: clinicColor,
-              color: '#FFFFFF',
+              width: 84,
+              height: 84,
+              borderRadius: 22,
+              backgroundColor: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontWeight: 800,
-              fontSize: 28,
               margin: '0 auto 16px',
-              boxShadow: `0 8px 24px ${clinicColor}40`,
+              border: '1px solid #E2E8F0',
+              boxShadow: `0 10px 28px ${clinicColor}26`,
             }}
           >
-            {clinicInitial}
+            <img
+              src="/brand/entrustic-logo.png"
+              alt={clinicName}
+              style={{ width: 62, height: 62, objectFit: 'contain', display: 'block' }}
+              onError={(e) => {
+                const el = e.currentTarget;
+                el.style.display = 'none';
+                const parent = el.parentElement;
+                if (parent && !parent.dataset.fallback) {
+                  parent.dataset.fallback = '1';
+                  parent.style.background = clinicColor;
+                  parent.style.color = '#FFFFFF';
+                  parent.style.fontWeight = '800';
+                  parent.style.fontSize = '28px';
+                  parent.textContent = clinicInitial;
+                }
+              }}
+            />
           </div>
           <Title level={3} style={{ margin: 0, color: '#0F172A', fontWeight: 700 }}>
             {clinicName}
@@ -237,6 +252,9 @@ export function LoginView({ clinicName, clinicColor, clinicInitial, onLoggedIn }
             <Text style={{ fontSize: 12, color: '#94A3B8' }}>
               {tx('نظام سحابي مشفر وآمن لإدارة العيادات والمراكز الطبية', 'Secure Clinical Workspace — All sessions are encrypted and logged')}
             </Text>
+          </div>
+          <div style={{ marginTop: 10, fontSize: 12, color: '#94A3B8', fontWeight: 600 }}>
+            Entrustic Beauty
           </div>
         </div>
       </div>

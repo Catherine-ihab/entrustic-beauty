@@ -348,18 +348,34 @@ export function App() {
                 width: 42,
                 height: 42,
                 borderRadius: 10,
-                backgroundColor: primaryColor,
-                color: '#FFFFFF',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E2E8F0',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontWeight: 700,
-                fontSize: 18,
                 flexShrink: 0,
-                boxShadow: `0 2px 6px ${primaryColor}40`,
+                boxShadow: `0 2px 6px ${primaryColor}26`,
+                overflow: 'hidden',
               }}
             >
-              {clinic?.name?.charAt(0) || 'C'}
+              <img
+                src="/brand/entrustic-logo.png"
+                alt={clinic?.name || lockedName || 'Entrustic Beauty'}
+                style={{ width: 34, height: 34, objectFit: 'contain', display: 'block' }}
+                onError={(e) => {
+                  const el = e.currentTarget;
+                  el.style.display = 'none';
+                  const parent = el.parentElement;
+                  if (parent && !parent.dataset.fallback) {
+                    parent.dataset.fallback = '1';
+                    parent.style.background = primaryColor;
+                    parent.style.color = '#FFFFFF';
+                    parent.style.fontWeight = '700';
+                    parent.style.fontSize = '18px';
+                    parent.textContent = clinic?.name?.charAt(0) || 'E';
+                  }
+                }}
+              />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <div
