@@ -77,7 +77,7 @@ export function PatientProfile({ patientId, onBack, onNewVisit }: PatientProfile
   const [activeTab, setActiveTab] = useState('overview');
 
   const { snapshot, loading: snapshotLoading } = useMedicalSnapshot(patientId);
-  const { tx } = useLang();
+  const { tx, ar } = useLang();
 
   useEffect(() => {
     let cancelled = false;
@@ -91,11 +91,13 @@ export function PatientProfile({ patientId, onBack, onNewVisit }: PatientProfile
       .catch(() => {
         if (cancelled) return;
         // Identity fields are the only thing rendered if the fetch fails; keep
-        // them neutral rather than inventing a male demo patient.
+        // them neutral rather than inventing a male demo patient. The literals
+        // are inline so this effect does not depend on `tx`, which useLang
+        // recreates every render and would trigger an endless refetch loop.
         setPatient({
           id: patientId,
           patient_number: '—',
-          first_name: tx('غير متوفر', 'Unavailable'),
+          first_name: ar ? 'غير متوفر' : 'Unavailable',
           last_name: '',
           date_of_birth: null,
           gender: 'unspecified',
@@ -113,7 +115,7 @@ export function PatientProfile({ patientId, onBack, onNewVisit }: PatientProfile
     return () => {
       cancelled = true;
     };
-  }, [patientId, tx]);
+  }, [patientId, ar]);
 
   // Visit history and upcoming bookings live on their own endpoints; the
   // Overview tab used to be handed two empty arrays so it always claimed
