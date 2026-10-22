@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Table, Typography, Space, Button, Progress, Tag, Divider } from 'antd';
+import React from 'react';
+import { Row, Col, Card, Table, Typography, Space, Button, Progress, Tag, Divider, Empty, Spin } from 'antd';
 import {
   Users,
   Calendar,
@@ -18,7 +18,7 @@ import {
 import { PageHeader, MetricCard, StatusBadge } from '../../design-system';
 import { useAuthStore } from '../../store/auth-store';
 import { useLang } from '../../lib/useLang';
-import { getQueue, subscribeToQueue, QueueEntry } from '../../lib/clinicQueue';
+import { useDashboardSummary } from './useDashboardSummary';
 
 const { Text } = Typography;
 
@@ -26,9 +26,12 @@ interface DashboardViewProps {
   onNavigate: (tabKey: string) => void;
 }
 
+const fmt = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n));
+
 export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
   const { user, clinic } = useAuthStore();
   const { tx } = useLang();
+  const { data, loading, error, refetch } = useDashboardSummary();
 
   const userPermissions = user?.permissions || [
     'patients:read',
@@ -42,31 +45,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
 
   const hasFinancialAccess = userPermissions.includes('invoices:read');
 
-  // Shared clinic queue integration
-  const [liveQueue, setLiveQueue] = useState<QueueEntry[]>([]);
+  const patients = data?.patients;
+  const appts = data?.appointments;
+  const revenue = data?.revenue;
+  const capacity = data?.capacity;
+  const currency = revenue?.currency || clinic?.currency || 'EGP';
 
-  useEffect(() => {
-    const refresh = () => setLiveQueue(getQueue());
-    refresh();
-    const unsub = subscribeToQueue(refresh);
-    return () => unsub();
-  }, []);
-
-  const completedTodayCount = liveQueue.filter((q) => q.status === 'done').length;
-  const inProgressTodayCount = liveQueue.filter((q) => q.status === 'in-progress').length;
-  const waitingTodayCount = liveQueue.filter((q) => q.status === 'waiting' || q.status === 'calling').length;
-
-  const todayQueue = liveQueue.map((item) => ({
-    id: item.id,
-    patientNumber: item.patientNumber,
-    patientName: item.patientName,
-    time: item.scheduledTime,
-    provider: item.practitioner || (item.serviceCategory === 'laser' ? tx('د. سارة القاضي', 'Dr. Sarah El-Kady') : tx('د. طارق منصور', 'Dr. Tariq Mansour')),
-    service: item.serviceName,
-    serviceCategory: item.serviceCategory,
-    status: item.status === 'in-progress' ? 'in_progress' : item.status === 'done' ? 'completed' : 'confirmed',
-    packageInfo: item.packageSessionNumber ? `${item.packageSessionNumber}/${item.packageTotalSessions || 4}` : undefined,
+  const todayQueue = (data?.todaySchedule || []).map((row) => ({
+    id: row.id,
+    patientNumber: row.patientNumber,
+    patientName: row.patientName,
+    time: row.startTime,
+    provider: row.provider,
+    service: row.service || '—',
+    serviceCategory: 'appointments',
+    status: row.status,
   }));
+
+  const collectionRate =
+    revenue && revenue.todayBilled > 0
+      ? Math.round((revenue.todayCollected / revenue.todayBilled) * 100)
+      : 0;
+
 
   return (
     <div>
@@ -99,36 +99,54 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
         <Col xs={24} sm={12} lg={hasFinancialAccess ? 6 : 8}>
           <MetricCard
             title={tx('إجمالي الحالات والعملاء', 'Total Registered Patients')}
-            value="1,428"
+            value={patients ? fmt(patients.total) : '—'}
             icon={<Users size={20} />}
             iconBgColor="#FDF2F8"
             iconColor="#be185d"
-            trendText={tx('+14% هذا الشهر', '+14% this month')}
-            subtext={tx('سجل نشط', 'active directory')}
+            trendText={tx(
+              `+${fmt(patients?.newThisMonth ?? 0)} هذا الشهر`,
+              `+${fmt(patients?.newThisMonth ?? 0)} this month`,
+            )}
+            subtext={tx(`${fmt(patients?.active ?? 0)} سجل نشط`, `${fmt(patients?.active ?? 0)} active`)}
+            loading={loading}
           />
         </Col>
 
         <Col xs={24} sm={12} lg={hasFinancialAccess ? 6 : 8}>
           <MetricCard
             title={tx('مواعيد وجلسات اليوم', "Today's Appointments")}
-            value={String(liveQueue.length)}
+            value={appts ? fmt(appts.today) : '—'}
             icon={<Calendar size={20} />}
             iconBgColor="#F0FDF4"
             iconColor="#16A34A"
-            trendText={tx(`${completedTodayCount} مكتملة`, `${completedTodayCount} Completed`)}
-            subtext={tx(`${waitingTodayCount} متبقية`, `${waitingTodayCount} remaining`)}
+            trendText={tx(
+              `${fmt(appts?.todayCompleted ?? 0)} مكتملة`,
+              `${fmt(appts?.todayCompleted ?? 0)} Completed`,
+            )}
+            subtext={tx(
+              `${fmt(appts?.todayRemaining ?? 0)} متبقية`,
+              `${fmt(appts?.todayRemaining ?? 0)} remaining`,
+            )}
+            loading={loading}
           />
         </Col>
 
         <Col xs={24} sm={12} lg={hasFinancialAccess ? 6 : 8}>
           <MetricCard
             title={tx('الجلسات الجارية وغرفة الانتظار', 'Active Consultations')}
-            value={tx(`${inProgressTodayCount} قيد الجلسة`, `${inProgressTodayCount} In Progress`)}
+            value={tx(
+              `${fmt(appts?.inProgress ?? 0)} قيد الجلسة`,
+              `${fmt(appts?.inProgress ?? 0)} In Progress`,
+            )}
             icon={<Activity size={20} />}
             iconBgColor="#FFFBEB"
             iconColor="#D97706"
-            trendText={tx(`${waitingTodayCount} في الانتظار`, `${waitingTodayCount} in waiting room`)}
+            trendText={tx(
+              `${fmt(appts?.waiting ?? 0)} في الانتظار`,
+              `${fmt(appts?.waiting ?? 0)} in waiting room`,
+            )}
             subtext={tx('معدل انتظار طبيعي', 'normal queue pace')}
+            loading={loading}
           />
         </Col>
 
@@ -136,16 +154,34 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
           <Col xs={24} sm={12} lg={6}>
             <MetricCard
               title={tx('إيرادات ومتحصلات اليوم', "Today's Settled Revenue")}
-              value={`12,450 ${clinic?.currency || 'EGP'}`}
+              value={revenue ? `${fmt(revenue.todayCollected)} ${currency}` : '—'}
               icon={<TrendingUp size={20} />}
               iconBgColor="#F5F3FF"
               iconColor="#7C3AED"
-              trendText={tx('92% تم تحصيلها', '92% collected')}
-              subtext={tx('850 معلقة', '850 pending')}
+              trendText={tx(`${collectionRate}% تم تحصيلها`, `${collectionRate}% collected`)}
+              subtext={tx(
+                `${fmt(revenue?.todayPending ?? 0)} معلقة`,
+                `${fmt(revenue?.todayPending ?? 0)} pending`,
+              )}
+              loading={loading}
             />
           </Col>
         )}
       </Row>
+
+      {error && (
+        <Card
+          style={{ borderRadius: 12, border: '1px solid #FECACA', background: '#FEF2F2', marginBottom: 20 }}
+          bodyStyle={{ padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+        >
+          <Text style={{ color: '#B91C1C' }}>
+            {tx('تعذر تحميل بيانات لوحة التحكم.', 'Could not load dashboard data.')} {error}
+          </Text>
+          <Button size="small" onClick={refetch}>
+            {tx('إعادة المحاولة', 'Retry')}
+          </Button>
+        </Card>
+      )}
 
       <Row gutter={[20, 20]}>
         {/* Main Operational Queue */}
@@ -169,7 +205,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
             <Table
               dataSource={todayQueue}
               rowKey="id"
+              loading={loading}
               pagination={false}
+              locale={{
+                emptyText: (
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description={tx('لا توجد مواعيد اليوم', 'No appointments today')}
+                  />
+                ),
+              }}
               columns={[
                 {
                   title: tx('وقت الحجز', 'Slot Time'),
@@ -205,13 +250,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                 {
                   title: tx('إجراء', 'Action'),
                   key: 'action',
-                  render: (_: any, r: any) => (
+                  render: () => (
                     <Button
                       size="small"
                       type="primary"
                       ghost
                       style={{ borderRadius: 6, borderColor: '#be185d', color: '#be185d', fontWeight: 600 }}
-                      onClick={() => onNavigate(r.serviceCategory || 'appointments')}
+                      onClick={() => onNavigate('appointments')}
                     >
                       {tx('فتح الغرفة', 'Open Room')}
                     </Button>
@@ -285,34 +330,50 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
             bodyStyle={{ padding: 16 }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <Text strong style={{ fontSize: 13, display: 'block' }}>Candela GentleMax Pro Plus</Text>
-                  <Text type="secondary" style={{ fontSize: 11 }}>755nm / 1064nm Dual Handpiece</Text>
+              {loading && <Spin size="small" />}
+              {!loading && (data?.devices?.length ?? 0) === 0 && (
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  {tx('لا توجد أجهزة مسجلة', 'No devices registered')}
+                </Text>
+              )}
+              {(data?.devices || []).map((d) => (
+                <div
+                  key={d.id}
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}
+                >
+                  <div style={{ minWidth: 0 }}>
+                    <Text strong style={{ fontSize: 13, display: 'block' }}>{d.name}</Text>
+                    <Text type="secondary" style={{ fontSize: 11 }}>
+                      {d.model || '—'}
+                      {d.nextCalibration ? ` · ${d.nextCalibration}` : ''}
+                    </Text>
+                  </div>
+                  <Tag color={d.status === 'active' ? 'success' : d.status === 'maintenance' ? 'warning' : 'default'}>
+                    {d.status === 'active'
+                      ? tx('جاهز', 'Ready')
+                      : d.status === 'maintenance'
+                        ? tx('صيانة', 'Maintenance')
+                        : d.status}
+                  </Tag>
                 </div>
-                <Tag color="success">{tx('جاهز / 42 ألف ضربة', 'Ready / 42k shots')}</Tag>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <Text strong style={{ fontSize: 13, display: 'block' }}>InMode Morpheus8 RF</Text>
-                  <Text type="secondary" style={{ fontSize: 11 }}>Face 24-Pin Tip Mounted</Text>
-                </div>
-                <Tag color="success">{tx('تمت المعايرة', 'Calibrated')}</Tag>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <Text strong style={{ fontSize: 13, display: 'block' }}>HydraFacial Syndeo</Text>
-                  <Text type="secondary" style={{ fontSize: 11 }}>Vortex-Fusion System</Text>
-                </div>
-                <Tag color="processing">{tx('قيد الجلسة', 'In Treatment')}</Tag>
-              </div>
+              ))}
               <Divider style={{ margin: '6px 0' }} />
-              <div style={{ background: '#FFF1F2', padding: '8px 12px', borderRadius: 8, border: '1px solid #FFE4E6' }}>
-                <Text strong style={{ fontSize: 12, color: '#BE123C' }}>{tx('تنبيه نقص مستلزمات:', 'Low Consumables Alert:')}</Text>
-                <div style={{ fontSize: 11, color: '#9F1239', marginTop: 2 }}>
-                  {tx('غاز تبريد كانديلا DCD: متبقي أسطوانتين • بوتوكس 100 وحدة: متبقي 4 فيالات في الثلاجة.', 'Candela DCD Cryogen: 2 canisters left • Botox 100U: 4 vials in cold storage.')}
+              {(data?.lowStock?.length ?? 0) > 0 ? (
+                <div style={{ background: '#FFF1F2', padding: '8px 12px', borderRadius: 8, border: '1px solid #FFE4E6' }}>
+                  <Text strong style={{ fontSize: 12, color: '#BE123C' }}>
+                    {tx('تنبيه نقص مستلزمات:', 'Low Consumables Alert:')}
+                  </Text>
+                  <div style={{ fontSize: 11, color: '#9F1239', marginTop: 2 }}>
+                    {(data?.lowStock || [])
+                      .map((s) => `${s.name}: ${tx('متبقي', 'left')} ${s.remaining} ${s.unit || ''}`.trim())
+                      .join(' • ')}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  {tx('المخزون في المستوى الطبيعي', 'Stock levels are healthy')}
+                </Text>
+              )}
             </div>
           </Card>
 
@@ -325,13 +386,29 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
               <Text style={{ color: '#64748B' }}>{tx('المواعيد المحجوزة', 'Slots Utilized')}</Text>
-              <Text strong style={{ color: '#0F172A' }}>{tx('18 من 24 موعد (75%)', '18 of 24 (75%)')}</Text>
+              <Text strong style={{ color: '#0F172A' }}>
+                {capacity
+                  ? tx(
+                      `${capacity.bookedToday} من ${capacity.dailySlots} موعد (${capacity.utilizationPercent}%)`,
+                      `${capacity.bookedToday} of ${capacity.dailySlots} (${capacity.utilizationPercent}%)`,
+                    )
+                  : '—'}
+              </Text>
             </div>
-            <Progress percent={75} strokeColor="#be185d" showInfo={false} style={{ marginBottom: 16 }} />
+            <Progress
+              percent={capacity?.utilizationPercent ?? 0}
+              strokeColor="#be185d"
+              showInfo={false}
+              style={{ marginBottom: 16 }}
+            />
 
             <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #F1F5F9', paddingTop: 12 }}>
-              <Text style={{ color: '#64748B', fontSize: 13 }}>{tx('متوسط مدة الانتظار', 'Average Wait Time')}</Text>
-              <Text strong style={{ color: '#059669', fontSize: 13 }}>{tx('12 دقيقة', '12 minutes')}</Text>
+              <Text style={{ color: '#64748B', fontSize: 13 }}>
+                {tx('مواعيد قادمة (٧ أيام)', 'Upcoming (7 days)')}
+              </Text>
+              <Text strong style={{ color: '#059669', fontSize: 13 }}>
+                {appts ? tx(`${fmt(appts.upcoming)} موعد`, `${fmt(appts.upcoming)} booked`) : '—'}
+              </Text>
             </div>
           </Card>
         </Col>

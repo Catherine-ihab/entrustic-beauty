@@ -14,6 +14,7 @@ import { ServicesModule } from './modules/services/services.module';
 import { AppointmentsModule } from './modules/appointments/appointments.module';
 import { RecordsModule } from './modules/records/records.module';
 import { InvoicesModule } from './modules/invoices/invoices.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { PlatformAdminModule } from './modules/platform-admin/platform-admin.module';
 import { BeforeAfterModule } from './modules/before-after/before-after.module';
 import { AuditModule } from './modules/audit/audit.module';
@@ -87,6 +88,7 @@ import { TelemedicineModule } from './modules/telemedicine/telemedicine.module';
     AppointmentsModule,
     RecordsModule,
     InvoicesModule,
+    DashboardModule,
     PlatformAdminModule,
     BeforeAfterModule,
     AuditModule,
