@@ -213,7 +213,15 @@ export class PlatformAdminService {
       if (!branding) {
         branding = this.brandingRepo.create({ clinic_id: id });
       }
-      Object.assign(branding, dto.branding);
+      // snake_case columns vs camelCase DTO — `Object.assign` here silently
+      // dropped every branding field (see tenants.updateBranding for the
+      // canonical mapping).
+      const b = dto.branding;
+      if (b.primaryColor !== undefined) branding.primary_color = b.primaryColor;
+      if (b.secondaryColor !== undefined) branding.secondary_color = b.secondaryColor;
+      if (b.logoUrl !== undefined) branding.logo_url = b.logoUrl;
+      if (b.faviconUrl !== undefined) branding.favicon_url = b.faviconUrl;
+      if (b.welcomeMessage !== undefined) branding.welcome_message = b.welcomeMessage;
       await this.brandingRepo.save(branding);
     }
 

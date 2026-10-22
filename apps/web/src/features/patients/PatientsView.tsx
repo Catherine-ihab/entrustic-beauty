@@ -1,56 +1,28 @@
 import { useState } from 'react';
 import { Table, Button, Space, Input, Tag, Modal, Form, Select, Typography, message } from 'antd';
-import { IPatient, Gender, PatientStatus } from '@clinic/shared-types';
-import { UserPlus, Search, ExternalLink } from 'lucide-react';
+import { UserPlus, Search, ExternalLink, RefreshCw } from 'lucide-react';
+import { apiClient } from '../../lib/api-client';
 import { PatientProfile } from './PatientProfile/PatientProfile';
 import { VisitWorkspace } from '../visits/VisitWorkspace';
+import { usePatients, type PatientRow } from './usePatients';
 
 const { Title } = Typography;
+
+const GENDER_LABELS: Record<string, string> = {
+  female: 'أنثى',
+  male: 'ذكر',
+  unspecified: 'غير محدد',
+};
 
 export function PatientsView() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [visitingPatientId, setVisitingPatientId] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [saving, setSaving] = useState(false);
 
-  const [patients, setPatients] = useState<IPatient[]>([
-    {
-      id: 'p-1',
-      clinicId: 'demo',
-      patientNumber: 'PAT-00001',
-      firstName: 'Ahmad',
-      lastName: 'Hassan Al-Sayed',
-      gender: Gender.MALE,
-      phone: '+20 100 123 4567',
-      status: PatientStatus.ACTIVE,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: 'p-2',
-      clinicId: 'demo',
-      patientNumber: 'PAT-00002',
-      firstName: 'Sara',
-      lastName: 'El-Sayed',
-      gender: Gender.FEMALE,
-      phone: '+20 111 987 6543',
-      status: PatientStatus.ACTIVE,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: 'p-3',
-      clinicId: 'demo',
-      patientNumber: 'PAT-00003',
-      firstName: 'Mohamed',
-      lastName: 'Ibrahim',
-      gender: Gender.MALE,
-      phone: '+20 122 555 6789',
-      status: PatientStatus.ACTIVE,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-  ]);
+  const { patients, loading, error, refetch } = usePatients(search.trim() || undefined);
 
   if (visitingPatientId) {
     return (
@@ -75,31 +47,31 @@ export function PatientsView() {
     );
   }
 
-  const handleCreate = (values: any) => {
-    const newPatient: IPatient = {
-      id: `p-${Date.now()}`,
-      clinicId: 'demo',
-      patientNumber: `PAT-${String(patients.length + 1).padStart(5, '0')}`,
-      firstName: values.firstName,
-      lastName: values.lastName,
-      gender: values.gender || Gender.UNSPECIFIED,
-      phone: values.phone,
-      status: PatientStatus.ACTIVE,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    setPatients([newPatient, ...patients]);
-    setIsModalOpen(false);
-    form.resetFields();
-    message.success('Patient registered successfully');
+  const handleCreate = async (values: any) => {
+    setSaving(true);
+    try {
+      await apiClient.post('/patients', {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        phone: values.phone,
+        gender: values.gender || 'female',
+      });
+      setIsModalOpen(false);
+      form.resetFields();
+      message.success('تم تسجيل الحالة بنجاح');
+      refetch();
+    } catch (err: any) {
+      message.error(err?.message || 'تعذر تسجيل الحالة');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const columns = [
     {
       title: 'رقم الملف / الحالة',
-      dataIndex: 'patientNumber',
-      key: 'patientNumber',
+      dataIndex: 'patient_number',
+      key: 'patient_number',
       render: (num: string) => (
         <Tag color="magenta" style={{ fontWeight: 600, borderRadius: 8, fontFamily: 'monospace' }}>
           {num}
@@ -109,9 +81,9 @@ export function PatientsView() {
     {
       title: 'اسم الحالة / العميلة',
       key: 'fullName',
-      render: (_: any, r: IPatient) => (
+      render: (_: any, r: PatientRow) => (
         <span style={{ fontWeight: 600, color: '#0F172A' }}>
-          {r.firstName} {r.lastName}
+          {r.first_name} {r.last_name}
         </span>
       ),
     },
@@ -119,9 +91,9 @@ export function PatientsView() {
       title: 'النوع',
       dataIndex: 'gender',
       key: 'gender',
-      render: (g: Gender) => (
+      render: (g: string) => (
         <span style={{ color: '#64748B', fontSize: 13 }}>
-          {g === Gender.FEMALE ? 'أنثى' : g === Gender.MALE ? 'ذكر' : 'غير محدد'}
+          {GENDER_LABELS[g] || 'غير محدد'}
         </span>
       ),
     },
@@ -137,12 +109,12 @@ export function PatientsView() {
       title: 'الحالة',
       dataIndex: 'status',
       key: 'status',
-      render: (status: PatientStatus) => (
+      render: (status: string) => (
         <Tag
-          color={status === PatientStatus.ACTIVE ? 'green' : 'orange'}
+          color={status === 'active' ? 'green' : 'orange'}
           style={{ borderRadius: 8, fontWeight: 500 }}
         >
-          {status === PatientStatus.ACTIVE ? 'نشط' : status}
+          {status === 'active' ? 'نشط' : status}
         </Tag>
       ),
     },
@@ -150,7 +122,7 @@ export function PatientsView() {
       title: 'الملف الطبي',
       key: 'actions',
       width: 140,
-      render: (_: any, r: IPatient) => (
+      render: (_: any, r: PatientRow) => (
         <Button
           size="small"
           type="primary"
@@ -179,15 +151,26 @@ export function PatientsView() {
             سجل الحالات والعملاء (Clients & Cases Directory)
           </Title>
           <div style={{ fontSize: 13, color: '#64748B', marginTop: 2 }}>
-            {patients.length} حالة وعميلة مسجلة بالمركز
+            {loading ? 'جارٍ تحميل الحالات…' : `${patients.length} حالة وعميلة مسجلة بالمركز`}
           </div>
         </div>
         <Space>
           <Input
             placeholder="بحث في الحالات بالاسم أو الهاتف…"
             prefix={<Search size={14} color="#94A3B8" />}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            allowClear
             style={{ width: 260, borderRadius: 8 }}
           />
+          <Button
+            icon={<RefreshCw size={15} />}
+            onClick={refetch}
+            loading={loading}
+            style={{ height: 38, borderRadius: 8 }}
+          >
+            تحديث
+          </Button>
           <Button
             type="primary"
             icon={<UserPlus size={15} />}
@@ -199,10 +182,17 @@ export function PatientsView() {
         </Space>
       </div>
 
+      {error && (
+        <div style={{ marginBottom: 12, color: '#b91c1c', fontSize: 13 }}>
+          تعذر تحميل بيانات الحالات: {error}
+        </div>
+      )}
+
       <Table
         dataSource={patients}
         columns={columns}
         rowKey="id"
+        loading={loading}
         pagination={{ pageSize: 20, showTotal: (total) => `${total} حالة` }}
         style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid #E2E8F0' }}
         rowClassName={() => 'patient-row'}
@@ -218,6 +208,7 @@ export function PatientsView() {
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         onOk={() => form.submit()}
+        confirmLoading={saving}
         okText="تسجيل وفتح الملف"
         cancelText="إلغاء"
         width={460}
@@ -234,10 +225,10 @@ export function PatientsView() {
           <Form.Item name="phone" label="رقم الهاتف المحمول" rules={[{ required: true }]}>
             <Input placeholder="01XXXXXXXXX" />
           </Form.Item>
-          <Form.Item name="gender" label="النوع" initialValue={Gender.FEMALE}>
+          <Form.Item name="gender" label="النوع" initialValue="female">
             <Select>
-              <Select.Option value={Gender.FEMALE}>أنثى</Select.Option>
-              <Select.Option value={Gender.MALE}>ذكر</Select.Option>
+              <Select.Option value="female">أنثى</Select.Option>
+              <Select.Option value="male">ذكر</Select.Option>
             </Select>
           </Form.Item>
         </Form>

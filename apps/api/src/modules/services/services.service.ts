@@ -12,9 +12,17 @@ export class ServicesService {
   ) {}
 
   async create(clinicId: string, dto: CreateClinicServiceDto): Promise<ClinicService> {
+    // Entity columns are snake_case while the DTO is camelCase — spreading the
+    // DTO left `current_price` NULL on a NOT NULL column, so creating a service
+    // always failed with a 500.
     const service = this.serviceRepo.create({
-      ...dto,
       clinic_id: clinicId,
+      category_id: dto.categoryId ?? null,
+      name: dto.name,
+      description: dto.description ?? null,
+      default_duration_minutes: dto.defaultDurationMinutes ?? 30,
+      current_price: dto.currentPrice,
+      sort_order: dto.sortOrder ?? 0,
     });
     return this.serviceRepo.save(service);
   }
@@ -42,7 +50,26 @@ export class ServicesService {
 
   async update(clinicId: string, id: string, dto: UpdateClinicServiceDto): Promise<ClinicService> {
     const service = await this.findOne(clinicId, id);
-    Object.assign(service, dto);
+
+    // Same camelCase → snake_case mapping as `create`; only touch columns the
+    // caller actually sent.
+    const mapping: Array<[keyof UpdateClinicServiceDto, keyof ClinicService]> = [
+      ['categoryId', 'category_id'],
+      ['name', 'name'],
+      ['description', 'description'],
+      ['defaultDurationMinutes', 'default_duration_minutes'],
+      ['currentPrice', 'current_price'],
+      ['isActive', 'is_active'],
+      ['sortOrder', 'sort_order'],
+    ];
+
+    for (const [dtoKey, column] of mapping) {
+      const value = dto[dtoKey];
+      if (value !== undefined) {
+        (service as unknown as Record<string, unknown>)[column] = value;
+      }
+    }
+
     return this.serviceRepo.save(service);
   }
 

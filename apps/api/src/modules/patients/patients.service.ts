@@ -50,11 +50,33 @@ export class PatientsService {
     }
   }
 
+  /**
+   * Entity columns are snake_case while the DTO is camelCase — spreading the
+   * DTO straight into `create()` left every real column NULL and made Postgres
+   * reject the insert (500), so registering a patient from the UI never worked.
+   */
+  private mapCreateDto(dto: CreatePatientDto) {
+    return {
+      first_name: dto.firstName,
+      last_name: dto.lastName,
+      date_of_birth: dto.dateOfBirth ?? null,
+      gender: dto.gender,
+      phone: dto.phone ?? null,
+      email: dto.email ?? null,
+      address: dto.address ?? null,
+      emergency_contact_name: dto.emergencyContactName ?? null,
+      emergency_contact_phone: dto.emergencyContactPhone ?? null,
+      blood_type: dto.bloodType ?? null,
+      allergies: dto.allergies ?? null,
+      notes: dto.notes ?? null,
+    };
+  }
+
   async create(clinicId: string, dto: CreatePatientDto): Promise<Patient> {
     const patientNumber = await this.generatePatientNumber(clinicId);
 
     const patient = this.patientRepo.create({
-      ...dto,
+      ...this.mapCreateDto(dto),
       clinic_id: clinicId,
       patient_number: patientNumber,
     });
@@ -110,7 +132,33 @@ export class PatientsService {
 
   async update(clinicId: string, id: string, dto: UpdatePatientDto): Promise<Patient> {
     const patient = await this.findOne(clinicId, id);
-    Object.assign(patient, dto);
+
+    // Same camelCase → snake_case mapping as `create`; only overwrite the
+    // fields the caller actually sent so a partial update cannot null out
+    // untouched columns.
+    const mapping: Record<string, string> = {
+      firstName: 'first_name',
+      lastName: 'last_name',
+      dateOfBirth: 'date_of_birth',
+      gender: 'gender',
+      phone: 'phone',
+      email: 'email',
+      address: 'address',
+      emergencyContactName: 'emergency_contact_name',
+      emergencyContactPhone: 'emergency_contact_phone',
+      bloodType: 'blood_type',
+      allergies: 'allergies',
+      notes: 'notes',
+      status: 'status',
+    };
+
+    for (const [dtoKey, column] of Object.entries(mapping)) {
+      const value = (dto as Record<string, unknown>)[dtoKey];
+      if (value !== undefined) {
+        (patient as unknown as Record<string, unknown>)[column] = value;
+      }
+    }
+
     return this.patientRepo.save(patient);
   }
 
