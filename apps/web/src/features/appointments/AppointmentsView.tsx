@@ -102,8 +102,8 @@ const INITIAL_DOCTORS: DoctorSchedule[] = [
   },
   {
     id: 'doc-2',
-    name: 'د. طارق منصور',
-    roleTitle: 'استشاري جراحة التجميل وحقن الفيلر والبوتوكس',
+    name: 'د. هبة رمضان',
+    roleTitle: 'استشارية جراحة التجميل وحقن الفيلر والبوتوكس',
     specialtyCategory: 'بوتوكس وفيلر',
     room: 'عيادة الحقن والتجميل',
     color: '#0284c7',
@@ -178,7 +178,7 @@ const STATUS_ORDER: QueueStatus[] = ['waiting', 'in_doctor', 'completed', 'cance
 const INITIAL_APPOINTMENTS: ClinicAppointment[] = [
   {
     id: 'apt-1',
-    name: 'أحمد محمد حسن',
+    name: 'منة الله سيد أحمد',
     phone: '01012345678',
     patientNumber: 'PAT-00001',
     serviceCategory: 'ليزر وإزالة شعر',
@@ -199,7 +199,7 @@ const INITIAL_APPOINTMENTS: ClinicAppointment[] = [
     serviceName: 'حقن بوتوكس جبهة وجلابيلا',
     date: dayjs().format('YYYY-MM-DD'),
     time: '11:00',
-    doctor: 'د. طارق منصور',
+    doctor: 'د. هبة رمضان',
     room: 'عيادة الحقن والتجميل',
     priceEgp: 3500,
     status: 'in_doctor',

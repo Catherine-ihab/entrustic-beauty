@@ -89,7 +89,7 @@ export const InjectablesWorkspaceView: React.FC = () => {
     {
       id: 'inj-01',
       date: dayjs().subtract(2, 'day').format('YYYY-MM-DD'),
-      patientName: 'Nouran Mostafa',
+      patientName: 'نوران مصطفى',
       patientId: 'PAT-00042',
       category: 'Neurotoxin',
       productName: 'Botox Cosmetic (Allergan)',
@@ -98,7 +98,7 @@ export const InjectablesWorkspaceView: React.FC = () => {
       targetArea: 'Upper Face (Glabella 20U + Frontalis 10U)',
       totalDosage: '30 Units',
       technique: '32G Nano-needle / 5 points Glabella, 4 points Frontalis',
-      practitioner: 'Dr. Tariq Mansour',
+      practitioner: 'Dr. Heba Ramadan',
       consentSigned: true,
       notes: 'No bruising. Patient instructed not to lie down for 4 hours and avoid intense gym sessions for 24h.',
     },
@@ -130,7 +130,7 @@ export const InjectablesWorkspaceView: React.FC = () => {
       targetArea: 'Lip Vermilion Border & Body',
       totalDosage: '1.0 mL',
       technique: '30G Needle / Micro-droplet contouring',
-      practitioner: 'Dr. Tariq Mansour',
+      practitioner: 'Dr. Heba Ramadan',
       consentSigned: true,
       notes: 'Cold compress applied immediately. Mild anticipated swelling. Post-care instructions dispatched via WhatsApp.',
     },
@@ -180,7 +180,7 @@ export const InjectablesWorkspaceView: React.FC = () => {
       targetArea: areas,
       totalDosage: formattedDosage,
       technique: values.technique || '32G 4mm Nano-needle',
-      practitioner: values.practitioner || 'د. طارق منصور',
+      practitioner: values.practitioner || 'د. هبة رمضان',
       consentSigned: consentVerified,
       notes: values.notes || 'جلسة علاجية ممتازة وتوزيع متناسق بدون كدمات.',
     };
@@ -818,7 +818,7 @@ export const InjectablesWorkspaceView: React.FC = () => {
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="practitioner" label={tx('الطبيبة / الطبيب المعالج', 'Treating Physician')} initialValue="د. طارق منصور">
+              <Form.Item name="practitioner" label={tx('الطبيبة / الطبيب المعالج', 'Treating Physician')} initialValue="د. هبة رمضان">
                 <Input />
               </Form.Item>
             </Col>

@@ -72,36 +72,90 @@ interface PatientProfileProps {
 export function PatientProfile({ patientId, onBack, onNewVisit }: PatientProfileProps) {
   const [patient, setPatient] = useState<PatientDetails | null>(null);
   const [loadingPatient, setLoadingPatient] = useState(true);
+  const [recentVisits, setRecentVisits] = useState<any[]>([]);
+  const [upcomingAppointments, setUpcomingAppointments] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('overview');
 
   const { snapshot, loading: snapshotLoading } = useMedicalSnapshot(patientId);
   const { tx } = useLang();
 
   useEffect(() => {
+    let cancelled = false;
     setLoadingPatient(true);
     apiClient
       .get(`/patients/${patientId}`)
       .then((res: any) => {
+        if (cancelled) return;
         setPatient(res?.data || res);
       })
       .catch(() => {
-        // Fallback demo patient for visual testing
+        if (cancelled) return;
+        // Identity fields are the only thing rendered if the fetch fails; keep
+        // them neutral rather than inventing a male demo patient.
         setPatient({
           id: patientId,
-          patient_number: 'PAT-00001',
-          first_name: 'Ahmad',
-          last_name: 'Hassan Al-Sayed',
-          date_of_birth: '1990-03-15',
-          gender: 'male',
-          phone: '+20 100 123 4567',
-          email: 'ahmad.hassan@example.com',
-          address: 'Cairo, Egypt',
-          blood_type: 'O+',
-          status: 'active',
+          patient_number: '—',
+          first_name: tx('غير متوفر', 'Unavailable'),
+          last_name: '',
+          date_of_birth: null,
+          gender: 'unspecified',
+          phone: null,
+          email: null,
+          address: null,
+          blood_type: null,
+          status: 'unknown',
           created_at: new Date().toISOString(),
         });
       })
-      .finally(() => setLoadingPatient(false));
+      .finally(() => {
+        if (!cancelled) setLoadingPatient(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [patientId, tx]);
+
+  // Visit history and upcoming bookings live on their own endpoints; the
+  // Overview tab used to be handed two empty arrays so it always claimed
+  // "No visits recorded" even for a patient with a full clinical history.
+  useEffect(() => {
+    let cancelled = false;
+    apiClient
+      .get(`/visits/patient/${patientId}`)
+      .then((res: any) => {
+        if (cancelled) return;
+        const payload = res?.data ?? res;
+        setRecentVisits(Array.isArray(payload) ? payload : (payload?.items ?? []));
+      })
+      .catch(() => {
+        if (!cancelled) setRecentVisits([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [patientId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    apiClient
+      .get('/appointments', { params: { patientId, limit: 100 } })
+      .then((res: any) => {
+        if (cancelled) return;
+        const payload = res?.data ?? res;
+        const rows = Array.isArray(payload) ? payload : (payload?.items ?? []);
+        const now = Date.now();
+        setUpcomingAppointments(
+          rows
+            .filter((a: any) => new Date(a.start_time).getTime() >= now)
+            .sort((a: any, b: any) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime()),
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setUpcomingAppointments([]);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [patientId]);
 
   const primaryColor = '#2563EB';
@@ -118,8 +172,9 @@ export function PatientProfile({ patientId, onBack, onNewVisit }: PatientProfile
       children: (
         <OverviewTab
           patientId={patientId}
-          recentVisits={[]}
-          upcomingAppointments={[]}
+          recentVisits={recentVisits}
+          upcomingAppointments={upcomingAppointments}
+          loading={loadingPatient}
         />
       ),
     },

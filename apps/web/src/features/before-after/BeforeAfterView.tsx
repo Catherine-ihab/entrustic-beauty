@@ -66,7 +66,7 @@ const INITIAL_CASES: BeforeAfterCase[] = [
     treatmentDescription: 'حقن 1.0 mL فيلر Restylane Kysse بتقنية Micro-droplet لاستعادة الامتلاء والتناسق',
     timeElapsed: 'النتيجة بعد 14 يوماً من الجلسة',
     date: dayjs().subtract(14, 'day').format('YYYY-MM-DD'),
-    doctor: 'د. طارق منصور',
+    doctor: 'د. هبة رمضان',
     notes: 'تحسن ملحوظ في تحديد قوس كيوبيد مع نعومة ومرونة طبيعية بدون أي تكتل أو كدمات.',
     beforeImageUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80',
     afterImageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
@@ -83,7 +83,7 @@ const INITIAL_CASES: BeforeAfterCase[] = [
     treatmentDescription: 'حقن 26 وحدة Allergan Botox لتنعيم خطوط التعبس مع الحفاظ على الحركة الطبيعية للحواجب',
     timeElapsed: 'النتيجة بعد 10 أيام',
     date: dayjs().subtract(20, 'day').format('YYYY-MM-DD'),
-    doctor: 'د. طارق منصور',
+    doctor: 'د. هبة رمضان',
     notes: 'اختفاء كامل لخطوط 11 بين الحاجبين عند الضحك أو الغضب مع ثبات مظهر طبيعي مريح.',
     beforeImageUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80',
     afterImageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
@@ -183,7 +183,7 @@ export function BeforeAfterView() {
       treatmentDescription: values.treatmentDescription || '',
       timeElapsed: values.timeElapsed || 'بعد الجلسة',
       date: dayjs().format('YYYY-MM-DD'),
-      doctor: values.doctor || 'د. طارق منصور',
+      doctor: values.doctor || 'د. هبة رمضان',
       notes: values.notes || '',
       beforeImageUrl: values.beforeImageUrl || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80',
       afterImageUrl: values.afterImageUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
@@ -501,7 +501,7 @@ export function BeforeAfterView() {
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="doctor" label="الطبيبة / المعالج المسؤول" initialValue="د. طارق منصور">
+              <Form.Item name="doctor" label="الطبيبة / المعالج المسؤول" initialValue="د. هبة رمضان">
                 <Input />
               </Form.Item>
             </Col>

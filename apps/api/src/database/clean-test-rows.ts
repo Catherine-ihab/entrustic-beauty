@@ -9,10 +9,10 @@ async function main() {
   await AppDataSource.initialize();
   try {
     const patients = await AppDataSource.query(
-      `DELETE FROM patients WHERE phone LIKE '+2010000000%' RETURNING patient_number`,
+      `DELETE FROM patients WHERE phone LIKE '+2010%0000%' OR phone LIKE '+2010999000%' RETURNING patient_number`,
     );
     const services = await AppDataSource.query(
-      `DELETE FROM clinic_services WHERE name = 'خدمة اختبار' RETURNING name`,
+      `DELETE FROM clinic_services WHERE name IN ('خدمة اختبار', 'خدمة بروفة') RETURNING name`,
     );
     console.log(`deleted test patients: ${patients.length}`);
     console.log(`deleted test services: ${services.length}`);

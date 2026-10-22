@@ -441,7 +441,7 @@ export function App() {
               </Avatar>
               <div style={{ lineHeight: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: '#0F172A' }}>
-                  {user ? `${user.firstName} ${user.lastName}` : (currentLanguage === 'ar' ? 'د. طارق منصور' : 'Dr. Tariq Mansour')}
+                  {user ? `${user.firstName} ${user.lastName}` : (currentLanguage === 'ar' ? 'د. سارة الشريف' : 'Dr. Sara El-Sherif')}
                 </div>
                 <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>
                   {user?.roles?.[0] || (currentLanguage === 'ar' ? 'مدير المركز' : 'Clinic Admin')}

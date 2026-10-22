@@ -63,7 +63,7 @@ export const DEFAULT_DOCTOR_RULES: DoctorCommissionRule[] = [
   },
   {
     doctorId: 'doc-2',
-    doctorName: 'د. طارق منصور',
+    doctorName: 'د. هبة رمضان',
     specialty: 'جراحة التجميل وحقن الفيلر والبوتوكس',
     rateType: 'percentage',
     percentageRate: 30, // 30% commission on aesthetic injectables

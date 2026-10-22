@@ -184,7 +184,7 @@ export interface StaffMember {
 const DEFAULT_STAFF: StaffMember[] = [
   {
     id: 'usr-1',
-    name: 'Dr. Tariq Mansour',
+    name: 'Dr. Heba Ramadan',
     username: 'admin@clinic.com',
     password: 'Admin@2026',
     role: 'Clinic Owner / Admin',

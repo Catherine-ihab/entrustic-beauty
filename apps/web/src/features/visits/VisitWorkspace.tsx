@@ -163,7 +163,7 @@ export function VisitWorkspace({
         visitNumber={visitId ? 2 : 1}
         status={visitId ? 'in_progress' : 'draft'}
         allergies={allergies}
-        doctorName={user ? `Dr. ${user.firstName} ${user.lastName}` : 'Dr. Tariq Mansour'}
+        doctorName={user ? `Dr. ${user.firstName} ${user.lastName}` : 'Dr. Heba Ramadan'}
         onBack={onBack}
         onSaveDraft={handleSaveDraft}
         onFinalize={handleFinalize}

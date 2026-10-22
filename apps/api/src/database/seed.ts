@@ -284,7 +284,7 @@ async function seed() {
       ) VALUES (
         uuid_generate_v4(),
         $1, $2, $3, $4,
-        'Ahmed', 'Al-Shifa',
+        'سارة', 'الشريف',
         'active', false
       ) ON CONFLICT (clinic_id, email) DO NOTHING
     `, [
