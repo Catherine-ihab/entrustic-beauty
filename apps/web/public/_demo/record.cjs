@@ -125,7 +125,7 @@ async function main() {
   const listFile = path.join(WORK, 'list.txt');
   fs.writeFileSync(listFile, segments.map((p) => "file '" + p.replace(/\\/g, '/') + "'").join('\n'), 'utf8');
 
-  const finalOut = path.join(OUT, 'entrustic-beauty-demo.mp4');
+  const finalOut = path.join(OUT, '_raw.mp4');
   execFileSync(
     ffmpeg,
     ['-y', '-hide_banner', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', listFile, '-c', 'copy', finalOut],
@@ -136,6 +136,7 @@ async function main() {
   const size = fs.statSync(finalOut).size;
   console.log('\nDONE ->', finalOut);
   console.log('size:', (size / 1024 / 1024).toFixed(1), 'MB');
+  console.log('next: node mux.cjs   (adds the narration track)');
 }
 
 main().catch((e) => {

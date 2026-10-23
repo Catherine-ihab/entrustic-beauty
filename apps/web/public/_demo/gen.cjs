@@ -14,6 +14,15 @@ const path = require('path');
 const OUT = path.join(__dirname, 'scenes');
 fs.mkdirSync(OUT, { recursive: true });
 
+/* Scene lengths are driven by the narration, not the other way round:
+ * voiceover.py measures every recorded line and writes timing.json, and each
+ * scene is stretched to lead-in + speech + tail so sound and picture stay in
+ * sync. Without timing.json the `dur` values below are used as-is. */
+const TIMING = path.join(__dirname, 'timing.json');
+const timings = fs.existsSync(TIMING)
+  ? Object.fromEntries(JSON.parse(fs.readFileSync(TIMING, 'utf8')).map((t) => [t.id, t.dur]))
+  : {};
+
 /* Total on-screen duration per scene, in seconds. Bump these to slow a scene down. */
 const scenes = [
   {
@@ -258,6 +267,7 @@ const manifest = [];
 let total = 0;
 for (let i = 0; i < scenes.length; i++) {
   const s = scenes[i];
+  if (timings[s.id]) s.dur = timings[s.id];
   const n = String(i + 1).padStart(2, '0') + ' / ' + scenes.length;
   let html;
   if (s.kind === 'hero') html = renderHero(s);
