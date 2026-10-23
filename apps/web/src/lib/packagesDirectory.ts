@@ -427,3 +427,74 @@ export function subscribeToPackageEnrollments(callback: () => void): () => void 
   };
 }
 
+// ─── Demo enrolment seeding against the real roster ──────────────────────────
+
+/**
+ * The enrolment table used to be seeded with invented patients (`PAT-00104`,
+ * `01012345678`, …) that existed nowhere else in the system. Once the real
+ * roster is known we rebuild the demo enrolments from real patients so every
+ * screen shows the same names, numbers and phone numbers.
+ *
+ * Runs only when it finds an enrolment whose patient is not in the roster, so
+ * enrolments the user creates by hand are never discarded.
+ */
+export function rebuildEnrollmentsFromPatients(
+  patients: Array<{ name: string; patientNumber: string; phone: string }>,
+): ClientPackageEnrollment[] {
+  const current = getClientPackageEnrollments();
+  if (!patients.length) return current;
+
+  const known = new Set(patients.map((p) => p.patientNumber));
+  const hasPhantomPatient = current.some((e) => !known.has(e.patientId));
+  if (!hasPhantomPatient) return current;
+
+  const packages = getClinicPackages();
+  if (!packages.length) return current;
+
+  const now = new Date();
+  const iso = (d: Date) => d.toISOString().slice(0, 10);
+  const addMonths = (d: Date, months: number) => {
+    const copy = new Date(d);
+    copy.setMonth(copy.getMonth() + months);
+    return copy;
+  };
+  const completedPlan = [3, 1, 2, 0, 4, 2, 1, 3, 0];
+
+  const next: ClientPackageEnrollment[] = patients.slice(0, 9).map((patient, i) => {
+    const pkg = packages[i % packages.length];
+    const purchase = new Date(now);
+    if (i === 8) {
+      // One lapsed package so the "منتهية الصلاحية" state is visible too.
+      purchase.setMonth(purchase.getMonth() - 19);
+    } else {
+      purchase.setDate(purchase.getDate() - (6 + i * 12));
+    }
+    const expiry = addMonths(purchase, pkg.validityMonths || 12);
+    const expired = expiry < now;
+    const completed = Math.min(pkg.totalSessions - 1, completedPlan[i] ?? 1);
+    const remaining = Math.max(0, pkg.totalSessions - completed);
+    const installment = i % 3 === 1;
+
+    return {
+      id: `enr-${patient.patientNumber}`,
+      patientName: patient.name,
+      patientId: patient.patientNumber,
+      patientPhone: patient.phone,
+      packageName: pkg.name,
+      category: pkg.category,
+      totalSessions: pkg.totalSessions,
+      completedSessions: completed,
+      remainingSessions: remaining,
+      priceEgp: pkg.priceEgp,
+      paymentStatus: installment ? 'تقسيط / دفعة مقدمة' : 'مدفوع بالكامل',
+      paidAmountEgp: installment ? Math.round(pkg.priceEgp / 2) : pkg.priceEgp,
+      purchaseDate: iso(purchase),
+      expiryDate: iso(expiry),
+      status: expired ? 'منتهية الصلاحية' : remaining === 0 ? 'مكتملة' : 'نشطة',
+    };
+  });
+
+  saveClientPackageEnrollments(next);
+  return next;
+}
+

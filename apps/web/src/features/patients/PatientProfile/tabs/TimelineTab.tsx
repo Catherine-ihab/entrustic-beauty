@@ -43,8 +43,8 @@ const TYPE_CONFIG: Record<
     label: 'Visits',
   },
   condition: {
-    color: '#DC2626',
-    dot: <Activity size={14} color="#DC2626" />,
+    color: '#B91C1C',
+    dot: <Activity size={14} color="#B91C1C" />,
     label: 'Conditions',
   },
   allergy: {
@@ -53,8 +53,8 @@ const TYPE_CONFIG: Record<
     label: 'Allergies',
   },
   medication: {
-    color: '#7C3AED',
-    dot: <Pill size={14} color="#7C3AED" />,
+    color: '#6D28D9',
+    dot: <Pill size={14} color="#6D28D9" />,
     label: 'Medications',
   },
   file: {
@@ -63,13 +63,13 @@ const TYPE_CONFIG: Record<
     label: 'Files',
   },
   consent: {
-    color: '#059669',
-    dot: <FileCheck size={14} color="#059669" />,
+    color: '#047857',
+    dot: <FileCheck size={14} color="#047857" />,
     label: 'Consents',
   },
   invoice: {
-    color: '#D97706',
-    dot: <Receipt size={14} color="#D97706" />,
+    color: '#B45309',
+    dot: <Receipt size={14} color="#B45309" />,
     label: 'Invoices',
   },
 };
@@ -353,7 +353,7 @@ export function TimelineTab({ patientId }: TimelineTabProps) {
 
               {ev.description && (
                 <Text
-                  style={{ fontSize: 12, color: '#94A3B8', display: 'block' }}
+                  style={{ fontSize: 12, color: '#64748B', display: 'block' }}
                 >
                   {ev.description}
                 </Text>
@@ -369,7 +369,7 @@ export function TimelineTab({ patientId }: TimelineTabProps) {
               }}
             >
               <Clock size={11} color="#CBD5E1" />
-              <Text style={{ fontSize: 11, color: '#94A3B8', whiteSpace: 'nowrap' }}>
+              <Text style={{ fontSize: 11, color: '#64748B', whiteSpace: 'nowrap' }}>
                 {formatTimestamp(ev.timestamp)}
               </Text>
             </div>
@@ -396,7 +396,7 @@ export function TimelineTab({ patientId }: TimelineTabProps) {
           <Title level={5} style={{ margin: 0, color: '#0F172A' }}>
             Medical Timeline
           </Title>
-          <Text style={{ fontSize: 12, color: '#94A3B8' }}>
+          <Text style={{ fontSize: 12, color: '#64748B' }}>
             Complete chronological history of clinical events
           </Text>
         </div>
@@ -443,7 +443,7 @@ export function TimelineTab({ patientId }: TimelineTabProps) {
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           description={
-            <Text style={{ color: '#94A3B8', fontSize: 13 }}>
+            <Text style={{ color: '#64748B', fontSize: 13 }}>
               {filter === 'all'
                 ? 'No clinical events recorded yet'
                 : `No ${TYPE_CONFIG[filter as TimelineEventType]?.label ?? filter} events recorded`}
@@ -454,7 +454,7 @@ export function TimelineTab({ patientId }: TimelineTabProps) {
       ) : (
         <>
           <div style={{ marginBottom: 12 }}>
-            <Text style={{ fontSize: 12, color: '#94A3B8' }}>
+            <Text style={{ fontSize: 12, color: '#64748B' }}>
               {events.length} event{events.length !== 1 ? 's' : ''}
               {filter !== 'all'
                 ? ` · ${TYPE_CONFIG[filter as TimelineEventType]?.label ?? filter}`

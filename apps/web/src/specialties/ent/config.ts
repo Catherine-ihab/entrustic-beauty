@@ -8,7 +8,7 @@ export const ENT_CONFIG: SpecialtyModuleConfig = {
   taglineEn: 'Otology, Rhinology, Laryngology, Head & Neck Surgery',
   taglineAr: 'جراحة وأمراض الأذن، الأنف، الجيوب الأنفية، والحنجرة والأحبال الصوتية',
   icon: 'Ear',
-  themeColor: '#7c3aed',
+  themeColor: '#6D28D9',
   has3DVisualizer: false,
   has2DVisualizer: true,
   measurements: [

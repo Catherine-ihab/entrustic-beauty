@@ -115,7 +115,7 @@ export function DrugsManager() {
             ))}
           </Space>
         ) : (
-          <Text style={{ fontSize: 11, color: '#94A3B8' }}>—</Text>
+          <Text style={{ fontSize: 11, color: '#64748B' }}>—</Text>
         ),
     },
     {
@@ -143,7 +143,7 @@ export function DrugsManager() {
       </div>
 
       <Input
-        prefix={<Search size={15} color="#94A3B8" />}
+        prefix={<Search size={15} color="#64748B" />}
         placeholder="Search by name, generic, or category…"
         value={q}
         onChange={(e) => setQ(e.target.value)}

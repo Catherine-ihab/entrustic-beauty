@@ -200,7 +200,7 @@ export function InventoryManager() {
         return (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontWeight: 700, fontSize: 15, color: isLow ? '#dc2626' : '#059669' }}>
+              <span style={{ fontWeight: 700, fontSize: 15, color: isLow ? '#B91C1C' : '#047857' }}>
                 {r.currentStock}
               </span>
               <span style={{ fontSize: 12, color: '#475569' }}>{r.unit}</span>
@@ -249,7 +249,7 @@ export function InventoryManager() {
           <Button
             size="small"
             icon={<Download size={13} />}
-            style={{ color: '#059669', borderColor: '#059669', fontSize: 12 }}
+            style={{ color: '#047857', borderColor: '#047857', fontSize: 12 }}
             onClick={() => {
               setRecvItem(r);
               recvForm.setFieldsValue({ quantity: 1, batchLotNumber: r.batchLotNumber });
@@ -368,7 +368,7 @@ export function InventoryManager() {
         <Col xs={12} sm={6}>
           <Card size="small" style={{ borderRadius: 10, border: '1px solid #fed7aa' }}>
             <Text type="secondary" style={{ fontSize: 12 }}>تنبيهات انخفاض الرصيد</Text>
-            <div style={{ fontWeight: 800, fontSize: 20, color: lowStockItems.length > 0 ? '#dc2626' : '#059669' }}>
+            <div style={{ fontWeight: 800, fontSize: 20, color: lowStockItems.length > 0 ? '#B91C1C' : '#047857' }}>
               {lowStockItems.length} أصناف منخفضة
             </div>
           </Card>
@@ -380,7 +380,7 @@ export function InventoryManager() {
         <Alert
           type="warning"
           showIcon
-          icon={<AlertTriangle size={16} color="#d97706" />}
+          icon={<AlertTriangle size={16} color="#B45309" />}
           message={
             <span>
               <strong>تنبيه نقص المخزون:</strong> يوجد {lowStockItems.length} أصناف وصلت للحد الأدنى (

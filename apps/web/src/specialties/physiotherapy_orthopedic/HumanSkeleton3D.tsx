@@ -50,10 +50,10 @@ const DEFAULT_HOTSPOTS: AnatomicalHotspot[] = [
 ];
 
 function getPainBadge(vas: number) {
-  if (vas === 0) return { color: '#10B981', label: 'Pain-Free (VAS 0)' };
+  if (vas === 0) return { color: '#047857', label: 'Pain-Free (VAS 0)' };
   if (vas <= 3) return { color: '#FACC15', label: 'Mild (VAS 1-3)' };
   if (vas <= 6) return { color: '#F97316', label: 'Moderate (VAS 4-6)' };
-  return { color: '#EF4444', label: 'Severe (VAS 7-10)' };
+  return { color: '#B91C1C', label: 'Severe (VAS 7-10)' };
 }
 
 export function HumanSkeleton3D({ readonly = false }: SpecialtyComponentProps) {
@@ -105,7 +105,7 @@ export function HumanSkeleton3D({ readonly = false }: SpecialtyComponentProps) {
       title={
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
           <Space>
-            <Activity size={17} color="#10B981" />
+            <Activity size={17} color="#047857" />
             <span style={{ fontWeight: 700, color: '#F8FAFC', fontSize: 14 }}>
               Anatomical Musculoskeletal Explorer (عضلات ومفاصل الجسم التشريحي)
             </span>
@@ -362,8 +362,8 @@ export function HumanSkeleton3D({ readonly = false }: SpecialtyComponentProps) {
             <div style={{ fontSize: 12, color: '#38BDF8', fontWeight: 600, marginBottom: 2 }}>
               {hoveredSpot.nameAr}
             </div>
-            <div style={{ fontSize: 11, color: '#94A3B8' }}>
-              التصنيف: <strong style={{ color: hoveredSpot.type === 'muscle' ? '#F43F5E' : '#38BDF8' }}>
+            <div style={{ fontSize: 11, color: '#64748B' }}>
+              التصنيف: <strong style={{ color: hoveredSpot.type === 'muscle' ? '#BE123C' : '#38BDF8' }}>
                 {hoveredSpot.type === 'muscle' ? 'عضلة وأوتار (Muscular)' : 'مفصل عظمي (Articular Joint)'}
               </strong>
             </div>
@@ -397,7 +397,7 @@ export function HumanSkeleton3D({ readonly = false }: SpecialtyComponentProps) {
         >
           {/* Target Filter (Muscles vs Joints vs All) */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ color: '#94A3B8', fontSize: 11 }}>إظهار النقاط:</span>
+            <span style={{ color: '#64748B', fontSize: 11 }}>إظهار النقاط:</span>
             <Segmented
               size="small"
               value={filterType}
@@ -424,7 +424,7 @@ export function HumanSkeleton3D({ readonly = false }: SpecialtyComponentProps) {
                 style={{ width: 140, margin: '0 6px' }}
                 tooltip={{ formatter: (v) => `شفافية العضلات: ${v}%` }}
               />
-              <span style={{ color: '#F43F5E', fontSize: 11, fontWeight: 600 }}>
+              <span style={{ color: '#BE123C', fontSize: 11, fontWeight: 600 }}>
                 عضلات 100% 💪
               </span>
             </div>
@@ -447,7 +447,7 @@ export function HumanSkeleton3D({ readonly = false }: SpecialtyComponentProps) {
       >
         <Space size="middle" wrap>
           <span style={{ color: '#E2E8F0', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#10B981', boxShadow: '0 0 6px #10B981' }} />
+            <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#047857', boxShadow: '0 0 6px #047857' }} />
             طبيعي بدون ألم (VAS 0)
           </span>
           <span style={{ color: '#E2E8F0', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -459,7 +459,7 @@ export function HumanSkeleton3D({ readonly = false }: SpecialtyComponentProps) {
             ألم متوسط / شد عضلي (VAS 4–6)
           </span>
           <span style={{ color: '#E2E8F0', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#EF4444', boxShadow: '0 0 6px #EF4444' }} />
+            <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#B91C1C', boxShadow: '0 0 6px #B91C1C' }} />
             ألم حاد / تمزق أو غضروف (VAS 7–10)
           </span>
         </Space>

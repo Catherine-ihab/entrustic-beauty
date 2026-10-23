@@ -98,7 +98,7 @@ export function AuditLogsView() {
         <Space>
           <Input
             placeholder={tx('بحث في السجل…', 'Search the trail…')}
-            prefix={<Search size={14} color="#94A3B8" />}
+            prefix={<Search size={14} color="#64748B" />}
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             allowClear

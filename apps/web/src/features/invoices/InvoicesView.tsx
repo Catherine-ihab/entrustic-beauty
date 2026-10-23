@@ -462,7 +462,7 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
         <div>
           <Text>{Number(v).toLocaleString()} {r.currency}</Text>
           {Number(r.discountAmount) > 0 && (
-            <div style={{ fontSize: 11, color: '#059669' }}>
+            <div style={{ fontSize: 11, color: '#047857' }}>
               خصم: {Number(r.discountAmount).toLocaleString()} {r.currency}
             </div>
           )}
@@ -480,7 +480,7 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
       title: 'المدفوع',
       key: 'paidAmount',
       render: (_: any, r: IInvoice) => (
-        <Text style={{ color: '#059669', fontWeight: 600 }}>{Number(r.paidAmount).toLocaleString()} {r.currency}</Text>
+        <Text style={{ color: '#047857', fontWeight: 600 }}>{Number(r.paidAmount).toLocaleString()} {r.currency}</Text>
       ),
     },
     {
@@ -489,9 +489,9 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
       render: (_: any, r: IInvoice) => {
         const rem = Number(r.total) - Number(r.paidAmount);
         return rem > 0 ? (
-          <Text strong style={{ color: '#DC2626' }}>{rem.toLocaleString()} {r.currency}</Text>
+          <Text strong style={{ color: '#B91C1C' }}>{rem.toLocaleString()} {r.currency}</Text>
         ) : (
-          <Text style={{ color: '#059669' }}>مسدد ✓</Text>
+          <Text style={{ color: '#047857' }}>مسدد ✓</Text>
         );
       },
     },
@@ -506,7 +506,7 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
             <Progress
               percent={pct}
               size="small"
-              strokeColor={pct === 100 ? '#059669' : '#F59E0B'}
+              strokeColor={pct === 100 ? '#047857' : '#F59E0B'}
               showInfo={false}
               style={{ marginBottom: 2 }}
             />
@@ -535,7 +535,7 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
                 size="small"
                 type="primary"
                 icon={<CreditCard size={12} />}
-                style={{ borderRadius: 6, fontSize: 11, backgroundColor: '#059669', borderColor: '#059669' }}
+                style={{ borderRadius: 6, fontSize: 11, backgroundColor: '#047857', borderColor: '#047857' }}
                 onClick={() => {
                   payForm.setFieldsValue({ amount: rem });
                   setPayModalId(r.id);
@@ -573,7 +573,7 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
                 style={{
                   borderRadius: 6,
                   fontSize: 11,
-                  borderColor: '#f43f5e',
+                  borderColor: '#BE123C',
                   color: '#be185d',
                   fontWeight: 600,
                   backgroundColor: '#fff1f2',
@@ -629,11 +629,11 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
           <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
             <div style={{ padding: '10px 20px', borderRadius: 10, backgroundColor: '#ECFDF5', border: '1px solid #A7F3D0' }}>
               <Text style={{ fontSize: 11, color: '#64748B', display: 'block' }}>إجمالي المحصّل</Text>
-              <div style={{ fontWeight: 800, color: '#059669', fontSize: 16 }}>{totalCollected.toLocaleString()} {currency}</div>
+              <div style={{ fontWeight: 800, color: '#047857', fontSize: 16 }}>{totalCollected.toLocaleString()} {currency}</div>
             </div>
             <div style={{ padding: '10px 20px', borderRadius: 10, backgroundColor: '#FEF2F2', border: '1px solid #FECACA' }}>
               <Text style={{ fontSize: 11, color: '#64748B', display: 'block' }}>متبقي (غير محصّل)</Text>
-              <div style={{ fontWeight: 800, color: '#DC2626', fontSize: 16 }}>{totalOutstanding.toLocaleString()} {currency}</div>
+              <div style={{ fontWeight: 800, color: '#B91C1C', fontSize: 16 }}>{totalOutstanding.toLocaleString()} {currency}</div>
             </div>
             <div style={{ padding: '10px 20px', borderRadius: 10, backgroundColor: '#F0FDF4', border: '1px solid #BBF7D0' }}>
               <Text style={{ fontSize: 11, color: '#64748B', display: 'block' }}>إجمالي الفواتير</Text>
@@ -664,7 +664,7 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
                     ]}
                   />
                   {Number(record.discountAmount) > 0 && (
-                    <div style={{ textAlign: 'left', marginTop: 8, color: '#059669', fontWeight: 600 }}>
+                    <div style={{ textAlign: 'left', marginTop: 8, color: '#047857', fontWeight: 600 }}>
                       🎁 خصم مطبق: {Number(record.discountAmount).toLocaleString()} {record.currency}
                     </div>
                   )}
@@ -928,7 +928,7 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
                       <Button
                         type="text"
                         size="small"
-                        icon={<Trash2 size={14} color="#DC2626" />}
+                        icon={<Trash2 size={14} color="#B91C1C" />}
                         onClick={() => removeLineItem(item.serviceId)}
                       />
                     ),
@@ -936,7 +936,7 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
                 ]}
               />
             ) : (
-              <div style={{ textAlign: 'center', padding: '20px 0', color: '#94A3B8', fontSize: 13 }}>
+              <div style={{ textAlign: 'center', padding: '20px 0', color: '#64748B', fontSize: 13 }}>
                 لم تتم إضافة أي خدمة بعد — اختاري من القائمة واضغطي &quot;إضافة&quot;
               </div>
             )}
@@ -994,8 +994,8 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
               </div>
               {discountAmount > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Text style={{ color: '#059669' }}>🎁 الخصم المطبق:</Text>
-                  <Text strong style={{ color: '#059669' }}>— {discountAmount.toLocaleString()} ج.م</Text>
+                  <Text style={{ color: '#047857' }}>🎁 الخصم المطبق:</Text>
+                  <Text strong style={{ color: '#047857' }}>— {discountAmount.toLocaleString()} ج.م</Text>
                 </div>
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderTop: '2px solid #fbcfe8' }}>
@@ -1003,17 +1003,17 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
                 <Text strong style={{ fontSize: 18, color: '#be185d' }}>{finalTotal.toLocaleString()} ج.م</Text>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Text style={{ color: '#059669' }}>المدفوع الآن:</Text>
-                <Text strong style={{ color: '#059669' }}>{paidNow.toLocaleString()} ج.م</Text>
+                <Text style={{ color: '#047857' }}>المدفوع الآن:</Text>
+                <Text strong style={{ color: '#047857' }}>{paidNow.toLocaleString()} ج.م</Text>
               </div>
               {remaining > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Text style={{ color: '#DC2626', fontWeight: 600 }}>المتبقي (مدين):</Text>
-                  <Text strong style={{ color: '#DC2626', fontSize: 15 }}>{remaining.toLocaleString()} ج.م</Text>
+                  <Text style={{ color: '#B91C1C', fontWeight: 600 }}>المتبقي (مدين):</Text>
+                  <Text strong style={{ color: '#B91C1C', fontSize: 15 }}>{remaining.toLocaleString()} ج.م</Text>
                 </div>
               )}
               {remaining === 0 && finalTotal > 0 && (
-                <div style={{ textAlign: 'center', color: '#059669', fontWeight: 700, fontSize: 14 }}>
+                <div style={{ textAlign: 'center', color: '#047857', fontWeight: 700, fontSize: 14 }}>
                   ✅ تم السداد بالكامل
                 </div>
               )}
@@ -1029,7 +1029,7 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
                 <span style={{ fontWeight: 700 }}>4. إرسال فوري لغرفة الكشف وطابور الطبيبة (Queue Dispatch)</span>
               </Space>
             }
-            style={{ borderRadius: 10, border: '1.5px solid #f43f5e', background: '#fff1f2' }}
+            style={{ borderRadius: 10, border: '1.5px solid #BE123C', background: '#fff1f2' }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
@@ -1107,7 +1107,7 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
         onOk={() => payForm.submit()}
         okText="✅ تسجيل الدفعة"
         cancelText="إلغاء"
-        okButtonProps={{ style: { backgroundColor: '#059669', borderColor: '#059669', fontWeight: 700 } }}
+        okButtonProps={{ style: { backgroundColor: '#047857', borderColor: '#047857', fontWeight: 700 } }}
       >
         <Form form={payForm} layout="vertical" onFinish={handleRecordPayment} style={{ marginTop: 12 }}>
           {payModalId && (() => {

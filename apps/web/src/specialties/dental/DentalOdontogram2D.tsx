@@ -29,8 +29,8 @@ export interface ToothRecord {
 }
 
 const PROCEDURE_MAP: Record<ToothProcedure, { labelEn: string; labelAr: string; color: string; short: string }> = {
-  healthy:    { labelEn: 'Sound / Healthy',     labelAr: 'سليم',         color: '#10B981', short: 'سليم' },
-  caries:     { labelEn: 'Active Caries',       labelAr: 'تسوس نشط',     color: '#EF4444', short: 'تسوس' },
+  healthy:    { labelEn: 'Sound / Healthy',     labelAr: 'سليم',         color: '#047857', short: 'سليم' },
+  caries:     { labelEn: 'Active Caries',       labelAr: 'تسوس نشط',     color: '#B91C1C', short: 'تسوس' },
   filling:    { labelEn: 'Restoration / Filling', labelAr: 'حشو عادي',     color: '#2563EB', short: 'حشو' },
   root_canal: { labelEn: 'Root Canal (Endo)',   labelAr: 'حشو عصب',      color: '#9333EA', short: 'عصب' },
   crown:      { labelEn: 'Crown / Prosthesis',  labelAr: 'تركيبة / طربوش', color: '#F59E0B', short: 'تركيبة' },

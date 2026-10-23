@@ -27,7 +27,7 @@ export const RX_PRESETS: RxPreset[] = [
     name: 'Upper Respiratory / Cold',
     nameAr: 'نزلة برد — كبار',
     category: 'عام',
-    color: '#3B82F6',
+    color: '#1D4ED8',
     items: [
       { drugName: 'Paracetamol 500mg', dose: '500mg', frequency: 'كل 8 ساعات', duration: '5 أيام' },
       { drugName: 'Cetirizine 10mg', dose: '10mg', frequency: 'مرة ليلاً', duration: '5 أيام' },
@@ -40,7 +40,7 @@ export const RX_PRESETS: RxPreset[] = [
     name: 'Upper Resp. — Children',
     nameAr: 'نزلة برد — أطفال',
     category: 'عام',
-    color: '#8B5CF6',
+    color: '#7C3AED',
     items: [
       { drugName: 'Paracetamol Syrup 250mg/5ml', dose: 'حسب الوزن', frequency: 'كل 6 ساعات', duration: '3 أيام' },
       { drugName: 'Loratadine Syrup 5mg/5ml', dose: '5ml', frequency: 'مرة صباحاً', duration: '5 أيام' },
@@ -65,7 +65,7 @@ export const RX_PRESETS: RxPreset[] = [
     name: 'Hypertension — Starter',
     nameAr: 'ارتفاع ضغط الدم',
     category: 'عام',
-    color: '#EF4444',
+    color: '#B91C1C',
     items: [
       { drugName: 'Amlodipine 5mg', dose: '5mg', frequency: 'مرة صباحاً', duration: '30 يوم' },
       { drugName: 'Losartan 50mg', dose: '50mg', frequency: 'مرة صباحاً', duration: '30 يوم' },
@@ -77,7 +77,7 @@ export const RX_PRESETS: RxPreset[] = [
     name: 'DM Type 2 — Starter',
     nameAr: 'سكر النوع الثاني',
     category: 'عام',
-    color: '#10B981',
+    color: '#047857',
     items: [
       { drugName: 'Metformin 500mg', dose: '500mg', frequency: 'مع الأكل مرتين', duration: '30 يوم' },
       { drugName: 'Gliclazide MR 30mg', dose: '30mg', frequency: 'مرة صباحاً مع الفطار', duration: '30 يوم' },
@@ -90,7 +90,7 @@ export const RX_PRESETS: RxPreset[] = [
     name: 'Post-Extraction',
     nameAr: 'بعد الخلع',
     category: 'أسنان',
-    color: '#0284C7',
+    color: '#0369A1',
     items: [
       { drugName: 'Amoxicillin 500mg', dose: '500mg', frequency: 'كل 8 ساعات', duration: '5 أيام' },
       { drugName: 'Ibuprofen 400mg', dose: '400mg', frequency: 'كل 8 ساعات', duration: '3 أيام' },
@@ -103,7 +103,7 @@ export const RX_PRESETS: RxPreset[] = [
     name: 'Pulpitis / Root Canal',
     nameAr: 'التهاب عصب — قبل العصب',
     category: 'أسنان',
-    color: '#7C3AED',
+    color: '#6D28D9',
     items: [
       { drugName: 'Amoxicillin + Clavulanate 625mg', dose: '625mg', frequency: 'كل 12 ساعة', duration: '7 أيام' },
       { drugName: 'Ibuprofen 600mg', dose: '600mg', frequency: 'كل 8 ساعات للألم', duration: '3 أيام' },
@@ -153,7 +153,7 @@ export const RX_PRESETS: RxPreset[] = [
     name: 'Low Back Pain',
     nameAr: 'آلام أسفل الظهر',
     category: 'علاج طبيعي',
-    color: '#059669',
+    color: '#047857',
     items: [
       { drugName: 'Diclofenac 50mg', dose: '50mg', frequency: 'كل 12 ساعة مع الأكل', duration: '5 أيام' },
       { drugName: 'Methocarbamol 750mg', dose: '750mg', frequency: 'كل 8 ساعات', duration: '5 أيام' },
@@ -234,7 +234,7 @@ export function PrescriptionPresets({ onApplyPreset }: PrescriptionPresetsProps)
         width={680}
       >
         <Input
-          prefix={<Search size={14} color="#94A3B8" />}
+          prefix={<Search size={14} color="#64748B" />}
           placeholder="ابحث بالاسم أو التخصص..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}

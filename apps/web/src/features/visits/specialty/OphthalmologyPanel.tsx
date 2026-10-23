@@ -29,7 +29,7 @@ export function OphthalmologyPanel({ readonly = false }: OphthalmologyPanelProps
       size="small"
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Eye size={16} color="#0284C7" />
+          <Eye size={16} color="#0369A1" />
           <span style={{ fontWeight: 600, fontSize: 14 }}>Per-Eye Ophthalmic Examination (OD / OS)</span>
           <Tag color="geekblue" style={{ borderRadius: 6, fontSize: 11 }}>Ophthalmology</Tag>
         </div>

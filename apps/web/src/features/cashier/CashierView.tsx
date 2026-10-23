@@ -169,7 +169,7 @@ export function CashierView() {
       title: 'المبلغ',
       dataIndex: 'amount',
       key: 'a',
-      render: (v: number) => <Text strong style={{ color: '#059669' }}>{v.toLocaleString()} ج.م</Text>,
+      render: (v: number) => <Text strong style={{ color: '#047857' }}>{v.toLocaleString()} ج.م</Text>,
     },
     {
       title: 'طريقة الدفع',
@@ -191,7 +191,7 @@ export function CashierView() {
       title: 'المبلغ',
       dataIndex: 'amount',
       key: 'a',
-      render: (v: number) => <Text strong style={{ color: '#DC2626' }}>{v.toLocaleString()} ج.م</Text>,
+      render: (v: number) => <Text strong style={{ color: '#B91C1C' }}>{v.toLocaleString()} ج.م</Text>,
     },
     { title: 'الوقت', dataIndex: 'at', key: 't', render: (d: string) => dayjs(d).format('HH:mm') },
   ];
@@ -256,10 +256,10 @@ export function CashierView() {
       {/* KPI Cards */}
       <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
         {[
-          { title: 'إجمالي الإيرادات', value: totalRevenue, prefix: <TrendingUp size={16} />, color: '#059669', bg: '#ECFDF5' },
-          { title: 'كاش', value: cashRevenue, prefix: <DollarSign size={16} />, color: '#0284C7', bg: '#EFF6FF' },
-          { title: 'كارت/تحويل', value: cardRevenue, prefix: <DollarSign size={16} />, color: '#7C3AED', bg: '#EDE9FE' },
-          { title: 'مصروفات', value: totalExpenses, prefix: <TrendingDown size={16} />, color: '#DC2626', bg: '#FEF2F2' },
+          { title: 'إجمالي الإيرادات', value: totalRevenue, prefix: <TrendingUp size={16} />, color: '#047857', bg: '#ECFDF5' },
+          { title: 'كاش', value: cashRevenue, prefix: <DollarSign size={16} />, color: '#0369A1', bg: '#EFF6FF' },
+          { title: 'كارت/تحويل', value: cardRevenue, prefix: <DollarSign size={16} />, color: '#6D28D9', bg: '#EDE9FE' },
+          { title: 'مصروفات', value: totalExpenses, prefix: <TrendingDown size={16} />, color: '#B91C1C', bg: '#FEF2F2' },
           { title: 'صافي الدرج', value: netCash, prefix: <DollarSign size={16} />, color: '#0F172A', bg: '#F8FAFC' },
         ].map((k) => (
           <Card key={k.title} size="small" style={{ flex: '1 1 140px', minWidth: 130, borderRadius: 10, backgroundColor: k.bg, border: `1px solid ${k.color}20` }} bodyStyle={{ padding: '10px 14px' }}>
@@ -282,7 +282,7 @@ export function CashierView() {
           message={
             <span>
               الفرق بين المتوقع والفعلي:&nbsp;
-              <strong style={{ color: variance != null && variance >= 0 ? '#059669' : '#DC2626' }}>
+              <strong style={{ color: variance != null && variance >= 0 ? '#047857' : '#B91C1C' }}>
                 {variance != null ? `${variance >= 0 ? '+' : ''}${variance.toLocaleString()} ج.م` : '—'}
               </strong>
               &nbsp;| النقد الفعلي في الدرج: <strong>{(shift.closingCash || 0).toLocaleString()} ج.م</strong>
@@ -294,7 +294,7 @@ export function CashierView() {
       {/* Payments Table */}
       <Card
         size="small"
-        title={<Space><TrendingUp size={14} color="#059669" /><span>الإيرادات ({shift.payments.length})</span></Space>}
+        title={<Space><TrendingUp size={14} color="#047857" /><span>الإيرادات ({shift.payments.length})</span></Space>}
         style={{ borderRadius: 10, marginBottom: 12 }}
         bodyStyle={{ padding: 0 }}
       >
@@ -308,7 +308,7 @@ export function CashierView() {
         />
         {shift.payments.length > 0 && (
           <div style={{ padding: '8px 16px', textAlign: 'end', borderTop: '1px solid #F1F5F9' }}>
-            <Text strong style={{ color: '#059669' }}>الإجمالي: {totalRevenue.toLocaleString()} ج.م</Text>
+            <Text strong style={{ color: '#047857' }}>الإجمالي: {totalRevenue.toLocaleString()} ج.م</Text>
           </div>
         )}
       </Card>
@@ -316,7 +316,7 @@ export function CashierView() {
       {/* Expenses Table */}
       <Card
         size="small"
-        title={<Space><TrendingDown size={14} color="#DC2626" /><span>المصروفات ({shift.expenses.length})</span></Space>}
+        title={<Space><TrendingDown size={14} color="#B91C1C" /><span>المصروفات ({shift.expenses.length})</span></Space>}
         style={{ borderRadius: 10, marginBottom: 12 }}
         bodyStyle={{ padding: 0 }}
       >
@@ -330,7 +330,7 @@ export function CashierView() {
         />
         {shift.expenses.length > 0 && (
           <div style={{ padding: '8px 16px', textAlign: 'end', borderTop: '1px solid #F1F5F9' }}>
-            <Text strong style={{ color: '#DC2626' }}>الإجمالي: {totalExpenses.toLocaleString()} ج.م</Text>
+            <Text strong style={{ color: '#B91C1C' }}>الإجمالي: {totalExpenses.toLocaleString()} ج.م</Text>
           </div>
         )}
       </Card>
@@ -345,12 +345,12 @@ export function CashierView() {
           <div style={{ color: '#64748B', fontSize: 20 }}>+</div>
           <div>
             <Text style={{ color: '#64748B', fontSize: 12 }}>إجمالي الإيرادات</Text>
-            <Text strong style={{ display: 'block', fontSize: 16, color: '#059669' }}>{totalRevenue.toLocaleString()} ج.م</Text>
+            <Text strong style={{ display: 'block', fontSize: 16, color: '#047857' }}>{totalRevenue.toLocaleString()} ج.م</Text>
           </div>
           <div style={{ color: '#64748B', fontSize: 20 }}>−</div>
           <div>
             <Text style={{ color: '#64748B', fontSize: 12 }}>المصروفات</Text>
-            <Text strong style={{ display: 'block', fontSize: 16, color: '#DC2626' }}>{totalExpenses.toLocaleString()} ج.م</Text>
+            <Text strong style={{ display: 'block', fontSize: 16, color: '#B91C1C' }}>{totalExpenses.toLocaleString()} ج.م</Text>
           </div>
           <Divider type="vertical" style={{ height: 40 }} />
           <div style={{ textAlign: 'end' }}>

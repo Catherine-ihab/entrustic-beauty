@@ -148,10 +148,10 @@ export function SessionCourseCard({ patientId, clinicType }: SessionCourseCardPr
       size="small"
       title={
         <Space>
-          <Layers size={15} color="#7C3AED" />
+          <Layers size={15} color="#6D28D9" />
           <span style={{ fontWeight: 600, fontSize: 13 }}>كورسات الجلسات</span>
           {courses.length > 0 && (
-            <Badge count={courses.length} style={{ backgroundColor: '#7C3AED' }} />
+            <Badge count={courses.length} style={{ backgroundColor: '#6D28D9' }} />
           )}
         </Space>
       }
@@ -160,7 +160,7 @@ export function SessionCourseCard({ patientId, clinicType }: SessionCourseCardPr
           size="small"
           type="primary"
           icon={<Plus size={13} />}
-          style={{ borderRadius: 8, fontSize: 11, backgroundColor: '#7C3AED', borderColor: '#7C3AED' }}
+          style={{ borderRadius: 8, fontSize: 11, backgroundColor: '#6D28D9', borderColor: '#6D28D9' }}
           onClick={() => { courseForm.resetFields(); setAddCourseOpen(true); }}
         >
           كورس جديد
@@ -169,10 +169,10 @@ export function SessionCourseCard({ patientId, clinicType }: SessionCourseCardPr
       style={{ borderRadius: 12, border: '1px solid #E2E8F0', marginBottom: 16 }}
     >
       {courses.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '20px 0', color: '#94A3B8' }}>
+        <div style={{ textAlign: 'center', padding: '20px 0', color: '#64748B' }}>
           <Layers size={28} color="#CBD5E1" style={{ marginBottom: 8 }} />
           <br />
-          <Text style={{ color: '#94A3B8', fontSize: 12 }}>لا يوجد كورسات — اضغط "كورس جديد"</Text>
+          <Text style={{ color: '#64748B', fontSize: 12 }}>لا يوجد كورسات — اضغط "كورس جديد"</Text>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -217,7 +217,7 @@ export function SessionCourseCard({ patientId, clinicType }: SessionCourseCardPr
                         <Button
                           size="small"
                           icon={<PlayCircle size={13} />}
-                          style={{ borderRadius: 8, fontSize: 11, backgroundColor: '#EDE9FE', borderColor: '#C4B5FD', color: '#7C3AED' }}
+                          style={{ borderRadius: 8, fontSize: 11, backgroundColor: '#EDE9FE', borderColor: '#C4B5FD', color: '#6D28D9' }}
                           onClick={() => { sessionForm.resetFields(); setRecordSessionOpen(course.id); }}
                         >
                           جلسة
@@ -235,7 +235,7 @@ export function SessionCourseCard({ patientId, clinicType }: SessionCourseCardPr
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                     <div style={{ display: 'flex', gap: 16 }}>
                       <div style={{ textAlign: 'center' }}>
-                        <div style={{ fontSize: 18, fontWeight: 700, color: '#7C3AED', lineHeight: 1 }}>{attended}</div>
+                        <div style={{ fontSize: 18, fontWeight: 700, color: '#6D28D9', lineHeight: 1 }}>{attended}</div>
                         <div style={{ fontSize: 10, color: '#64748B' }}>حضر</div>
                       </div>
                       <div style={{ textAlign: 'center' }}>
@@ -249,16 +249,16 @@ export function SessionCourseCard({ patientId, clinicType }: SessionCourseCardPr
                     </div>
                     {course.pricePerSession > 0 && (
                       <div style={{ textAlign: 'end' }}>
-                        <div style={{ fontSize: 12, fontWeight: 600, color: '#059669' }}>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: '#047857' }}>
                           {(attended * course.pricePerSession).toLocaleString()} {course.currency}
                         </div>
-                        <div style={{ fontSize: 10, color: '#94A3B8' }}>محصّل</div>
+                        <div style={{ fontSize: 10, color: '#64748B' }}>محصّل</div>
                       </div>
                     )}
                   </div>
                   <Progress
                     percent={pct}
-                    strokeColor={isFinished ? '#10B981' : '#7C3AED'}
+                    strokeColor={isFinished ? '#047857' : '#6D28D9'}
                     trailColor="#E2E8F0"
                     showInfo={false}
                     size="small"
@@ -281,7 +281,7 @@ export function SessionCourseCard({ patientId, clinicType }: SessionCourseCardPr
                       </Tooltip>
                     ))}
                     {Array.from({ length: remaining }).map((_, i) => (
-                      <Tag key={`up-${i}`} icon={<Calendar size={10} />} style={{ fontSize: 10, backgroundColor: '#F1F5F9', borderColor: '#CBD5E1', color: '#94A3B8' }}>
+                      <Tag key={`up-${i}`} icon={<Calendar size={10} />} style={{ fontSize: 10, backgroundColor: '#F1F5F9', borderColor: '#CBD5E1', color: '#64748B' }}>
                         #{attended + i + 1}
                       </Tag>
                     ))}
@@ -295,7 +295,7 @@ export function SessionCourseCard({ patientId, clinicType }: SessionCourseCardPr
 
       {/* Add Course Modal */}
       <Modal
-        title={<Space><Layers size={15} color="#7C3AED" /><span>كورس جلسات جديد</span></Space>}
+        title={<Space><Layers size={15} color="#6D28D9" /><span>كورس جلسات جديد</span></Space>}
         open={addCourseOpen}
         onCancel={() => setAddCourseOpen(false)}
         onOk={() => courseForm.submit()}
@@ -327,7 +327,7 @@ export function SessionCourseCard({ patientId, clinicType }: SessionCourseCardPr
 
       {/* Record Session Modal */}
       <Modal
-        title={<Space><PlayCircle size={15} color="#7C3AED" /><span>تسجيل جلسة</span></Space>}
+        title={<Space><PlayCircle size={15} color="#6D28D9" /><span>تسجيل جلسة</span></Space>}
         open={!!recordSessionOpen}
         onCancel={() => setRecordSessionOpen(null)}
         onOk={() => sessionForm.submit()}

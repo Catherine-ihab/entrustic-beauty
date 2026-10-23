@@ -848,7 +848,7 @@ export const SkinCareWorkspaceView: React.FC = () => {
                             <Tag color="magenta" style={{ fontWeight: 700, fontSize: 12, margin: 0 }}>
                               {bundle.price.toLocaleString()} ج.م
                             </Tag>
-                            <span style={{ fontSize: 11, color: '#94A3B8', textDecoration: 'line-through' }}>
+                            <span style={{ fontSize: 11, color: '#64748B', textDecoration: 'line-through' }}>
                               {bundle.originalPrice.toLocaleString()} ج.م
                             </span>
                           </Space>

@@ -890,7 +890,7 @@ export function DevicesView() {
               {r.manufacturer} {r.model ? `· ${r.model}` : ''}
             </div>
             {r.specifications && (
-              <div style={{ fontSize: 10, color: '#94A3B8', marginTop: 2 }}>{r.specifications}</div>
+              <div style={{ fontSize: 10, color: '#64748B', marginTop: 2 }}>{r.specifications}</div>
             )}
           </div>
         </div>
@@ -924,7 +924,7 @@ export function DevicesView() {
         if (!d) return '—';
         const isOverdue = dayjs(d).isBefore(dayjs());
         return (
-          <span style={{ color: isOverdue ? '#DC2626' : '#059669', fontWeight: 600, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ color: isOverdue ? '#B91C1C' : '#047857', fontWeight: 600, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
             {isOverdue && <AlertTriangle size={13} />}
             {dayjs(d).format('YYYY-MM-DD')}
             {isOverdue && <Tag color="error" style={{ fontSize: 9, lineHeight: '14px', padding: '0 4px', marginInlineStart: 4 }}>{tx('متأخرة', 'OVERDUE')}</Tag>}
@@ -996,7 +996,7 @@ export function DevicesView() {
         <Space>
           <Input
             placeholder={tx('بحث في الأجهزة، السيريال، الشركة المصنعة...', 'Search devices, serial, manufacturer...')}
-            prefix={<Search size={14} color="#94A3B8" />}
+            prefix={<Search size={14} color="#64748B" />}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ width: 230, borderRadius: 8 }}

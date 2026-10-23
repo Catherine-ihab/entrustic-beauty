@@ -106,7 +106,7 @@ const INITIAL_DOCTORS: DoctorSchedule[] = [
     roleTitle: 'استشارية جراحة التجميل وحقن الفيلر والبوتوكس',
     specialtyCategory: 'بوتوكس وفيلر',
     room: 'عيادة الحقن والتجميل',
-    color: '#0284c7',
+    color: '#0369A1',
     offDays: [4, 5], // إجازة الخميس والجمعة
     offDates: [],
   },
@@ -116,7 +116,7 @@ const INITIAL_DOCTORS: DoctorSchedule[] = [
     roleTitle: 'أخصائية العناية بالبشرة وتنظيف الهيدرافيشل',
     specialtyCategory: 'عناية بالبشرة وهيدرافيشل',
     room: 'غرفة العناية بالبشرة',
-    color: '#059669',
+    color: '#047857',
     offDays: [5], // إجازة الجمعة
     offDates: [],
   },
@@ -126,7 +126,7 @@ const INITIAL_DOCTORS: DoctorSchedule[] = [
     roleTitle: 'كبيرة معالجات السبا والحمام المغربي',
     specialtyCategory: 'سبا ومساج',
     room: 'جناح الحمام المغربي 1',
-    color: '#d97706',
+    color: '#B45309',
     offDays: [1], // إجازة الاثنين
     offDates: [],
   },
@@ -136,7 +136,7 @@ const INITIAL_DOCTORS: DoctorSchedule[] = [
     roleTitle: 'أخصائية سنفرة وعناية بالجسم وتفتيح البشرة',
     specialtyCategory: 'عناية بالجسم وسكراب',
     room: 'غرفة العناية بالجسم',
-    color: '#7c3aed',
+    color: '#6D28D9',
     offDays: [3], // إجازة الأربعاء
     offDates: [],
   },
@@ -159,14 +159,14 @@ const STATUS_CONFIG: Record<QueueStatus, { labelAr: string; color: string; bg: s
   },
   completed: {
     labelAr: 'تمت الجلسة',
-    color: '#059669',
+    color: '#047857',
     bg: '#ECFDF5',
     border: '#A7F3D0',
     icon: <CheckCircle2 size={14} />,
   },
   cancelled: {
     labelAr: 'ملغي',
-    color: '#DC2626',
+    color: '#B91C1C',
     bg: '#FEF2F2',
     border: '#FECACA',
     icon: <XCircle size={14} />,
@@ -745,7 +745,7 @@ export function AppointmentsView() {
             />
 
             <Input
-              prefix={<Search size={14} color="#94A3B8" />}
+              prefix={<Search size={14} color="#64748B" />}
               placeholder="بحث بالحالة أو الطبيبة..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -812,7 +812,7 @@ export function AppointmentsView() {
                           {docTodayCount}
                         </Tag>
                         {isOffToday && (
-                          <span style={{ fontSize: 11, color: isSelected ? '#ffedd5' : '#ef4444' }}>
+                          <span style={{ fontSize: 11, color: isSelected ? '#ffedd5' : '#B91C1C' }}>
                             (إجازة اليوم)
                           </span>
                         )}
@@ -883,7 +883,7 @@ export function AppointmentsView() {
                     </div>
                     <div style={{ textAlign: 'center', padding: '4px 10px', background: '#FFF', borderRadius: 8, border: '1px solid #E2E8F0' }}>
                       <div style={{ fontSize: 11, color: '#64748B' }}>اكتملت</div>
-                      <div style={{ fontWeight: 700, color: '#059669' }}>
+                      <div style={{ fontWeight: 700, color: '#047857' }}>
                         {filteredQueue.filter((a) => a.status === 'completed').length}
                       </div>
                     </div>
@@ -955,7 +955,7 @@ export function AppointmentsView() {
                                   <span>•</span>
                                   <span>{appt.serviceName}</span>
                                   <span>•</span>
-                                  <span style={{ color: '#0284c7', fontWeight: 600 }}>👨‍⚕️ {appt.doctor}</span>
+                                  <span style={{ color: '#0369A1', fontWeight: 600 }}>👨‍⚕️ {appt.doctor}</span>
                                   <span>•</span>
                                   <span>🏢 {appt.room}</span>
                                   {appt.phone && (
@@ -973,9 +973,9 @@ export function AppointmentsView() {
                               <Button
                                 size="small"
                                 style={{
-                                  backgroundColor: '#22c55e',
+                                  backgroundColor: '#047857',
                                   color: '#ffffff',
-                                  borderColor: '#22c55e',
+                                  borderColor: '#047857',
                                   fontWeight: 600,
                                   borderRadius: 6,
                                 }}
@@ -993,7 +993,7 @@ export function AppointmentsView() {
                                     style={{
                                       backgroundColor: '#fff1f2',
                                       color: '#be185d',
-                                      borderColor: '#f43f5e',
+                                      borderColor: '#BE123C',
                                       fontWeight: 600,
                                       borderRadius: 6,
                                     }}
@@ -1018,7 +1018,7 @@ export function AppointmentsView() {
                                 <Button
                                   type="primary"
                                   size="small"
-                                  style={{ backgroundColor: '#059669', borderColor: '#059669', borderRadius: 6 }}
+                                  style={{ backgroundColor: '#047857', borderColor: '#047857', borderRadius: 6 }}
                                   onClick={() => changeStatus(appt.id, 'completed')}
                                 >
                                   إنهاء الجلسة ✓
@@ -1044,7 +1044,7 @@ export function AppointmentsView() {
                       ))}
 
                       {items.length === 0 && (
-                        <div style={{ padding: '16px 20px', background: '#FAFAFA', borderRadius: 10, color: '#94A3B8', fontSize: 13, textAlign: 'center' }}>
+                        <div style={{ padding: '16px 20px', background: '#FAFAFA', borderRadius: 10, color: '#64748B', fontSize: 13, textAlign: 'center' }}>
                           لا توجد حالات في هذه المرحلة حالياً
                         </div>
                       )}
@@ -1111,21 +1111,21 @@ export function AppointmentsView() {
                           >
                             <div>
                               <div style={{ fontWeight: 700, color: '#1E3A8A', fontSize: 13 }}>{currentInSession.name}</div>
-                              <div style={{ fontSize: 11, color: '#3B82F6' }}>
+                              <div style={{ fontSize: 11, color: '#1D4ED8' }}>
                                 ⏰ {currentInSession.time} • {currentInSession.serviceName}
                               </div>
                             </div>
                             <Button
                               size="small"
                               type="primary"
-                              style={{ backgroundColor: '#059669', borderColor: '#059669', fontSize: 11 }}
+                              style={{ backgroundColor: '#047857', borderColor: '#047857', fontSize: 11 }}
                               onClick={() => changeStatus(currentInSession.id, 'completed')}
                             >
                               إنهاء ✓
                             </Button>
                           </div>
                         ) : (
-                          <div style={{ background: '#F8FAFC', border: '1px dashed #CBD5E1', borderRadius: 8, padding: '10px', textAlign: 'center', color: '#94A3B8', fontSize: 12 }}>
+                          <div style={{ background: '#F8FAFC', border: '1px dashed #CBD5E1', borderRadius: 8, padding: '10px', textAlign: 'center', color: '#64748B', fontSize: 12 }}>
                             العيادة شاغرة حالياً (لا توجد حالة بالداخل)
                           </div>
                         )}
@@ -1165,7 +1165,7 @@ export function AppointmentsView() {
                               <Space size={4}>
                                 <Button
                                   size="small"
-                                  style={{ backgroundColor: '#22c55e', color: '#fff', borderColor: '#22c55e', padding: '0 6px', fontSize: 11 }}
+                                  style={{ backgroundColor: '#047857', color: '#fff', borderColor: '#047857', padding: '0 6px', fontSize: 11 }}
                                   onClick={() => sendWhatsAppReminder(appt)}
                                 >
                                   واتساب
@@ -1183,7 +1183,7 @@ export function AppointmentsView() {
                           ))}
 
                           {waitingCases.length === 0 && (
-                            <div style={{ fontSize: 11, color: '#94A3B8', textAlign: 'center', padding: '8px 0' }}>
+                            <div style={{ fontSize: 11, color: '#64748B', textAlign: 'center', padding: '8px 0' }}>
                               لا توجد حالات في صالة الانتظار لهذه الطبيبة
                             </div>
                           )}
@@ -1191,7 +1191,7 @@ export function AppointmentsView() {
                       </div>
 
                       {/* Section 3: Completed count */}
-                      <div style={{ fontSize: 11, color: '#059669', background: '#ECFDF5', padding: '6px 10px', borderRadius: 6, display: 'flex', justifyContent: 'space-between' }}>
+                      <div style={{ fontSize: 11, color: '#047857', background: '#ECFDF5', padding: '6px 10px', borderRadius: 6, display: 'flex', justifyContent: 'space-between' }}>
                         <span>الحالات المكتملة اليوم:</span>
                         <strong>{completedCases.length} حالات ✓</strong>
                       </div>
@@ -1259,13 +1259,13 @@ export function AppointmentsView() {
                     <div>
                       <div style={{ fontWeight: 600, color: '#0F172A' }}>{appt.name}</div>
                       <div style={{ fontSize: 12, color: '#64748B' }}>
-                        ⏰ {appt.time} • {appt.serviceName} • <span style={{ color: '#0284c7', fontWeight: 600 }}>{appt.doctor}</span> • 🏢 {appt.room}
+                        ⏰ {appt.time} • {appt.serviceName} • <span style={{ color: '#0369A1', fontWeight: 600 }}>{appt.doctor}</span> • 🏢 {appt.room}
                       </div>
                     </div>
                     <Space size={6}>
                       <Button
                         size="small"
-                        style={{ backgroundColor: '#22c55e', color: '#fff', borderColor: '#22c55e' }}
+                        style={{ backgroundColor: '#047857', color: '#fff', borderColor: '#047857' }}
                         onClick={() => sendWhatsAppReminder(appt)}
                       >
                         واتساب
@@ -1276,7 +1276,7 @@ export function AppointmentsView() {
                 ))}
 
                 {selectedDateList.length === 0 && (
-                  <div style={{ textAlign: 'center', padding: '40px 0', color: '#94A3B8' }}>
+                  <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748B' }}>
                     لا توجد حجوزات مجدولة في هذا التاريخ حتى الآن.
                   </div>
                 )}
@@ -1310,14 +1310,14 @@ export function AppointmentsView() {
                     <Tag color="cyan">{appt.serviceName}</Tag>
                   </div>
                   <div style={{ fontSize: 12, color: '#64748B', marginTop: 3 }}>
-                    📅 {appt.date} • ⏰ {appt.time} • 👨‍⚕️ <strong style={{ color: '#0284c7' }}>{appt.doctor}</strong> • 🏢 {appt.room}
+                    📅 {appt.date} • ⏰ {appt.time} • 👨‍⚕️ <strong style={{ color: '#0369A1' }}>{appt.doctor}</strong> • 🏢 {appt.room}
                   </div>
                 </div>
 
                 <Space size={8}>
                   <Button
                     size="small"
-                    style={{ backgroundColor: '#22c55e', color: '#fff', borderColor: '#22c55e' }}
+                    style={{ backgroundColor: '#047857', color: '#fff', borderColor: '#047857' }}
                     onClick={() => sendWhatsAppReminder(appt)}
                   >
                     واتساب تذكير
@@ -1349,7 +1349,7 @@ export function AppointmentsView() {
             <Alert
               type="error"
               showIcon
-              icon={<ShieldAlert size={18} color="#dc2626" />}
+              icon={<ShieldAlert size={18} color="#B91C1C" />}
               message={<span style={{ fontWeight: 700 }}>⚠️ تحذير للسكرتارية: هذا اليوم إجازة رسمية للطبيبة!</span>}
               description={
                 <div>
@@ -1357,7 +1357,7 @@ export function AppointmentsView() {
                   <div style={{ marginTop: 4, fontWeight: 600 }}>
                     💡 أيام العمل المتاحة للدكتورة {modalDoctor} هي: [{modalOffCheck.availableDays}].
                   </div>
-                  <div style={{ fontSize: 11, color: '#dc2626', marginTop: 2 }}>
+                  <div style={{ fontSize: 11, color: '#B91C1C', marginTop: 2 }}>
                     يرجى تغيير تاريخ الموعد أو اختيار طبيبة بديلة لتجنب تضارب المواعيد مع إجازة الطبيبة.
                   </div>
                 </div>
@@ -1607,7 +1607,7 @@ export function AppointmentsView() {
                               borderRadius: 4,
                               padding: '2px 8px',
                               backgroundColor: isOff ? '#FEE2E2' : '#F1F5F9',
-                              color: isOff ? '#DC2626' : '#475569',
+                              color: isOff ? '#B91C1C' : '#475569',
                               border: isOff ? '1px solid #FECACA' : '1px solid #E2E8F0',
                               fontWeight: isOff ? 700 : 400,
                             }}

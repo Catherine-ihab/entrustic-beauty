@@ -7,10 +7,10 @@ import dayjs from 'dayjs';
 import { useLang } from '../../../../lib/useLang';
 
 const SEVERITY_TAG: Record<string, { color: string; bg: string; labelAr: string; labelEn: string }> = {
-  life_threatening: { color: '#DC2626', bg: '#FEF2F2', labelAr: '⚠️ مهددة للحياة', labelEn: '⚠️ Life-Threatening' },
+  life_threatening: { color: '#B91C1C', bg: '#FEF2F2', labelAr: '⚠️ مهددة للحياة', labelEn: '⚠️ Life-Threatening' },
   severe:           { color: '#C2410C', bg: '#FFF7ED', labelAr: 'شديدة', labelEn: 'Severe' },
   moderate:         { color: '#B45309', bg: '#FFFBEB', labelAr: 'متوسطة', labelEn: 'Moderate' },
-  mild:             { color: '#16A34A', bg: '#F0FDF4', labelAr: 'خفيفة', labelEn: 'Mild' },
+  mild:             { color: '#047857', bg: '#F0FDF4', labelAr: 'خفيفة', labelEn: 'Mild' },
   unknown:          { color: '#64748B', bg: '#F8FAFC', labelAr: 'غير محددة', labelEn: 'Unknown' },
 };
 
@@ -100,7 +100,7 @@ export function AllergiesTab({ patientId, readonly = false }: AllergiesTabProps)
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {r.severity === 'life_threatening' && (
             <Tooltip title={tx('حساسية مهددة للحياة — توخي الحذر الشديد', 'Life-threatening allergy — extreme caution required')}>
-              <ShieldAlert size={15} color="#DC2626" />
+              <ShieldAlert size={15} color="#B91C1C" />
             </Tooltip>
           )}
           <span style={{ fontWeight: 600, color: '#0F172A' }}>{val}</span>
@@ -119,7 +119,7 @@ export function AllergiesTab({ patientId, readonly = false }: AllergiesTabProps)
       title: tx('الأعراض ورد الفعل', 'Reaction'),
       dataIndex: 'reaction',
       key: 'reaction',
-      render: (val: string | null) => val || <span style={{ color: '#94A3B8' }}>—</span>,
+      render: (val: string | null) => val || <span style={{ color: '#64748B' }}>—</span>,
     },
     {
       title: tx('درجة الخطورة', 'Severity'),
@@ -157,7 +157,7 @@ export function AllergiesTab({ patientId, readonly = false }: AllergiesTabProps)
       title: tx('تاريخ البدء', 'Onset'),
       dataIndex: 'onset_date',
       key: 'onset_date',
-      render: (val: string | null) => val || <span style={{ color: '#94A3B8' }}>—</span>,
+      render: (val: string | null) => val || <span style={{ color: '#64748B' }}>—</span>,
     },
     ...(!readonly
       ? [{

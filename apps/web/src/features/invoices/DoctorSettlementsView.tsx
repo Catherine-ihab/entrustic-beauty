@@ -186,20 +186,20 @@ export function DoctorSettlementsView() {
       title: 'إجمالي المستحق المكتسب',
       dataIndex: 'totalEarned',
       key: 'earned',
-      render: (v: number) => <Text style={{ color: '#059669', fontWeight: 700 }}>{v.toLocaleString()} ج.م</Text>,
+      render: (v: number) => <Text style={{ color: '#047857', fontWeight: 700 }}>{v.toLocaleString()} ج.م</Text>,
     },
     {
       title: 'المدفوع',
       dataIndex: 'settledAmount',
       key: 'settled',
-      render: (v: number) => <Text style={{ color: '#0284c7' }}>{v.toLocaleString()} ج.م</Text>,
+      render: (v: number) => <Text style={{ color: '#0369A1' }}>{v.toLocaleString()} ج.م</Text>,
     },
     {
       title: 'الرصيد المتبقي للصرف',
       dataIndex: 'pendingBalance',
       key: 'balance',
       render: (v: number) => (
-        <Text style={{ color: v > 0 ? '#dc2626' : '#059669', fontWeight: 800, fontSize: 14 }}>
+        <Text style={{ color: v > 0 ? '#B91C1C' : '#047857', fontWeight: 800, fontSize: 14 }}>
           {v.toLocaleString()} ج.م
         </Text>
       ),
@@ -214,7 +214,7 @@ export function DoctorSettlementsView() {
           icon={<Wallet size={13} />}
           disabled={r.pendingBalance <= 0}
           onClick={() => handleOpenPayout(r.doctorName, r.pendingBalance)}
-          style={{ background: r.pendingBalance > 0 ? '#059669' : undefined, borderColor: '#059669' }}
+          style={{ background: r.pendingBalance > 0 ? '#047857' : undefined, borderColor: '#047857' }}
         >
           صرف المستحقات
         </Button>
@@ -275,7 +275,7 @@ export function DoctorSettlementsView() {
       dataIndex: 'earnedAmountEgp',
       key: 'earned',
       render: (v: number) => (
-        <Text style={{ color: '#059669', fontWeight: 800 }}>{v.toLocaleString()} ج.م</Text>
+        <Text style={{ color: '#047857', fontWeight: 800 }}>{v.toLocaleString()} ج.م</Text>
       ),
     },
     {
@@ -310,10 +310,10 @@ export function DoctorSettlementsView() {
         <Col xs={24} sm={8}>
           <Card size="small" style={{ borderRadius: 12, border: '1px solid #bbf7d0', background: '#f0fdf4' }}>
             <Space align="center" size={10}>
-              <CheckCircle2 size={20} color="#16a34a" />
+              <CheckCircle2 size={20} color="#047857" />
               <div>
                 <Text type="secondary" style={{ fontSize: 12 }}>إجمالي المستحقات المسددة</Text>
-                <div style={{ fontSize: 24, fontWeight: 800, color: '#16a34a' }}>
+                <div style={{ fontSize: 24, fontWeight: 800, color: '#047857' }}>
                   {totalSettledPaid.toLocaleString()} ج.م
                 </div>
               </div>
@@ -340,7 +340,7 @@ export function DoctorSettlementsView() {
         style={{ borderRadius: 14, border: '1px solid #e2e8f0' }}
         title={
           <Space>
-            <UserCheck size={18} color="#059669" />
+            <UserCheck size={18} color="#047857" />
             <Text strong>مستحقات وأرصدة الأطباء والأخصائيات</Text>
           </Space>
         }
@@ -444,7 +444,7 @@ export function DoctorSettlementsView() {
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
             <Button onClick={() => setIsPayoutModalOpen(false)}>إلغاء</Button>
-            <Button type="primary" htmlType="submit" style={{ background: '#059669', borderColor: '#059669' }}>
+            <Button type="primary" htmlType="submit" style={{ background: '#047857', borderColor: '#047857' }}>
               تأكيد صرف المستحقات
             </Button>
           </div>

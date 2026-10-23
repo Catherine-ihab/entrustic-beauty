@@ -103,7 +103,7 @@ export function OverviewTab({
                       year: 'numeric',
                     })}
                   </Text>
-                  <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>
+                  <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>
                     Version {v.current_version}
                   </div>
                 </div>
@@ -225,7 +225,7 @@ export function FamilyHistoryTab({ patientId, readonly = false }: FamilyHistoryT
       dataIndex: 'notes',
       key: 'notes',
       ellipsis: true,
-      render: (val: string | null) => val || <span style={{ color: '#94A3B8' }}>—</span>,
+      render: (val: string | null) => val || <span style={{ color: '#64748B' }}>—</span>,
     },
   ];
 

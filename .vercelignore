@@ -1,0 +1,8 @@
+# The demo-video workspace is a local build folder (screen recordings, frame
+# generator, narration clips). Nothing in the app references it at runtime, so
+# keep it out of the deployment: it is tens of megabytes and it contains the
+# demo credentials in plain text.
+apps/web/public/_demo/
+
+# Local screenshot harness output
+capture-out/

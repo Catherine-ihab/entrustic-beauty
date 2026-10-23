@@ -242,8 +242,8 @@ export function subscribeToQueue(callback: () => void): () => void {
 export const CATEGORY_LABELS: Record<ServiceCategory, { ar: string; en: string; color: string }> = {
   laser: { ar: 'عيادة الليزر', en: 'Laser Clinic', color: '#be185d' },
   injectables: { ar: 'حقن الفيلر والبوتوكس', en: 'Injectables & Botox', color: '#831843' },
-  skincare: { ar: 'العناية بالوجه والماسكات', en: 'Facial Care & Masks', color: '#0284c7' },
-  bodycare: { ar: 'العناية بالجسم والسنفرة', en: 'Body Care & Scrubs', color: '#059669' },
-  spa: { ar: 'السبا والمساج والحمام المغربي', en: 'Spa & Massage', color: '#d97706' },
+  skincare: { ar: 'العناية بالوجه والماسكات', en: 'Facial Care & Masks', color: '#0369A1' },
+  bodycare: { ar: 'العناية بالجسم والسنفرة', en: 'Body Care & Scrubs', color: '#047857' },
+  spa: { ar: 'السبا والمساج والحمام المغربي', en: 'Spa & Massage', color: '#B45309' },
   general: { ar: 'خدمات عامة', en: 'General Services', color: '#64748b' },
 };

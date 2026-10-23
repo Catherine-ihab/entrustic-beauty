@@ -13,9 +13,9 @@ interface AestheticPanelProps {
 
 const AESTHETIC_STATUS_CONFIG: Record<string, StatusConfig> = {
   injected:   { label: 'Injected Today',   color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
-  planned:    { label: 'Planned Next',     color: '#D97706', bg: '#FFFBEB', border: '#FDE68A' },
-  touchup:    { label: 'Touch-Up Area',    color: '#7C3AED', bg: '#F5F3FF', border: '#DDD6FE' },
-  caution:    { label: 'High Risk Vessel', color: '#DC2626', bg: '#FEF2F2', border: '#FECACA' },
+  planned:    { label: 'Planned Next',     color: '#B45309', bg: '#FFFBEB', border: '#FDE68A' },
+  touchup:    { label: 'Touch-Up Area',    color: '#6D28D9', bg: '#F5F3FF', border: '#DDD6FE' },
+  caution:    { label: 'High Risk Vessel', color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA' },
   untouched:  { label: 'Not Indicated',    color: '#64748B', bg: '#F8FAFC', border: '#E2E8F0' },
 };
 
@@ -76,7 +76,7 @@ export function AestheticPanel({ readonly = false }: AestheticPanelProps) {
       size="small"
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Sparkles size={16} color="#7C3AED" />
+          <Sparkles size={16} color="#6D28D9" />
           <span style={{ fontWeight: 600, fontSize: 14 }}>Aesthetic Facial Mapping & Injectables</span>
           <Tag color="purple" style={{ borderRadius: 6, fontSize: 11 }}>Aesthetic & Cosmetics</Tag>
         </div>

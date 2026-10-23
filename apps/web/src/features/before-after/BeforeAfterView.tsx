@@ -550,7 +550,7 @@ export function BeforeAfterView() {
             <Row gutter={20}>
               <Col span={12}>
                 <Card
-                  title={<span style={{ color: '#dc2626', fontWeight: 700 }}>🔴 قبل الجلسة (BEFORE)</span>}
+                  title={<span style={{ color: '#B91C1C', fontWeight: 700 }}>🔴 قبل الجلسة (BEFORE)</span>}
                   size="small"
                   style={{ borderRadius: 12, border: '1px solid #fecaca' }}
                   cover={
@@ -569,7 +569,7 @@ export function BeforeAfterView() {
 
               <Col span={12}>
                 <Card
-                  title={<span style={{ color: '#059669', fontWeight: 700 }}>🟢 بعد العلاج (AFTER)</span>}
+                  title={<span style={{ color: '#047857', fontWeight: 700 }}>🟢 بعد العلاج (AFTER)</span>}
                   size="small"
                   style={{ borderRadius: 12, border: '1px solid #a7f3d0' }}
                   cover={
@@ -580,7 +580,7 @@ export function BeforeAfterView() {
                     />
                   }
                 >
-                  <div style={{ fontSize: 12, color: '#059669', fontWeight: 600 }}>
+                  <div style={{ fontSize: 12, color: '#047857', fontWeight: 600 }}>
                     {selectedCase.afterCaption}
                   </div>
                 </Card>

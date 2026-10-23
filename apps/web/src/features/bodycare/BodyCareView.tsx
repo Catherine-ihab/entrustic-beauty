@@ -310,7 +310,7 @@ export function BodyCareView() {
       width: 140,
       render: (_: any, r: BodyCareService) => (
         <div>
-          <div style={{ fontWeight: 700, color: '#059669', fontSize: 15 }}>
+          <div style={{ fontWeight: 700, color: '#047857', fontSize: 15 }}>
             {r.priceEgp.toLocaleString()} ج.م
           </div>
           <Text style={{ fontSize: 12, color: '#64748B', display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -387,7 +387,7 @@ export function BodyCareView() {
       {/* Luxury Header Banner */}
       <Card
         style={{
-          background: 'linear-gradient(135deg, #064e3b 0%, #047857 50%, #10b981 100%)',
+          background: 'linear-gradient(135deg, #064e3b 0%, #047857 50%, #047857 100%)',
           borderRadius: 16,
           border: 'none',
           color: '#ffffff',
@@ -475,7 +475,7 @@ export function BodyCareView() {
               value: 'sessions',
               label: (
                 <Space size={6}>
-                  <CheckCircle2 size={15} color="#059669" />
+                  <CheckCircle2 size={15} color="#047857" />
                   <span style={{ fontWeight: 600 }}>
                     {tx(`سجل الجلسات المنفذة (${sessions.length})`, `Completed Sessions (${sessions.length})`)}
                   </span>

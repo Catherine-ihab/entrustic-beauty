@@ -48,7 +48,7 @@ export function SkinCareSpaCombinedView({ initialTab = 'skincare' }: SkinCareSpa
                 value: 'bodycare',
                 label: (
                   <Space size={6}>
-                    <HeartHandshake size={16} color="#7c3aed" />
+                    <HeartHandshake size={16} color="#6D28D9" />
                     <span style={{ fontWeight: 700 }}>
                       {tx('العناية بالجسم وسنفرة البشرة (Body Care & Scrubs)', 'Body Care & Scrubs')}
                     </span>

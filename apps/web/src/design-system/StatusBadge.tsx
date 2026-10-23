@@ -29,27 +29,27 @@ const statusConfigMap: Record<
 > = {
   // Appointments
   scheduled: { label: 'Scheduled', bg: '#EFF6FF', color: '#2563EB', border: '#BFDBFE' },
-  confirmed: { label: 'Confirmed', bg: '#F0FDF4', color: '#16A34A', border: '#BBF7D0' },
-  in_progress: { label: 'In Progress', bg: '#FFFBEB', color: '#D97706', border: '#FDE68A' },
-  completed: { label: 'Completed', bg: '#ECFDF5', color: '#059669', border: '#A7F3D0' },
-  cancelled: { label: 'Cancelled', bg: '#FEF2F2', color: '#DC2626', border: '#FECACA' },
+  confirmed: { label: 'Confirmed', bg: '#F0FDF4', color: '#047857', border: '#BBF7D0' },
+  in_progress: { label: 'In Progress', bg: '#FFFBEB', color: '#B45309', border: '#FDE68A' },
+  completed: { label: 'Completed', bg: '#ECFDF5', color: '#047857', border: '#A7F3D0' },
+  cancelled: { label: 'Cancelled', bg: '#FEF2F2', color: '#B91C1C', border: '#FECACA' },
   no_show: { label: 'No Show', bg: '#F8FAFC', color: '#64748B', border: '#E2E8F0' },
 
   // Generic / Patient / Staff
-  active: { label: 'Active', bg: '#ECFDF5', color: '#059669', border: '#A7F3D0' },
+  active: { label: 'Active', bg: '#ECFDF5', color: '#047857', border: '#A7F3D0' },
   inactive: { label: 'Inactive', bg: '#F1F5F9', color: '#64748B', border: '#CBD5E1' },
-  archived: { label: 'Archived', bg: '#F8FAFC', color: '#94A3B8', border: '#E2E8F0' },
+  archived: { label: 'Archived', bg: '#F8FAFC', color: '#64748B', border: '#E2E8F0' },
 
   // Invoices
   draft: { label: 'Draft', bg: '#F1F5F9', color: '#475569', border: '#E2E8F0' },
   issued: { label: 'Issued', bg: '#EFF6FF', color: '#2563EB', border: '#BFDBFE' },
-  partially_paid: { label: 'Partially Paid', bg: '#FFFBEB', color: '#D97706', border: '#FDE68A' },
-  paid: { label: 'Paid', bg: '#ECFDF5', color: '#059669', border: '#A7F3D0' },
-  overdue: { label: 'Overdue', bg: '#FEF2F2', color: '#DC2626', border: '#FECACA' },
+  partially_paid: { label: 'Partially Paid', bg: '#FFFBEB', color: '#B45309', border: '#FDE68A' },
+  paid: { label: 'Paid', bg: '#ECFDF5', color: '#047857', border: '#A7F3D0' },
+  overdue: { label: 'Overdue', bg: '#FEF2F2', color: '#B91C1C', border: '#FECACA' },
 
   // Clinical Records
-  finalized: { label: 'Finalized', bg: '#F0FDF4', color: '#16A34A', border: '#BBF7D0' },
-  amended: { label: 'Amended', bg: '#F5F3FF', color: '#7C3AED', border: '#DDD6FE' },
+  finalized: { label: 'Finalized', bg: '#F0FDF4', color: '#047857', border: '#BBF7D0' },
+  amended: { label: 'Amended', bg: '#F5F3FF', color: '#6D28D9', border: '#DDD6FE' },
 };
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({

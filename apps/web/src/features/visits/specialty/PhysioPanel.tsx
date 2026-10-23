@@ -39,7 +39,7 @@ export function PhysioPanel({ readonly = false }: PhysioPanelProps) {
       size="small"
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Activity size={16} color="#059669" />
+          <Activity size={16} color="#047857" />
           <span style={{ fontWeight: 600, fontSize: 14 }}>Physiotherapy & Functional Assessment</span>
           <Tag color="green" style={{ borderRadius: 6, fontSize: 11 }}>Physio & Rehab</Tag>
         </div>

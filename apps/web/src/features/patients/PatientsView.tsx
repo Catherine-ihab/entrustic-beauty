@@ -157,7 +157,7 @@ export function PatientsView() {
         <Space>
           <Input
             placeholder="بحث في الحالات بالاسم أو الهاتف…"
-            prefix={<Search size={14} color="#94A3B8" />}
+            prefix={<Search size={14} color="#64748B" />}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             allowClear

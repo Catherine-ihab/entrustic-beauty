@@ -96,7 +96,7 @@ export function ConditionsTab({ patientId, readonly = false }: ConditionsTabProp
         <div>
           <div style={{ fontWeight: 600, color: '#0F172A' }}>{val}</div>
           {r.icd_code && (
-            <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>ICD: {r.icd_code}</div>
+            <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>ICD: {r.icd_code}</div>
           )}
         </div>
       ),
@@ -121,21 +121,21 @@ export function ConditionsTab({ patientId, readonly = false }: ConditionsTabProp
             {val}
           </Tag>
         ) : (
-          <span style={{ color: '#94A3B8' }}>—</span>
+          <span style={{ color: '#64748B' }}>—</span>
         ),
     },
     {
       title: 'Onset',
       dataIndex: 'onset_date',
       key: 'onset_date',
-      render: (val: string | null) => val || <span style={{ color: '#94A3B8' }}>—</span>,
+      render: (val: string | null) => val || <span style={{ color: '#64748B' }}>—</span>,
     },
     {
       title: 'Notes',
       dataIndex: 'notes',
       key: 'notes',
       ellipsis: true,
-      render: (val: string | null) => val || <span style={{ color: '#94A3B8' }}>—</span>,
+      render: (val: string | null) => val || <span style={{ color: '#64748B' }}>—</span>,
     },
     ...(!readonly
       ? [{
@@ -155,7 +155,7 @@ export function ConditionsTab({ patientId, readonly = false }: ConditionsTabProp
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Activity size={18} color="#64748B" />
           <span style={{ fontWeight: 600, fontSize: 15, color: '#0F172A' }}>Chronic Conditions</span>
-          <span style={{ fontSize: 12, color: '#94A3B8' }}>
+          <span style={{ fontSize: 12, color: '#64748B' }}>
             (separate from visit diagnoses)
           </span>
         </div>

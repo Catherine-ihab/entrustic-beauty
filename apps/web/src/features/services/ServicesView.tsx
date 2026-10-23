@@ -333,7 +333,7 @@ export function ServicesView({ currency = 'EGP' }: { currency?: string }) {
       key: 'currentPrice',
       render: (price: number) => (
         <span style={{ fontWeight: 700, color: '#0F172A', fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 2 }}>
-          <DollarSign size={13} color="#059669" />
+          <DollarSign size={13} color="#047857" />
           {Number(price).toFixed(2)} {currency}
         </span>
       ),
@@ -401,7 +401,7 @@ export function ServicesView({ currency = 'EGP' }: { currency?: string }) {
         <Space>
           <Input
             placeholder={tx('بحث في الخدمات والأسعار...', 'Search clinical services...')}
-            prefix={<Search size={14} color="#94A3B8" />}
+            prefix={<Search size={14} color="#64748B" />}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ width: 220, borderRadius: 8 }}

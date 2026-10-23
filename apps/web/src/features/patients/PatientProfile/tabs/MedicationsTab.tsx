@@ -82,7 +82,7 @@ export function MedicationsTab({ patientId, readonly = false }: MedicationsTabPr
         <div>
           <div style={{ fontWeight: 600, color: '#0F172A' }}>{r.name}</div>
           {r.generic_name && (
-            <div style={{ fontSize: 11, color: '#94A3B8' }}>{r.generic_name}</div>
+            <div style={{ fontSize: 11, color: '#64748B' }}>{r.generic_name}</div>
           )}
         </div>
       ),
@@ -109,13 +109,13 @@ export function MedicationsTab({ patientId, readonly = false }: MedicationsTabPr
       title: 'Started',
       dataIndex: 'start_date',
       key: 'start_date',
-      render: (val: string | null) => val || <span style={{ color: '#94A3B8' }}>—</span>,
+      render: (val: string | null) => val || <span style={{ color: '#64748B' }}>—</span>,
     },
     {
       title: 'Prescribed By',
       dataIndex: 'prescribed_by',
       key: 'prescribed_by',
-      render: (val: string | null) => val || <span style={{ color: '#94A3B8' }}>—</span>,
+      render: (val: string | null) => val || <span style={{ color: '#64748B' }}>—</span>,
     },
     ...(!readonly
       ? [{
@@ -171,7 +171,7 @@ export function MedicationsTab({ patientId, readonly = false }: MedicationsTabPr
 
           {historical.length > 0 && (
             <div>
-              <div style={{ fontWeight: 600, fontSize: 13, color: '#94A3B8', marginBottom: 10 }}>
+              <div style={{ fontWeight: 600, fontSize: 13, color: '#64748B', marginBottom: 10 }}>
                 <Tag style={{ fontWeight: 600 }}>Past Medications ({historical.length})</Tag>
               </div>
               <Table

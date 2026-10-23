@@ -118,7 +118,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
             value={appts ? fmt(appts.today) : '—'}
             icon={<Calendar size={20} />}
             iconBgColor="#F0FDF4"
-            iconColor="#16A34A"
+            iconColor="#047857"
             trendText={tx(
               `${fmt(appts?.todayCompleted ?? 0)} مكتملة`,
               `${fmt(appts?.todayCompleted ?? 0)} Completed`,
@@ -140,7 +140,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
             )}
             icon={<Activity size={20} />}
             iconBgColor="#FFFBEB"
-            iconColor="#D97706"
+            iconColor="#B45309"
             trendText={tx(
               `${fmt(appts?.waiting ?? 0)} في الانتظار`,
               `${fmt(appts?.waiting ?? 0)} in waiting room`,
@@ -157,7 +157,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
               value={revenue ? `${fmt(revenue.todayCollected)} ${currency}` : '—'}
               icon={<TrendingUp size={20} />}
               iconBgColor="#F5F3FF"
-              iconColor="#7C3AED"
+              iconColor="#6D28D9"
               trendText={tx(`${collectionRate}% تم تحصيلها`, `${collectionRate}% collected`)}
               subtext={tx(
                 `${fmt(revenue?.todayPending ?? 0)} معلقة`,
@@ -290,7 +290,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                 style={{ textAlign: 'start', height: 44, display: 'flex', alignItems: 'center', gap: 12 }}
                 onClick={() => onNavigate('injectables')}
               >
-                <Syringe size={18} color="#7C3AED" />
+                <Syringe size={18} color="#6D28D9" />
                 <span>{tx('حقن البوتوكس والفيلر', 'Botox & Injectables Registry')}</span>
               </Button>
               <Button
@@ -315,7 +315,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                   style={{ textAlign: 'start', height: 44, display: 'flex', alignItems: 'center', gap: 12 }}
                   onClick={() => onNavigate('invoices')}
                 >
-                  <Receipt size={18} color="#D97706" />
+                  <Receipt size={18} color="#B45309" />
                   <span>{tx('الفواتير والمالية والخزينة', 'Issue Invoice / Cashier')}</span>
                 </Button>
               )}
@@ -406,7 +406,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
               <Text style={{ color: '#64748B', fontSize: 13 }}>
                 {tx('مواعيد قادمة (٧ أيام)', 'Upcoming (7 days)')}
               </Text>
-              <Text strong style={{ color: '#059669', fontSize: 13 }}>
+              <Text strong style={{ color: '#047857', fontSize: 13 }}>
                 {appts ? tx(`${fmt(appts.upcoming)} موعد`, `${fmt(appts.upcoming)} booked`) : '—'}
               </Text>
             </div>

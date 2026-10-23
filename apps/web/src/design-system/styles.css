@@ -97,3 +97,32 @@ body {
 [dir="ltr"] {
   text-align: left;
 }
+
+/* ------------------------------------------------------------------------------
+   Tag legibility
+   antd's preset tag palettes ship ~3.3:1 text — too faint for 11–12px Arabic
+   labels ("نشطة" / "تقسيط"). These darker pairs land at 6–8:1 while keeping the
+   same pastel look.
+   ------------------------------------------------------------------------------ */
+.ant-tag-green    { color: #166534 !important; background: #DCFCE7 !important; border-color: #86EFAC !important; }
+.ant-tag-orange   { color: #9A3412 !important; background: #FFEDD5 !important; border-color: #FDBA74 !important; }
+.ant-tag-volcano  { color: #9A3412 !important; background: #FFEDD5 !important; border-color: #FDBA74 !important; }
+.ant-tag-magenta  { color: #9D174D !important; background: #FCE7F3 !important; border-color: #F9A8D4 !important; }
+.ant-tag-pink     { color: #9D174D !important; background: #FCE7F3 !important; border-color: #F9A8D4 !important; }
+.ant-tag-cyan     { color: #155E75 !important; background: #CFFAFE !important; border-color: #67E8F9 !important; }
+.ant-tag-blue     { color: #1E40AF !important; background: #DBEAFE !important; border-color: #93C5FD !important; }
+.ant-tag-geekblue { color: #1E3A8A !important; background: #DBEAFE !important; border-color: #93C5FD !important; }
+.ant-tag-red      { color: #991B1B !important; background: #FEE2E2 !important; border-color: #FCA5A5 !important; }
+.ant-tag-gold     { color: #854D0E !important; background: #FEF9C3 !important; border-color: #FDE047 !important; }
+.ant-tag-purple   { color: #5B21B6 !important; background: #EDE9FE !important; border-color: #C4B5FD !important; }
+
+/* antd status tags (Tag color="success" / "error" / "warning" / "processing") */
+.ant-tag-success    { color: #047857 !important; background: #ECFDF5 !important; border-color: #6EE7B7 !important; }
+.ant-tag-error      { color: #991B1B !important; background: #FEE2E2 !important; border-color: #FCA5A5 !important; }
+.ant-tag-warning    { color: #92400E !important; background: #FEF3C7 !important; border-color: #FCD34D !important; }
+.ant-tag-processing { color: #1E40AF !important; background: #DBEAFE !important; border-color: #93C5FD !important; }
+
+/* Secondary captions used as 11–12px inline text */
+.ant-typography.ant-typography-secondary {
+  color: #5B6B7F !important;
+}

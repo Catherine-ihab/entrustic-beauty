@@ -14,11 +14,11 @@ interface InteractiveMapProps {
 }
 
 const DEFAULT_STATUS_CONFIG: Record<string, StatusConfig> = {
-  normal:      { label: 'Normal / Intact',   color: '#059669', bg: '#ECFDF5', border: '#A7F3D0' },
+  normal:      { label: 'Normal / Intact',   color: '#047857', bg: '#ECFDF5', border: '#A7F3D0' },
   treated:     { label: 'Treated / Injected', color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
-  attention:   { label: 'Pathology / Focus', color: '#DC2626', bg: '#FEF2F2', border: '#FECACA' },
-  planned:     { label: 'Treatment Planned',  color: '#D97706', bg: '#FFFBEB', border: '#FDE68A' },
-  monitoring:  { label: 'Observation',       color: '#7C3AED', bg: '#F5F3FF', border: '#DDD6FE' },
+  attention:   { label: 'Pathology / Focus', color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA' },
+  planned:     { label: 'Treatment Planned',  color: '#B45309', bg: '#FFFBEB', border: '#FDE68A' },
+  monitoring:  { label: 'Observation',       color: '#6D28D9', bg: '#F5F3FF', border: '#DDD6FE' },
 };
 
 export function InteractiveMap({
@@ -50,7 +50,7 @@ export function InteractiveMap({
     // Default neutral state
     return {
       fill: isHovered ? '#E2E8F0' : '#F1F5F9',
-      stroke: isSelected ? '#2563EB' : isHovered ? '#94A3B8' : '#CBD5E1',
+      stroke: isSelected ? '#2563EB' : isHovered ? '#64748B' : '#CBD5E1',
       strokeWidth: isSelected ? 2.5 : isHovered ? 1.8 : 1,
     };
   };
@@ -114,7 +114,7 @@ export function InteractiveMap({
             const tooltipContent = (
               <div>
                 <strong>{region.label}</strong>
-                {region.group && <div style={{ fontSize: 11, color: '#94A3B8' }}>{region.group}</div>}
+                {region.group && <div style={{ fontSize: 11, color: '#64748B' }}>{region.group}</div>}
                 {state && (
                   <div style={{ marginTop: 4 }}>
                     <Tag color="blue" style={{ fontSize: 10 }}>

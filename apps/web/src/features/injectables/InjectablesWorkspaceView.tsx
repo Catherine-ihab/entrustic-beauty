@@ -261,7 +261,7 @@ export const InjectablesWorkspaceView: React.FC = () => {
         <div>
           <Text strong>{r.totalDosage}</Text>
           <div style={{ fontSize: 12, color: '#475569' }}>{r.targetArea}</div>
-          <div style={{ fontSize: 11, color: '#94A3B8' }}>{r.technique}</div>
+          <div style={{ fontSize: 11, color: '#64748B' }}>{r.technique}</div>
         </div>
       ),
     },
@@ -555,8 +555,8 @@ export const InjectablesWorkspaceView: React.FC = () => {
               size="small"
               title={
                 <Space>
-                  <AlertTriangle size={16} color="#dc2626" />
-                  <span style={{ fontWeight: 600, color: '#dc2626' }}>{tx('بروتوكول السلامة والتدخل السريع', 'Safety & Emergency Protocol')}</span>
+                  <AlertTriangle size={16} color="#B91C1C" />
+                  <span style={{ fontWeight: 600, color: '#B91C1C' }}>{tx('بروتوكول السلامة والتدخل السريع', 'Safety & Emergency Protocol')}</span>
                 </Space>
               }
               style={{ borderRadius: 12, border: '1px solid #fecaca', backgroundColor: '#fffbfb' }}

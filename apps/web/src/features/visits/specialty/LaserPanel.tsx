@@ -25,7 +25,7 @@ export function LaserPanel({ readonly = false }: LaserPanelProps) {
       size="small"
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Zap size={16} color="#D97706" />
+          <Zap size={16} color="#B45309" />
           <span style={{ fontWeight: 600, fontSize: 14 }}>Laser Parameters & Session Log</span>
           <Tag color="gold" style={{ borderRadius: 6, fontSize: 11 }}>Laser & Aesthetic</Tag>
         </div>

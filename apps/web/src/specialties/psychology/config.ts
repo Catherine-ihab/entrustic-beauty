@@ -8,7 +8,7 @@ export const PSYCHOLOGY_CONFIG: SpecialtyModuleConfig = {
   taglineEn: 'Psychometric Assessments, Cognitive Behavioral Protocols, MSE & Safety Formulations',
   taglineAr: 'المقاييس النفسية، العلاج السلوكي المعرفي، فحص الحالة العقلية، وخطط الأمان النفسي',
   icon: 'Brain',
-  themeColor: '#8b5cf6',
+  themeColor: '#7C3AED',
   has3DVisualizer: false,
   has2DVisualizer: true,
   measurements: [

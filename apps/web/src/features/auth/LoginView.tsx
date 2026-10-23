@@ -194,7 +194,7 @@ export function LoginView({ clinicName, clinicColor, clinicInitial, onLoggedIn }
               rules={[{ required: true, message: 'برجاء إدخال اسم المستخدم أو البريد الإلكتروني' }]}
             >
               <Input
-                prefix={<Mail size={16} color="#94A3B8" />}
+                prefix={<Mail size={16} color="#64748B" />}
                 placeholder="dr_ahmed أو you@clinic.com"
                 style={{ borderRadius: 10, height: 46 }}
                 autoFocus
@@ -209,14 +209,14 @@ export function LoginView({ clinicName, clinicColor, clinicInitial, onLoggedIn }
             >
               <Input
                 type={showPassword ? 'text' : 'password'}
-                prefix={<Lock size={16} color="#94A3B8" />}
+                prefix={<Lock size={16} color="#64748B" />}
                 suffix={
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}
                   >
-                    {showPassword ? <EyeOff size={16} color="#94A3B8" /> : <Eye size={16} color="#94A3B8" />}
+                    {showPassword ? <EyeOff size={16} color="#64748B" /> : <Eye size={16} color="#64748B" />}
                   </button>
                 }
                 placeholder={tx('كلمة المرور الخاصة بك', 'Your password')}
@@ -248,12 +248,12 @@ export function LoginView({ clinicName, clinicColor, clinicInitial, onLoggedIn }
         {/* Footer */}
         <div style={{ textAlign: 'center', marginTop: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-            <Stethoscope size={13} color="#94A3B8" />
-            <Text style={{ fontSize: 12, color: '#94A3B8' }}>
+            <Stethoscope size={13} color="#64748B" />
+            <Text style={{ fontSize: 12, color: '#64748B' }}>
               {tx('نظام سحابي مشفر وآمن لإدارة العيادات والمراكز الطبية', 'Secure Clinical Workspace — All sessions are encrypted and logged')}
             </Text>
           </div>
-          <div style={{ marginTop: 10, fontSize: 12, color: '#94A3B8', fontWeight: 600 }}>
+          <div style={{ marginTop: 10, fontSize: 12, color: '#64748B', fontWeight: 600 }}>
             Entrustic Beauty
           </div>
         </div>

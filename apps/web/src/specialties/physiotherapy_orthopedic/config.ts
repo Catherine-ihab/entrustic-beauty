@@ -8,7 +8,7 @@ export const PHYSIO_ORTHO_CONFIG: SpecialtyModuleConfig = {
   taglineEn: 'Musculoskeletal Biomechanics, Sports Injuries, Joint Mobilization & Functional Rehab',
   taglineAr: 'إعادة التأهيل الحركي، إصابات الملاعب، وتأهيل المفاصل والعمود الفقري',
   icon: 'Activity',
-  themeColor: '#059669',
+  themeColor: '#047857',
   has3DVisualizer: true,
   has2DVisualizer: true,
   measurements: [

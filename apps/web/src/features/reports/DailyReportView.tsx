@@ -125,11 +125,11 @@ function printReport(reportHtml: string) {
         .kpi-box { border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; text-align: center; }
         .kpi-box .label { font-size: 11px; color: #64748b; margin-bottom: 4px; }
         .kpi-box .value { font-size: 22px; font-weight: 700; color: #0f172a; }
-        .kpi-box .sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
-        .kpi-box.green .value { color: #059669; }
+        .kpi-box .sub { font-size: 11px; color: #64748B; margin-top: 2px; }
+        .kpi-box.green .value { color: #047857; }
         .kpi-box.pink .value { color: #be185d; }
-        .kpi-box.blue .value { color: #0284c7; }
-        .kpi-box.orange .value { color: #d97706; }
+        .kpi-box.blue .value { color: #0369A1; }
+        .kpi-box.orange .value { color: #B45309; }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { background: #f8fafc; padding: 8px 12px; text-align: right; font-weight: 600; color: #475569; border-bottom: 2px solid #e2e8f0; }
         td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; }
@@ -137,9 +137,9 @@ function printReport(reportHtml: string) {
         .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
         .badge-green { background: #dcfce7; color: #15803d; }
         .badge-blue { background: #dbeafe; color: #1d4ed8; }
-        .badge-red { background: #fee2e2; color: #dc2626; }
+        .badge-red { background: #fee2e2; color: #B91C1C; }
         .badge-yellow { background: #fef9c3; color: #a16207; }
-        .footer { margin: 32px 24px 16px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 12px; }
+        .footer { margin: 32px 24px 16px; text-align: center; font-size: 11px; color: #64748B; border-top: 1px solid #e2e8f0; padding-top: 12px; }
         @media print {
           body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .no-print { display: none; }
@@ -301,7 +301,7 @@ export function DailyReportView() {
       <tr>
         <td>${s.name}</td>
         <td style="text-align:center">${s.count}</td>
-        <td style="text-align:center;font-weight:700;color:#059669">${s.revenue.toLocaleString()} ج.م</td>
+        <td style="text-align:center;font-weight:700;color:#047857">${s.revenue.toLocaleString()} ج.م</td>
       </tr>
     `).join('');
 
@@ -366,12 +366,12 @@ export function DailyReportView() {
         </div>
         <div class="kpi-box">
           <div class="label">المصاريف</div>
-          <div class="value" style="color:#dc2626">${totalExpenses.toLocaleString()}</div>
+          <div class="value" style="color:#B91C1C">${totalExpenses.toLocaleString()}</div>
           <div class="sub">ج.م</div>
         </div>
         <div class="kpi-box">
           <div class="label">الخصومات الممنوحة</div>
-          <div class="value" style="color:#d97706">${totalDiscount.toLocaleString()}</div>
+          <div class="value" style="color:#B45309">${totalDiscount.toLocaleString()}</div>
           <div class="sub">ج.م</div>
         </div>
       </div>
@@ -381,7 +381,7 @@ export function DailyReportView() {
         <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr); margin: 0 0 16px;">
           <div class="kpi-box"><div class="label">إجمالي المواعيد</div><div class="value blue">${dayAppointments.length}</div></div>
           <div class="kpi-box"><div class="label">مكتملة</div><div class="value green">${completedAppts}</div></div>
-          <div class="kpi-box"><div class="label">ملغاة</div><div class="value" style="color:#dc2626">${cancelledAppts}</div></div>
+          <div class="kpi-box"><div class="label">ملغاة</div><div class="value" style="color:#B91C1C">${cancelledAppts}</div></div>
           <div class="kpi-box"><div class="label">خُدموا بالطابور</div><div class="value">${queueServed}</div></div>
         </div>
       </div>
@@ -408,14 +408,14 @@ export function DailyReportView() {
 
       ${lowStockCount > 0 ? `
       <div class="section">
-        <div class="section-title" style="color:#d97706;border-color:#d97706">⚠️ تنبيهات المخزن (${lowStockCount} صنف)</div>
+        <div class="section-title" style="color:#B45309;border-color:#B45309">⚠️ تنبيهات المخزن (${lowStockCount} صنف)</div>
         <table>
           <thead><tr><th>الصنف</th><th>الرصيد الحالي</th><th>الحد الأدنى</th><th>الفئة</th></tr></thead>
           <tbody>
             ${inventory.filter((i) => i.currentStock <= i.reorderLevel).map((i) => `
               <tr>
                 <td>${i.name}</td>
-                <td style="color:#dc2626;font-weight:700">${i.currentStock} ${i.unit}</td>
+                <td style="color:#B91C1C;font-weight:700">${i.currentStock} ${i.unit}</td>
                 <td>${i.reorderLevel} ${i.unit}</td>
                 <td><span class="badge badge-yellow">${i.category}</span></td>
               </tr>
@@ -513,7 +513,7 @@ export function DailyReportView() {
       title: 'المحصل',
       dataIndex: 'paidAmount',
       key: 'paidAmount',
-      render: (v: number) => <Text style={{ color: '#059669', fontWeight: 600 }}>{Number(v || 0).toLocaleString()} ج.م</Text>,
+      render: (v: number) => <Text style={{ color: '#047857', fontWeight: 600 }}>{Number(v || 0).toLocaleString()} ج.م</Text>,
     },
     {
       title: 'المتبقي',
@@ -521,7 +521,7 @@ export function DailyReportView() {
       render: (_: any, r: any) => {
         const rem = Number(r.total || 0) - Number(r.paidAmount || 0);
         return rem > 0
-          ? <Text style={{ color: '#dc2626', fontWeight: 600 }}>{rem.toLocaleString()} ج.م</Text>
+          ? <Text style={{ color: '#B91C1C', fontWeight: 600 }}>{rem.toLocaleString()} ج.م</Text>
           : <Tag color="green">مكتملة</Tag>;
       },
     },
@@ -573,7 +573,7 @@ export function DailyReportView() {
       title: 'السعر',
       dataIndex: 'priceEgp',
       key: 'priceEgp',
-      render: (v: number) => <Text style={{ color: '#0284c7', fontWeight: 600 }}>{Number(v || 0).toLocaleString()} ج.م</Text>,
+      render: (v: number) => <Text style={{ color: '#0369A1', fontWeight: 600 }}>{Number(v || 0).toLocaleString()} ج.م</Text>,
     },
     {
       title: 'الحالة',
@@ -604,26 +604,26 @@ export function DailyReportView() {
       title: 'الإيرادات',
       dataIndex: 'totalRevenue',
       key: 'totalRevenue',
-      render: (v: number) => <Text strong style={{ color: '#059669' }}>{Number(v).toLocaleString()} ج.م</Text>,
+      render: (v: number) => <Text strong style={{ color: '#047857' }}>{Number(v).toLocaleString()} ج.م</Text>,
     },
     {
       title: 'المحصل',
       dataIndex: 'totalPaid',
       key: 'totalPaid',
-      render: (v: number) => <Text style={{ color: '#0284c7', fontWeight: 600 }}>{Number(v).toLocaleString()} ج.م</Text>,
+      render: (v: number) => <Text style={{ color: '#0369A1', fontWeight: 600 }}>{Number(v).toLocaleString()} ج.م</Text>,
     },
     {
       title: 'المصاريف',
       dataIndex: 'totalExpenses',
       key: 'totalExpenses',
-      render: (v: number) => <Text style={{ color: '#dc2626' }}>{Number(v).toLocaleString()} ج.م</Text>,
+      render: (v: number) => <Text style={{ color: '#B91C1C' }}>{Number(v).toLocaleString()} ج.م</Text>,
     },
     {
       title: 'صافي الربح',
       dataIndex: 'netProfit',
       key: 'netProfit',
       render: (v: number) => (
-        <Text style={{ color: v >= 0 ? '#059669' : '#dc2626', fontWeight: 700 }}>
+        <Text style={{ color: v >= 0 ? '#047857' : '#B91C1C', fontWeight: 700 }}>
           {Number(v).toLocaleString()} ج.م
         </Text>
       ),
@@ -811,10 +811,10 @@ export function DailyReportView() {
                 return (
                   <Table.Summary.Row style={{ background: '#f0f0ff', fontWeight: 700 }}>
                     <Table.Summary.Cell index={0}>المجموع</Table.Summary.Cell>
-                    <Table.Summary.Cell index={1}><Text style={{ color: '#059669', fontWeight: 700 }}>{sumRev.toLocaleString()} ج.م</Text></Table.Summary.Cell>
-                    <Table.Summary.Cell index={2}><Text style={{ color: '#0284c7', fontWeight: 700 }}>{sumPaid.toLocaleString()} ج.م</Text></Table.Summary.Cell>
-                    <Table.Summary.Cell index={3}><Text style={{ color: '#dc2626', fontWeight: 700 }}>{sumExp.toLocaleString()} ج.م</Text></Table.Summary.Cell>
-                    <Table.Summary.Cell index={4}><Text style={{ color: sumNet >= 0 ? '#059669' : '#dc2626', fontWeight: 700 }}>{sumNet.toLocaleString()} ج.م</Text></Table.Summary.Cell>
+                    <Table.Summary.Cell index={1}><Text style={{ color: '#047857', fontWeight: 700 }}>{sumRev.toLocaleString()} ج.م</Text></Table.Summary.Cell>
+                    <Table.Summary.Cell index={2}><Text style={{ color: '#0369A1', fontWeight: 700 }}>{sumPaid.toLocaleString()} ج.م</Text></Table.Summary.Cell>
+                    <Table.Summary.Cell index={3}><Text style={{ color: '#B91C1C', fontWeight: 700 }}>{sumExp.toLocaleString()} ج.م</Text></Table.Summary.Cell>
+                    <Table.Summary.Cell index={4}><Text style={{ color: sumNet >= 0 ? '#047857' : '#B91C1C', fontWeight: 700 }}>{sumNet.toLocaleString()} ج.م</Text></Table.Summary.Cell>
                     <Table.Summary.Cell index={5} />
                     <Table.Summary.Cell index={6} />
                     <Table.Summary.Cell index={7} />
@@ -836,10 +836,10 @@ export function DailyReportView() {
                 bodyStyle={{ padding: '16px 18px' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                  <TrendingUp size={16} color="#059669" />
+                  <TrendingUp size={16} color="#047857" />
                   <Text type="secondary" style={{ fontSize: 12 }}>إجمالي الإيرادات</Text>
                 </div>
-                <div style={{ fontSize: 26, fontWeight: 800, color: '#059669', lineHeight: 1.1 }}>
+                <div style={{ fontSize: 26, fontWeight: 800, color: '#047857', lineHeight: 1.1 }}>
                   {totalRevenue.toLocaleString()}
                 </div>
                 <Text type="secondary" style={{ fontSize: 11 }}>ج.م · {dayInvoices.length} فاتورة</Text>
@@ -852,14 +852,14 @@ export function DailyReportView() {
                 bodyStyle={{ padding: '16px 18px' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                  <DollarSign size={16} color="#0284c7" />
+                  <DollarSign size={16} color="#0369A1" />
                   <Text type="secondary" style={{ fontSize: 12 }}>المحصل فعلياً</Text>
                 </div>
-                <div style={{ fontSize: 26, fontWeight: 800, color: '#0284c7', lineHeight: 1.1 }}>
+                <div style={{ fontSize: 26, fontWeight: 800, color: '#0369A1', lineHeight: 1.1 }}>
                   {totalPaid.toLocaleString()}
                 </div>
                 <div style={{ marginTop: 6 }}>
-                  <Progress percent={collectionRate} size="small" strokeColor="#0284c7" showInfo={false} />
+                  <Progress percent={collectionRate} size="small" strokeColor="#0369A1" showInfo={false} />
                   <Text type="secondary" style={{ fontSize: 11 }}>{collectionRate}% معدل التحصيل</Text>
                 </div>
               </Card>
@@ -871,10 +871,10 @@ export function DailyReportView() {
                 bodyStyle={{ padding: '16px 18px' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                  <TrendingDown size={16} color="#dc2626" />
+                  <TrendingDown size={16} color="#B91C1C" />
                   <Text type="secondary" style={{ fontSize: 12 }}>المصاريف</Text>
                 </div>
-                <div style={{ fontSize: 26, fontWeight: 800, color: '#dc2626', lineHeight: 1.1 }}>
+                <div style={{ fontSize: 26, fontWeight: 800, color: '#B91C1C', lineHeight: 1.1 }}>
                   {totalExpenses.toLocaleString()}
                 </div>
                 <Text type="secondary" style={{ fontSize: 11 }}>ج.م &nbsp;·&nbsp; خصم: {totalDiscount.toLocaleString()} ج.م</Text>
@@ -891,10 +891,10 @@ export function DailyReportView() {
                 bodyStyle={{ padding: '16px 18px' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                  <BarChart3 size={16} color={netProfit >= 0 ? '#059669' : '#dc2626'} />
+                  <BarChart3 size={16} color={netProfit >= 0 ? '#047857' : '#B91C1C'} />
                   <Text type="secondary" style={{ fontSize: 12 }}>صافي الربح</Text>
                 </div>
-                <div style={{ fontSize: 26, fontWeight: 800, color: netProfit >= 0 ? '#059669' : '#dc2626', lineHeight: 1.1 }}>
+                <div style={{ fontSize: 26, fontWeight: 800, color: netProfit >= 0 ? '#047857' : '#B91C1C', lineHeight: 1.1 }}>
                   {netProfit >= 0 ? '+' : ''}{netProfit.toLocaleString()}
                 </div>
                 <Text type="secondary" style={{ fontSize: 11 }}>ج.م بعد خصم المصاريف</Text>
@@ -912,13 +912,13 @@ export function DailyReportView() {
             </Col>
             <Col xs={8} sm={4}>
               <Card size="small" style={{ borderRadius: 10, textAlign: 'center', border: '1px solid #d1fae5' }}>
-                <div style={{ fontSize: 20, fontWeight: 800, color: '#059669' }}>{completedAppts}</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: '#047857' }}>{completedAppts}</div>
                 <Text type="secondary" style={{ fontSize: 11 }}>مكتملة</Text>
               </Card>
             </Col>
             <Col xs={8} sm={4}>
               <Card size="small" style={{ borderRadius: 10, textAlign: 'center', border: '1px solid #fecaca' }}>
-                <div style={{ fontSize: 20, fontWeight: 800, color: '#dc2626' }}>{cancelledAppts}</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: '#B91C1C' }}>{cancelledAppts}</div>
                 <Text type="secondary" style={{ fontSize: 11 }}>ملغاة</Text>
               </Card>
             </Col>
@@ -936,7 +936,7 @@ export function DailyReportView() {
             </Col>
             <Col xs={8} sm={4}>
               <Card size="small" style={{ borderRadius: 10, textAlign: 'center', border: '1px solid #bfdbfe' }}>
-                <div style={{ fontSize: 20, fontWeight: 800, color: '#0284c7' }}>{cardRevenue.toLocaleString()}</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: '#0369A1' }}>{cardRevenue.toLocaleString()}</div>
                 <Text type="secondary" style={{ fontSize: 11 }}>بطاقة ج.م</Text>
               </Card>
             </Col>
@@ -1007,7 +1007,7 @@ export function DailyReportView() {
                 extra={<Tag color="purple">{topServices.length} خدمة</Tag>}
               >
                 {topServices.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '32px 0', color: '#94a3b8' }}>
+                  <div style={{ textAlign: 'center', padding: '32px 0', color: '#64748B' }}>
                     <BarChart3 size={36} style={{ opacity: 0.3, marginBottom: 8 }} />
                     <div>لا توجد فواتير مسجلة بعد</div>
                   </div>
@@ -1026,7 +1026,7 @@ export function DailyReportView() {
                             justifyContent: 'center',
                             fontSize: 12,
                             fontWeight: 700,
-                            color: i === 0 ? '#d97706' : i === 1 ? '#6b7280' : '#be185d',
+                            color: i === 0 ? '#B45309' : i === 1 ? '#6b7280' : '#be185d',
                             flexShrink: 0,
                           }}
                         >
@@ -1044,8 +1044,8 @@ export function DailyReportView() {
                           />
                         </div>
                         <div style={{ textAlign: 'left', flexShrink: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: '#059669' }}>{s.revenue.toLocaleString()} ج.م</div>
-                          <div style={{ fontSize: 11, color: '#94a3b8' }}>{s.count} جلسة</div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: '#047857' }}>{s.revenue.toLocaleString()} ج.م</div>
+                          <div style={{ fontSize: 11, color: '#64748B' }}>{s.count} جلسة</div>
                         </div>
                       </div>
                     ))}
@@ -1075,19 +1075,19 @@ export function DailyReportView() {
                     <Row gutter={[10, 10]}>
                       <Col span={8}>
                         <div style={{ padding: '12px', background: '#f0fdf4', borderRadius: 10, textAlign: 'center' }}>
-                          <div style={{ fontSize: 18, fontWeight: 800, color: '#059669' }}>{cashRevenue.toLocaleString()}</div>
+                          <div style={{ fontSize: 18, fontWeight: 800, color: '#047857' }}>{cashRevenue.toLocaleString()}</div>
                           <div style={{ fontSize: 11, color: '#64748b' }}>نقداً ج.م</div>
                         </div>
                       </Col>
                       <Col span={8}>
                         <div style={{ padding: '12px', background: '#eff6ff', borderRadius: 10, textAlign: 'center' }}>
-                          <div style={{ fontSize: 18, fontWeight: 800, color: '#0284c7' }}>{cardRevenue.toLocaleString()}</div>
+                          <div style={{ fontSize: 18, fontWeight: 800, color: '#0369A1' }}>{cardRevenue.toLocaleString()}</div>
                           <div style={{ fontSize: 11, color: '#64748b' }}>بطاقة ج.م</div>
                         </div>
                       </Col>
                       <Col span={8}>
                         <div style={{ padding: '12px', background: '#fef2f2', borderRadius: 10, textAlign: 'center' }}>
-                          <div style={{ fontSize: 18, fontWeight: 800, color: '#dc2626' }}>{totalExpenses.toLocaleString()}</div>
+                          <div style={{ fontSize: 18, fontWeight: 800, color: '#B91C1C' }}>{totalExpenses.toLocaleString()}</div>
                           <div style={{ fontSize: 11, color: '#64748b' }}>مصاريف ج.م</div>
                         </div>
                       </Col>
@@ -1102,20 +1102,20 @@ export function DailyReportView() {
                         columns={[
                           { title: 'العميل', dataIndex: 'patientName', key: 'patientName', render: (v: string) => <Text strong style={{ fontSize: 12 }}>{v}</Text> },
                           { title: 'الخدمة', dataIndex: 'service', key: 'service', render: (v: string) => <Text type="secondary" style={{ fontSize: 11 }}>{v}</Text> },
-                          { title: 'المبلغ', dataIndex: 'amount', key: 'amount', render: (v: number) => <Text style={{ color: '#059669', fontWeight: 600, fontSize: 12 }}>{v.toLocaleString()} ج.م</Text> },
+                          { title: 'المبلغ', dataIndex: 'amount', key: 'amount', render: (v: number) => <Text style={{ color: '#047857', fontWeight: 600, fontSize: 12 }}>{v.toLocaleString()} ج.م</Text> },
                           { title: 'طريقة', dataIndex: 'method', key: 'method', render: (v: string) => <Tag color={v === 'cash' ? 'green' : 'blue'} style={{ fontSize: 10 }}>{v === 'cash' ? 'نقدي' : 'بطاقة'}</Tag> },
                         ]}
                         scroll={{ y: 160 }}
                       />
                     ) : (
-                      <div style={{ textAlign: 'center', padding: '16px 0', color: '#94a3b8' }}>
+                      <div style={{ textAlign: 'center', padding: '16px 0', color: '#64748B' }}>
                         <Clock size={24} style={{ opacity: 0.3 }} />
                         <div style={{ fontSize: 12, marginTop: 4 }}>لا توجد مدفوعات مسجلة في الشفت</div>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <div style={{ textAlign: 'center', padding: '32px 0', color: '#94a3b8' }}>
+                  <div style={{ textAlign: 'center', padding: '32px 0', color: '#64748B' }}>
                     <Users size={36} style={{ opacity: 0.3, marginBottom: 8 }} />
                     <div>لا يوجد شفت كاشير لهذا اليوم</div>
                   </div>
@@ -1137,14 +1137,14 @@ export function DailyReportView() {
             extra={
               <Space>
                 <Text type="secondary" style={{ fontSize: 12 }}>إجمالي: </Text>
-                <Text strong style={{ color: '#059669' }}>{totalRevenue.toLocaleString()} ج.م</Text>
+                <Text strong style={{ color: '#047857' }}>{totalRevenue.toLocaleString()} ج.م</Text>
                 <Text type="secondary" style={{ fontSize: 12 }}>· محصل: </Text>
-                <Text strong style={{ color: '#0284c7' }}>{totalPaid.toLocaleString()} ج.م</Text>
+                <Text strong style={{ color: '#0369A1' }}>{totalPaid.toLocaleString()} ج.م</Text>
               </Space>
             }
           >
             {dayInvoices.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '32px 0', color: '#94a3b8' }}>
+              <div style={{ textAlign: 'center', padding: '32px 0', color: '#64748B' }}>
                 <FileText size={36} style={{ opacity: 0.3, marginBottom: 8 }} />
                 <div>لا توجد فواتير مسجلة لهذا اليوم</div>
                 <Text type="secondary" style={{ fontSize: 12 }}>أضف فواتير من صفحة الفواتير والمالية</Text>
@@ -1164,11 +1164,11 @@ export function DailyReportView() {
                       <Text strong style={{ color: '#0f172a' }}>{totalRevenue.toLocaleString()} ج.م</Text>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={3}>
-                      <Text strong style={{ color: '#059669' }}>{totalPaid.toLocaleString()} ج.م</Text>
+                      <Text strong style={{ color: '#047857' }}>{totalPaid.toLocaleString()} ج.م</Text>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={4}>
                       {totalPending > 0
-                        ? <Text strong style={{ color: '#dc2626' }}>{totalPending.toLocaleString()} ج.م</Text>
+                        ? <Text strong style={{ color: '#B91C1C' }}>{totalPending.toLocaleString()} ج.م</Text>
                         : <Tag color="green">مكتمل</Tag>
                       }
                     </Table.Summary.Cell>
@@ -1197,7 +1197,7 @@ export function DailyReportView() {
             }
           >
             {dayAppointments.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '32px 0', color: '#94a3b8' }}>
+              <div style={{ textAlign: 'center', padding: '32px 0', color: '#64748B' }}>
                 <Calendar size={36} style={{ opacity: 0.3, marginBottom: 8 }} />
                 <div>لا توجد مواعيد لهذا اليوم</div>
               </div>
@@ -1218,8 +1218,8 @@ export function DailyReportView() {
               style={{ borderRadius: 12, border: '2px solid #fde68a', background: '#fffbeb' }}
               title={
                 <Space>
-                  <AlertTriangle size={15} color="#d97706" />
-                  <Text strong style={{ color: '#d97706' }}>تنبيهات انخفاض المخزن</Text>
+                  <AlertTriangle size={15} color="#B45309" />
+                  <Text strong style={{ color: '#B45309' }}>تنبيهات انخفاض المخزن</Text>
                   <Tag color="orange">{lowStockCount} صنف</Tag>
                 </Space>
               }
@@ -1231,7 +1231,7 @@ export function DailyReportView() {
                 pagination={false}
                 columns={[
                   { title: 'الصنف', dataIndex: 'name', key: 'name', render: (v: string) => <Text strong>{v}</Text> },
-                  { title: 'الرصيد', dataIndex: 'currentStock', key: 'currentStock', render: (v: number, r: any) => <Text style={{ color: '#dc2626', fontWeight: 700 }}>{v} {r.unit}</Text> },
+                  { title: 'الرصيد', dataIndex: 'currentStock', key: 'currentStock', render: (v: number, r: any) => <Text style={{ color: '#B91C1C', fontWeight: 700 }}>{v} {r.unit}</Text> },
                   { title: 'الحد الأدنى', dataIndex: 'reorderLevel', key: 'reorderLevel', render: (v: number, r: any) => <Text>{v} {r.unit}</Text> },
                   { title: 'الفئة', dataIndex: 'category', key: 'category', render: (v: string) => <Tag color="orange">{v}</Tag> },
                   {

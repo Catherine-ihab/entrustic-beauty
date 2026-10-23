@@ -19,7 +19,7 @@ export function DentalWorkspace(props: SpecialtyComponentProps) {
       <Card
         size="small"
         style={{
-          background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+          background: 'linear-gradient(135deg, #0369A1 0%, #0369a1 100%)',
           border: 'none',
           color: '#ffffff',
           borderRadius: 10,

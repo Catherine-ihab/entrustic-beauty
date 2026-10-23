@@ -195,7 +195,7 @@ export function PatientProfile({ patientId, onBack, onNewVisit }: PatientProfile
                 marginInlineStart: 2,
                 borderRadius: 10,
                 backgroundColor: snapshot?.alerts.hasLifeThreateningAllergy ? '#FEF2F2' : '#FFF7ED',
-                color: snapshot?.alerts.hasLifeThreateningAllergy ? '#DC2626' : '#C2410C',
+                color: snapshot?.alerts.hasLifeThreateningAllergy ? '#B91C1C' : '#C2410C',
                 border: 'none',
               }}
             >
@@ -357,8 +357,8 @@ export function PatientProfile({ patientId, onBack, onNewVisit }: PatientProfile
                         borderRadius: 8,
                         padding: '2px 8px',
                         backgroundColor: '#FEF2F2',
-                        border: '1.5px solid #DC2626',
-                        color: '#DC2626',
+                        border: '1.5px solid #B91C1C',
+                        color: '#B91C1C',
                       }}
                     >
                       🚨 حساسية خطيرة ({snapshot.allergies.find(a => a.severity === 'life_threatening')?.allergen || 'أدوية'})
@@ -391,7 +391,7 @@ export function PatientProfile({ patientId, onBack, onNewVisit }: PatientProfile
                     </Text>
                   )}
                   {patient.blood_type && (
-                    <Tag style={{ fontSize: 12, fontWeight: 700, color: '#DC2626', backgroundColor: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 8 }}>
+                    <Tag style={{ fontSize: 12, fontWeight: 700, color: '#B91C1C', backgroundColor: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 8 }}>
                       {patient.blood_type}
                     </Tag>
                   )}
@@ -468,8 +468,8 @@ export function PatientProfile({ patientId, onBack, onNewVisit }: PatientProfile
           tabBarStyle={{ marginBottom: 0 }}
           tabBarExtraContent={
             <div style={{ padding: '8px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Clock size={13} color="#94A3B8" />
-              <Text style={{ fontSize: 11, color: '#94A3B8' }}>
+              <Clock size={13} color="#64748B" />
+              <Text style={{ fontSize: 11, color: '#64748B' }}>
                 Patient since {patient ? new Date(patient.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '—'}
               </Text>
             </div>

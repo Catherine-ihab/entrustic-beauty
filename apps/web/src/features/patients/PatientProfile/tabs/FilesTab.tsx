@@ -309,11 +309,11 @@ export function FilesTab({ patientId, readonly = false }: FilesTabProps) {
               {previewDataUrl ? (
                 <div style={{ textAlign: 'center' }}>
                   <img src={previewDataUrl} alt="preview" style={{ maxHeight: 120, maxWidth: '100%', borderRadius: 8 }} />
-                  <p style={{ marginTop: 8, fontSize: 12, color: '#059669' }}>✓ {selectedFileObj?.name}</p>
+                  <p style={{ marginTop: 8, fontSize: 12, color: '#047857' }}>✓ {selectedFileObj?.name}</p>
                 </div>
               ) : (
                 <div>
-                  <FolderOpen size={28} color="#94A3B8" style={{ marginBottom: 8 }} />
+                  <FolderOpen size={28} color="#64748B" style={{ marginBottom: 8 }} />
                   <p className="ant-upload-text">اضغط أو اسحب الملف هنا (أشعة، صورة، PDF)</p>
                   <p className="ant-upload-hint">يدعم الصور من الموبايل والكومبيوتر مباشرة</p>
                 </div>

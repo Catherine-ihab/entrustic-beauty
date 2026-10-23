@@ -13,9 +13,9 @@ interface MedicalAlertBannerProps {
 }
 
 const SEVERITY_COLOR: Record<string, string> = {
-  life_threatening: '#DC2626',
+  life_threatening: '#B91C1C',
   severe: '#EA580C',
-  moderate: '#D97706',
+  moderate: '#B45309',
   mild: '#65A30D',
   unknown: '#64748B',
 };

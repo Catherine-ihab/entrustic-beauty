@@ -676,7 +676,7 @@ export const SettingsView: React.FC = () => {
                               <Input type="color" value={brandColor} onChange={(e) => setBrandColor(e.target.value)} style={{ width: 64, height: 40, padding: 2, cursor: 'pointer' }} />
                               <Input value={brandColor} onChange={(e) => setBrandColor(e.target.value)} style={{ width: 120 }} />
                               <Space size={6}>
-                                {['#2563EB', '#059669', '#7C3AED', '#D97706', '#0284C7', '#E11D48'].map((c) => (
+                                {['#2563EB', '#047857', '#6D28D9', '#B45309', '#0369A1', '#E11D48'].map((c) => (
                                   <div key={c} onClick={() => { setBrandColor(c); brandingForm.setFieldsValue({ primaryColor: c }); }}
                                     style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: c, cursor: 'pointer', border: brandColor === c ? '2px solid #0F172A' : '1px solid #E2E8F0' }}
                                   />
@@ -687,7 +687,7 @@ export const SettingsView: React.FC = () => {
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 8, border: '1px solid #E2E8F0', background: '#F8FAFC' }}>
                               <div style={{ width: 24, height: 24, borderRadius: 6, backgroundColor: brandColor, border: '1px solid #E2E8F0', flexShrink: 0 }} />
                               <span style={{ fontSize: 13, color: '#64748B', fontFamily: 'monospace' }}>{brandColor}</span>
-                              <Lock size={12} color="#94A3B8" />
+                              <Lock size={12} color="#64748B" />
                             </div>
                           )}
                         </Form.Item>
@@ -882,7 +882,7 @@ export const SettingsView: React.FC = () => {
                               <Button
                                 size="small"
                                 type="text"
-                                icon={<Key size={14} color="#059669" />}
+                                icon={<Key size={14} color="#047857" />}
                                 onClick={() =>
                                   setCredentialsModal({
                                     visible: true,
@@ -1077,7 +1077,7 @@ export const SettingsView: React.FC = () => {
                     <div style={{ fontSize: 16, fontWeight: 700, color: '#1E40AF', marginBottom: 6 }}>
                       نسخة احتياطية فورية
                     </div>
-                    <div style={{ fontSize: 13, color: '#3B82F6', marginBottom: 20 }}>
+                    <div style={{ fontSize: 13, color: '#1D4ED8', marginBottom: 20 }}>
                       تصدير كامل البيانات (مرضى، مواعيد، فواتير، وصفات، إعدادات) في ملف JSON
                     </div>
                     <Button
@@ -1120,9 +1120,9 @@ export const SettingsView: React.FC = () => {
                   {/* Info cards */}
                   <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                     {[
-                      { icon: <ShieldCheck size={18} />, title: 'بياناتك في أمان', desc: 'الملف المصدَّر يحتوي على كل البيانات المحلية ولا يُرسل لأي خادم خارجي.', color: '#059669', bg: '#ECFDF5', border: '#A7F3D0' },
+                      { icon: <ShieldCheck size={18} />, title: 'بياناتك في أمان', desc: 'الملف المصدَّر يحتوي على كل البيانات المحلية ولا يُرسل لأي خادم خارجي.', color: '#047857', bg: '#ECFDF5', border: '#A7F3D0' },
                       { icon: <HardDrive size={18} />, title: 'احفظه على USB', desc: 'يُنصح بنسخ الملف على USB أو Google Drive كل أسبوع على الأقل.', color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
-                      { icon: <RefreshCw size={18} />, title: 'نسخ منتظمة', desc: 'اضبط تذكيراً أسبوعياً لتنزيل نسخة احتياطية وحماية بياناتك.', color: '#7C3AED', bg: '#EDE9FE', border: '#C4B5FD' },
+                      { icon: <RefreshCw size={18} />, title: 'نسخ منتظمة', desc: 'اضبط تذكيراً أسبوعياً لتنزيل نسخة احتياطية وحماية بياناتك.', color: '#6D28D9', bg: '#EDE9FE', border: '#C4B5FD' },
                     ].map((info, i) => (
                       <div
                         key={i}
@@ -1306,7 +1306,7 @@ export const SettingsView: React.FC = () => {
                       onClick={() => setShowStaffPassword(!showStaffPassword)}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                     >
-                      {showStaffPassword ? <EyeOff size={16} color="#94A3B8" /> : <Eye size={16} color="#94A3B8" />}
+                      {showStaffPassword ? <EyeOff size={16} color="#64748B" /> : <Eye size={16} color="#64748B" />}
                     </button>
                   }
                 />
@@ -1460,7 +1460,7 @@ export const SettingsView: React.FC = () => {
       <Modal
         title={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Key size={18} color="#059669" />
+            <Key size={18} color="#047857" />
             <span>Staff Account Login Credentials</span>
           </div>
         }
@@ -1548,7 +1548,7 @@ export const SettingsView: React.FC = () => {
 
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#F8FAFC', borderRadius: 8, border: '1px solid #E2E8F0' }}>
                 <span style={{ color: '#64748B', fontSize: 13 }}>Password:</span>
-                <span style={{ fontFamily: 'monospace', fontWeight: 700, color: '#059669', fontSize: 14 }}>
+                <span style={{ fontFamily: 'monospace', fontWeight: 700, color: '#047857', fontSize: 14 }}>
                   {credentialsModal.password || '••••••••'}
                 </span>
               </div>

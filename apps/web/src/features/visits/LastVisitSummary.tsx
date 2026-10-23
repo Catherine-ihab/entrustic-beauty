@@ -33,7 +33,7 @@ export function LastVisitSummary({
         }
         style={{ borderRadius: 12, border: '1px solid #E2E8F0', marginBottom: 16 }}
       >
-        <Text style={{ fontSize: 12, color: '#94A3B8' }}>
+        <Text style={{ fontSize: 12, color: '#64748B' }}>
           This is the patient's first recorded visit at this practice.
         </Text>
       </Card>

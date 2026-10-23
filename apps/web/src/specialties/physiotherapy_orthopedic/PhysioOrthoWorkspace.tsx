@@ -21,7 +21,7 @@ export function PhysioOrthoWorkspace(props: SpecialtyComponentProps) {
       <Card
         size="small"
         style={{
-          background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+          background: 'linear-gradient(135deg, #047857 0%, #047857 100%)',
           border: 'none',
           color: '#ffffff',
           borderRadius: 10,
@@ -70,7 +70,7 @@ export function PhysioOrthoWorkspace(props: SpecialtyComponentProps) {
         size="small"
         title={
           <Space>
-            <Dumbbell size={15} color="#059669" />
+            <Dumbbell size={15} color="#047857" />
             <span style={{ fontWeight: 600 }}>Home Exercise Prescription (HEP) &amp; Functional Protocol</span>
           </Space>
         }

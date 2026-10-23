@@ -154,7 +154,7 @@ export function NutritionPanel({ readonly = false }: SpecialtyComponentProps) {
                 value={carbPercent}
                 onChange={setCarbPercent}
                 disabled={readonly}
-                trackStyle={{ backgroundColor: '#3B82F6' }}
+                trackStyle={{ backgroundColor: '#1D4ED8' }}
               />
             </div>
 
@@ -170,7 +170,7 @@ export function NutritionPanel({ readonly = false }: SpecialtyComponentProps) {
                 value={proteinPercent}
                 onChange={setProteinPercent}
                 disabled={readonly}
-                trackStyle={{ backgroundColor: '#10B981' }}
+                trackStyle={{ backgroundColor: '#047857' }}
               />
             </div>
 

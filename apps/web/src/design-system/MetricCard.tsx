@@ -67,14 +67,14 @@ export const MetricCard: React.FC<MetricCardProps> = ({
           {trendText && (
             <span
               style={{
-                color: trendPositive ? '#059669' : '#DC2626',
+                color: trendPositive ? '#047857' : '#B91C1C',
                 fontWeight: 600,
               }}
             >
               {trendText}
             </span>
           )}
-          {subtext && <span style={{ color: '#94A3B8' }}>{subtext}</span>}
+          {subtext && <span style={{ color: '#64748B' }}>{subtext}</span>}
         </div>
       )}
     </Card>

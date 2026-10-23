@@ -226,7 +226,7 @@ export function WhatsAppModal({
             }}
           >
             <Button
-              icon={copied ? <Check size={14} color="#059669" /> : <Copy size={14} />}
+              icon={copied ? <Check size={14} color="#047857" /> : <Copy size={14} />}
               onClick={handleCopy}
               style={{ borderRadius: 8 }}
             >

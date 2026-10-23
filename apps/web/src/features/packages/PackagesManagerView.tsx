@@ -40,13 +40,17 @@ import {
   saveClientPackageEnrollments,
   subscribeToPackageEnrollments,
 } from '../../lib/packagesDirectory';
-import { getRegisteredPatients, RegisteredPatient } from '../../lib/patientsDirectory';
+import {
+  getRegisteredPatients,
+  subscribeToRegisteredPatients,
+  RegisteredPatient,
+} from '../../lib/patientsDirectory';
 
 const { Title, Text } = Typography;
 
 export function PackagesManagerView() {
   const [templates, setTemplates] = useState<ClinicPackage[]>(getClinicPackages);
-  const [registeredPatients] = useState<RegisteredPatient[]>(getRegisteredPatients);
+  const [registeredPatients, setRegisteredPatients] = useState<RegisteredPatient[]>(getRegisteredPatients);
   const [enrollments, setEnrollments] = useState<ClientPackageEnrollment[]>(getClientPackageEnrollments);
 
   useEffect(() => {
@@ -60,10 +64,17 @@ export function PackagesManagerView() {
     const unsubEnr = subscribeToPackageEnrollments(() => {
       setEnrollments(getClientPackageEnrollments());
     });
-    return () => unsubEnr();
+    const unsubPatients = subscribeToRegisteredPatients(() => {
+      setRegisteredPatients(getRegisteredPatients());
+    });
+    return () => {
+      unsubEnr();
+      unsubPatients();
+    };
   }, []);
 
-  const [activeTab, setActiveTab] = useState<'enrollments' | 'templates'>('enrollments');
+  // The catalogue is the face of this page; enrolments sit one click away.
+  const [activeTab, setActiveTab] = useState<'enrollments' | 'templates'>('templates');
 
   // Modals
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
@@ -165,8 +176,11 @@ export function PackagesManagerView() {
       key: 'patient',
       render: (_: any, r: ClientPackageEnrollment) => (
         <div>
-          <div style={{ fontWeight: 600, color: '#0F172A', fontSize: 14 }}>{r.patientName}</div>
-          <Text type="secondary" style={{ fontSize: 12 }}>{r.patientId} {r.patientPhone && `• ${r.patientPhone}`}</Text>
+          <div style={{ fontWeight: 700, color: '#0F172A', fontSize: 14 }}>{r.patientName}</div>
+          <Text type="secondary" style={{ fontSize: 13 }}>
+            {r.patientId}
+            {r.patientPhone ? ` • ${r.patientPhone}` : ''}
+          </Text>
         </div>
       ),
     },
@@ -191,11 +205,11 @@ export function PackagesManagerView() {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 2 }}>
               <span>تم: <strong style={{ color: '#0F172A' }}>{r.completedSessions}</strong> من {r.totalSessions}</span>
-              <strong style={{ color: r.remainingSessions > 0 ? '#be185d' : '#059669' }}>
+              <strong style={{ color: r.remainingSessions > 0 ? '#be185d' : '#047857' }}>
                 متبقي {r.remainingSessions} جلسات
               </strong>
             </div>
-            <Progress percent={percent} size="small" strokeColor={r.remainingSessions > 0 ? '#be185d' : '#059669'} />
+            <Progress percent={percent} size="small" strokeColor={r.remainingSessions > 0 ? '#be185d' : '#047857'} />
           </div>
         );
       },
@@ -206,7 +220,7 @@ export function PackagesManagerView() {
       width: 170,
       render: (_: any, r: ClientPackageEnrollment) => (
         <div style={{ fontSize: 13 }}>
-          <div style={{ fontWeight: 700, color: '#059669' }}>{r.priceEgp.toLocaleString()} ج.م</div>
+          <div style={{ fontWeight: 700, color: '#047857' }}>{r.priceEgp.toLocaleString()} ج.م</div>
           <Tag color={r.paymentStatus === 'مدفوع بالكامل' ? 'blue' : 'orange'} style={{ fontSize: 11, marginTop: 2 }}>
             {r.paymentStatus}
           </Tag>
@@ -361,7 +375,7 @@ export function PackagesManagerView() {
                 <Title level={4} style={{ color: '#ffffff', margin: 0, fontWeight: 700 }}>
                   إدارة الباقات وعروض الجلسات المخصصة
                 </Title>
-                <Text style={{ color: '#e0e7ff', fontSize: 13 }}>
+                <Text style={{ color: '#E9E7FF', fontSize: 14, display: 'block', marginTop: 6, lineHeight: 1.6, maxWidth: 820 }}>
                   العيادة تحدد أسعار الباقات والخدمات التي بداخلها بحرية تامة، مع اشتراك الحالات وتتبع خصم الجلسات المتبقية بنقرة واحدة
                 </Text>
               </div>

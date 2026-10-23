@@ -74,7 +74,7 @@ export function PlatformAdminView() {
       timezone: 'Africa/Cairo',
       defaultLanguage: 'ar',
       branding: {
-        primaryColor: '#059669',
+        primaryColor: '#047857',
         welcomeMessage: 'عيادة العلاج الطبيعي والتأهيل الحركي',
       },
       enabledModules: ['dashboard', 'patients', 'appointments', 'records', 'services', 'invoices'],
@@ -91,7 +91,7 @@ export function PlatformAdminView() {
       timezone: 'Asia/Riyadh',
       defaultLanguage: 'en',
       branding: {
-        primaryColor: '#7C3AED',
+        primaryColor: '#6D28D9',
         welcomeMessage: 'Clinical Dermatology & Aesthetic Medicine',
       },
       enabledModules: ['dashboard', 'patients', 'appointments', 'records', 'services', 'invoices', 'before_after'],
@@ -191,7 +191,7 @@ export function PlatformAdminView() {
             value={`${clinics.length} Tenants`}
             icon={<Shield size={20} />}
             iconBgColor="#ECFDF5"
-            iconColor="#059669"
+            iconColor="#047857"
             trendText="100% Isolated"
             subtext="PostgreSQL RLS verified"
           />
@@ -202,7 +202,7 @@ export function PlatformAdminView() {
             value="15 Types"
             icon={<CheckCircle size={20} />}
             iconBgColor="#F5F3FF"
-            iconColor="#7C3AED"
+            iconColor="#6D28D9"
             trendText="Multi-Specialty"
             subtext="zero hardcoded workflows"
           />

@@ -155,8 +155,8 @@ export function VisitHeader({
             flexWrap: 'wrap',
           }}
         >
-          <ShieldAlert size={16} color={hasLifeThreatening || isPregnant ? '#DC2626' : '#D97706'} />
-          <Text strong style={{ fontSize: 12, color: hasLifeThreatening || isPregnant ? '#DC2626' : '#92400E' }}>
+          <ShieldAlert size={16} color={hasLifeThreatening || isPregnant ? '#B91C1C' : '#B45309'} />
+          <Text strong style={{ fontSize: 12, color: hasLifeThreatening || isPregnant ? '#B91C1C' : '#92400E' }}>
             تنبيه طبي عاجل (MEDICAL ALERTS):
           </Text>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>

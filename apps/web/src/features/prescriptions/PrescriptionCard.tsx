@@ -351,7 +351,7 @@ export function PrescriptionCard({ patientId, visitId }: PrescriptionCardProps) 
               display: 'flex',
               alignItems: 'center',
               gap: 4,
-              color: warnings.some((w) => w.severity === 'major' || w.severity === 'life_threatening') ? '#DC2626' : '#B45309',
+              color: warnings.some((w) => w.severity === 'major' || w.severity === 'life_threatening') ? '#B91C1C' : '#B45309',
               marginBottom: 6,
             }}
           >

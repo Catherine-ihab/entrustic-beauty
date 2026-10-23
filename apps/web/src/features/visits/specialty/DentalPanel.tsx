@@ -13,10 +13,10 @@ const TOOTH_STATUS_CONFIG: Record<
   ToothState['status'],
   { label: string; bg: string; border: string; text: string }
 > = {
-  healthy:    { label: 'Healthy',    bg: '#F0FDF4', border: '#86EFAC', text: '#16A34A' },
-  decay:      { label: 'Decay/Caries', bg: '#FEF2F2', border: '#FCA5A5', text: '#DC2626' },
+  healthy:    { label: 'Healthy',    bg: '#F0FDF4', border: '#86EFAC', text: '#047857' },
+  decay:      { label: 'Decay/Caries', bg: '#FEF2F2', border: '#FCA5A5', text: '#B91C1C' },
   filled:     { label: 'Filled',     bg: '#EFF6FF', border: '#93C5FD', text: '#2563EB' },
-  crown:      { label: 'Crown',      bg: '#F5F3FF', border: '#C4B5FD', text: '#7C3AED' },
+  crown:      { label: 'Crown',      bg: '#F5F3FF', border: '#C4B5FD', text: '#6D28D9' },
   root_canal: { label: 'Root Canal', bg: '#FDF2F8', border: '#F472B6', text: '#DB2777' },
   extracted:  { label: 'Missing',    bg: '#F8FAFC', border: '#CBD5E1', text: '#64748B' },
   implant:    { label: 'Implant',    bg: '#ECFEFF', border: '#67E8F9', text: '#0891B2' },
@@ -137,7 +137,7 @@ export function DentalPanel({ readonly = false }: DentalPanelProps) {
       {/* Odontogram Grid */}
       <div style={{ overflowX: 'auto', paddingBottom: 8 }}>
         <div style={{ minWidth: 640 }}>
-          <Text style={{ fontSize: 11, color: '#94A3B8', display: 'block', textAlign: 'center', marginBottom: 6 }}>
+          <Text style={{ fontSize: 11, color: '#64748B', display: 'block', textAlign: 'center', marginBottom: 6 }}>
             MAXILLARY (UPPER ARCH)
           </Text>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 16 }}>
@@ -146,7 +146,7 @@ export function DentalPanel({ readonly = false }: DentalPanelProps) {
 
           <div style={{ height: 1, backgroundColor: '#E2E8F0', margin: '12px 0' }} />
 
-          <Text style={{ fontSize: 11, color: '#94A3B8', display: 'block', textAlign: 'center', marginBottom: 6 }}>
+          <Text style={{ fontSize: 11, color: '#64748B', display: 'block', textAlign: 'center', marginBottom: 6 }}>
             MANDIBULAR (LOWER ARCH)
           </Text>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 6 }}>

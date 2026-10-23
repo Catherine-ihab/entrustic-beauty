@@ -564,7 +564,7 @@ export function DentalJaw3D({ readonly = false, onStateChange }: SpecialtyCompon
             <div style={{ fontWeight: 700, fontSize: 13 }}>
               Tooth #{hoveredTooth.fdiNumber} · {hoveredTooth.name}
             </div>
-            <div style={{ fontSize: 11, color: '#94A3B8', textTransform: 'capitalize' }}>
+            <div style={{ fontSize: 11, color: '#64748B', textTransform: 'capitalize' }}>
               Condition: {hoveredTooth.status} {hoveredTooth.notes ? `(${hoveredTooth.notes})` : ''}
             </div>
           </div>
@@ -592,7 +592,7 @@ export function DentalJaw3D({ readonly = false, onStateChange }: SpecialtyCompon
       >
         {/* Camera Views */}
         <Space size="small" wrap>
-          <span style={{ color: '#94A3B8', fontSize: 11 }}>View Angle:</span>
+          <span style={{ color: '#64748B', fontSize: 11 }}>View Angle:</span>
           <Button size="small" onClick={() => setCameraPreset('smile')}>Anterior Smile</Button>
           <Button size="small" onClick={() => setCameraPreset('upper_occlusal')}>Upper Biting</Button>
           <Button size="small" onClick={() => setCameraPreset('lower_occlusal')}>Lower Biting</Button>
@@ -602,7 +602,7 @@ export function DentalJaw3D({ readonly = false, onStateChange }: SpecialtyCompon
 
         {/* Jaw Opening Articulator Slider */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 180 }}>
-          <span style={{ color: '#94A3B8', fontSize: 11, whiteSpace: 'nowrap' }}>Jaw Opening:</span>
+          <span style={{ color: '#64748B', fontSize: 11, whiteSpace: 'nowrap' }}>Jaw Opening:</span>
           <Slider
             min={0}
             max={45}
@@ -633,11 +633,11 @@ export function DentalJaw3D({ readonly = false, onStateChange }: SpecialtyCompon
             Sound Enamel
           </span>
           <span style={{ color: '#E2E8F0', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#EF4444' }} />
+            <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#B91C1C' }} />
             Active Caries / Decay
           </span>
           <span style={{ color: '#E2E8F0', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#3B82F6' }} />
+            <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#1D4ED8' }} />
             Restored / Filled
           </span>
           <span style={{ color: '#E2E8F0', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -645,7 +645,7 @@ export function DentalJaw3D({ readonly = false, onStateChange }: SpecialtyCompon
             Prosthetic Crown
           </span>
           <span style={{ color: '#E2E8F0', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#10B981' }} />
+            <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#047857' }} />
             Titanium Implant
           </span>
           <span style={{ color: '#E2E8F0', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>

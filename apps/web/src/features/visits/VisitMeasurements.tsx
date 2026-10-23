@@ -31,14 +31,14 @@ export function VisitMeasurements({}: VisitMeasurementsProps) {
     if (!delta || !text) return null;
     if (delta === 'down') {
       return (
-        <span style={{ fontSize: 11, color: '#059669', display: 'flex', alignItems: 'center', gap: 2 }}>
+        <span style={{ fontSize: 11, color: '#047857', display: 'flex', alignItems: 'center', gap: 2 }}>
           <TrendingDown size={12} /> {text}
         </span>
       );
     }
     if (delta === 'up') {
       return (
-        <span style={{ fontSize: 11, color: '#D97706', display: 'flex', alignItems: 'center', gap: 2 }}>
+        <span style={{ fontSize: 11, color: '#B45309', display: 'flex', alignItems: 'center', gap: 2 }}>
           <TrendingUp size={12} /> {text}
         </span>
       );

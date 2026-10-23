@@ -188,7 +188,7 @@ export function TelemedRoom({ api, basePath, role, title, subtitle, onBack }: Te
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#94a3b8',
+                color: '#64748B',
                 gap: 8,
               }}
             >

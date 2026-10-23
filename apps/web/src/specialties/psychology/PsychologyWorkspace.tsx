@@ -11,7 +11,7 @@ export function PsychologyWorkspace(props: SpecialtyComponentProps) {
       <Card
         size="small"
         style={{
-          background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+          background: 'linear-gradient(135deg, #6D28D9 0%, #6d28d9 100%)',
           border: 'none',
           color: '#ffffff',
           borderRadius: 10,

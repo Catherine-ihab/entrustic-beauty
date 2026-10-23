@@ -36,11 +36,11 @@ interface MedicalSnapshotProps {
 }
 
 const SEVERITY_COLOR: Record<string, { bg: string; text: string; border: string }> = {
-  life_threatening: { bg: '#FEF2F2', text: '#DC2626', border: '#FECACA' },
+  life_threatening: { bg: '#FEF2F2', text: '#B91C1C', border: '#FECACA' },
   severe:           { bg: '#FFF7ED', text: '#C2410C', border: '#FED7AA' },
   moderate:         { bg: '#FFFBEB', text: '#B45309', border: '#FDE68A' },
-  mild:             { bg: '#F0FDF4', text: '#16A34A', border: '#BBF7D0' },
-  critical:         { bg: '#FEF2F2', text: '#DC2626', border: '#FECACA' },
+  mild:             { bg: '#F0FDF4', text: '#047857', border: '#BBF7D0' },
+  critical:         { bg: '#FEF2F2', text: '#B91C1C', border: '#FECACA' },
   unknown:          { bg: '#F8FAFC', text: '#64748B', border: '#E2E8F0' },
 };
 
@@ -81,7 +81,7 @@ export function MedicalSnapshot({
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         {hasLifeThreatening ? (
-          <ShieldAlert size={16} color="#DC2626" />
+          <ShieldAlert size={16} color="#B91C1C" />
         ) : (
           <Activity size={16} color="#64748B" />
         )}
@@ -111,15 +111,15 @@ export function MedicalSnapshot({
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-              <ShieldAlert size={14} color={hasLifeThreatening ? '#DC2626' : allergies.length === 0 ? '#D97706' : '#64748B'} />
-              <Text style={{ fontSize: 12, fontWeight: 600, color: hasLifeThreatening ? '#DC2626' : '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <ShieldAlert size={14} color={hasLifeThreatening ? '#B91C1C' : allergies.length === 0 ? '#B45309' : '#64748B'} />
+              <Text style={{ fontSize: 12, fontWeight: 600, color: hasLifeThreatening ? '#B91C1C' : '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 Allergies ({allergies.length})
               </Text>
             </div>
 
             {hasUnconfirmedAllergies ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <AlertTriangle size={13} color="#D97706" />
+                <AlertTriangle size={13} color="#B45309" />
                 <Text style={{ fontSize: 12, color: '#92400E', fontWeight: 500 }}>
                   Not confirmed — verify
                 </Text>
@@ -171,7 +171,7 @@ export function MedicalSnapshot({
             </div>
 
             {conditions.length === 0 ? (
-              <Text style={{ fontSize: 12, color: '#94A3B8' }}>None recorded</Text>
+              <Text style={{ fontSize: 12, color: '#64748B' }}>None recorded</Text>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {conditions.slice(0, 3).map((c) => {
@@ -220,7 +220,7 @@ export function MedicalSnapshot({
             </div>
 
             {medications.length === 0 ? (
-              <Text style={{ fontSize: 12, color: '#94A3B8' }}>None recorded</Text>
+              <Text style={{ fontSize: 12, color: '#64748B' }}>None recorded</Text>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {medications.slice(0, 3).map((m) => (

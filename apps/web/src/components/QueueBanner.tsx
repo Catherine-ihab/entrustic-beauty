@@ -123,7 +123,7 @@ export function QueueBanner({
         style={{
           borderRadius: 14,
           background: 'linear-gradient(135deg, #fff1f2 0%, #ffe4e6 50%, #ffffff 100%)',
-          border: '1.5px solid #f43f5e',
+          border: '1.5px solid #BE123C',
           boxShadow: '0 4px 16px rgba(244, 63, 94, 0.08)',
           marginBottom: 16,
           position: 'relative',
@@ -192,7 +192,7 @@ export function QueueBanner({
           </Space>
 
           <Space size={10}>
-            <Badge count={waitingPatients.length} overflowCount={99} style={{ backgroundColor: '#f43f5e' }}>
+            <Badge count={waitingPatients.length} overflowCount={99} style={{ backgroundColor: '#BE123C' }}>
               <Button
                 size="small"
                 icon={<Users size={14} />}
@@ -217,7 +217,7 @@ export function QueueBanner({
             <div
               style={{
                 backgroundColor: currentPatient ? '#ffffff' : 'rgba(255,255,255,0.7)',
-                border: currentPatient ? '1.5px solid #22c55e' : '1px dashed #cbd5e1',
+                border: currentPatient ? '1.5px solid #047857' : '1px dashed #cbd5e1',
                 borderRadius: 10,
                 padding: '10px 14px',
                 display: 'flex',
@@ -260,7 +260,7 @@ export function QueueBanner({
                 </div>
               ) : (
                 <div style={{ color: '#64748b', fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <UserCheck size={18} color="#94a3b8" />
+                  <UserCheck size={18} color="#64748B" />
                   <span>{tx('لا توجد حالة داخل غرفة العلاج حالياً — العيادة جاهزة لاستقبال الحالة التالية', 'No patient currently inside room')}</span>
                 </div>
               )}
@@ -282,8 +282,8 @@ export function QueueBanner({
                     icon={<CheckCircle size={15} />}
                     onClick={() => handleFinishSession(currentPatient)}
                     style={{
-                      backgroundColor: '#16a34a',
-                      borderColor: '#16a34a',
+                      backgroundColor: '#047857',
+                      borderColor: '#047857',
                       fontWeight: 700,
                       borderRadius: 8,
                     }}
@@ -354,7 +354,7 @@ export function QueueBanner({
                 </div>
               ) : (
                 <div style={{ color: '#64748b', fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <CheckCircle size={18} color="#10b981" />
+                  <CheckCircle size={18} color="#047857" />
                   <span>{tx('طابور الانتظار فارغ — لا توجد حالات منتظرة حالياً', 'No patients waiting in queue')}</span>
                 </div>
               )}
@@ -445,7 +445,7 @@ export function QueueBanner({
               gap: 8,
             }}
           >
-            <AlertCircle size={16} color="#0284c7" />
+            <AlertCircle size={16} color="#0369A1" />
             <span>
               {tx(
                 'الترتيب هنا تسلسلي: الحالة اللي بتدفع في الاستقبال بتسمع فوراً للدكتورة. حتى لو حصل تأخير (ديلاي) 10 أو 20 دقيقة، الترتيب يظل سارياً دون إغلاق الموعد.',
@@ -541,7 +541,7 @@ export function QueueBanner({
                       onClick={() => {
                         handleFinishSession(r);
                       }}
-                      style={{ backgroundColor: '#16a34a', borderColor: '#16a34a', fontWeight: 600 }}
+                      style={{ backgroundColor: '#047857', borderColor: '#047857', fontWeight: 600 }}
                     >
                       {tx('إنهاء', 'Finish')}
                     </Button>

@@ -5,6 +5,8 @@ import { isRTL } from './lib/i18n';
 import { useAuthStore } from './store/auth-store';
 import { IS_PLATFORM_OWNER } from './store/platform-owner';
 import { apiClient, DEFAULT_TENANT_SLUG } from './lib/api-client';
+import { ensurePatientsSynced } from './lib/patientsDirectory';
+import { rebuildEnrollmentsFromPatients } from './lib/packagesDirectory';
 import { getAppTheme } from './design-system/theme';
 import './design-system/styles.css';
 
@@ -98,6 +100,16 @@ export function App() {
   const lockedConfig = SPECIALTY_LOCK ? getSpecialtyModule(SPECIALTY_LOCK)?.config : undefined;
   const lockedName = lockedConfig ? 'Entrustic Beauty' : undefined;
   const lockedType = SPECIALTY_LOCK ?? ClinicType.GENERAL_MEDICAL;
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    // Several demo workspaces keep their roster in localStorage. Hydrate it from
+    // the real API so packages / invoices / appointments never show invented
+    // patients (they used to display PAT-00104 alongside the real PAT-0002…).
+    ensurePatientsSynced()
+      .then((patients) => rebuildEnrollmentsFromPatients(patients))
+      .catch(() => {});
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const slug = getTenantSlug();
@@ -404,7 +416,7 @@ export function App() {
           {/* Center: Global Omni-Search Mock */}
           <div style={{ maxWidth: 360, width: '100%', display: 'none', minWidth: 220 }} className="desktop-search">
             <Input
-              prefix={<Search size={15} color="#94A3B8" />}
+              prefix={<Search size={15} color="#64748B" />}
               placeholder="Search patients, bookings, invoices... (Ctrl + K)"
               style={{ borderRadius: 8, height: 36, backgroundColor: '#F8FAFC' }}
             />

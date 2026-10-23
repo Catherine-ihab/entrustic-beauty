@@ -8,7 +8,7 @@ export const NUTRITION_CONFIG: SpecialtyModuleConfig = {
   taglineEn: 'Metabolic Profiling, BMR/TDEE Calculation, Macro Optimization & Medical Nutrition Therapy',
   taglineAr: 'حساب السعرات، توزيع المغذيات، علاج السمنة والنحافة، وتغذية الأمراض المزمنة',
   icon: 'Apple',
-  themeColor: '#10b981',
+  themeColor: '#047857',
   has3DVisualizer: false,
   has2DVisualizer: true,
   measurements: [

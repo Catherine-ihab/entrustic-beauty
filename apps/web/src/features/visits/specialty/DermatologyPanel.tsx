@@ -12,10 +12,10 @@ interface DermatologyPanelProps {
 }
 
 const DERM_STATUS_CONFIG: Record<string, StatusConfig> = {
-  normal:     { label: 'Clear / Intact',   color: '#059669', bg: '#ECFDF5', border: '#A7F3D0' },
-  erythema:   { label: 'Erythema / Rash',  color: '#DC2626', bg: '#FEF2F2', border: '#FECACA' },
-  lesion:     { label: 'Macule / Papule',  color: '#D97706', bg: '#FFFBEB', border: '#FDE68A' },
-  biopsy:     { label: 'Biopsy Taken',     color: '#7C3AED', bg: '#F5F3FF', border: '#DDD6FE' },
+  normal:     { label: 'Clear / Intact',   color: '#047857', bg: '#ECFDF5', border: '#A7F3D0' },
+  erythema:   { label: 'Erythema / Rash',  color: '#B91C1C', bg: '#FEF2F2', border: '#FECACA' },
+  lesion:     { label: 'Macule / Papule',  color: '#B45309', bg: '#FFFBEB', border: '#FDE68A' },
+  biopsy:     { label: 'Biopsy Taken',     color: '#6D28D9', bg: '#F5F3FF', border: '#DDD6FE' },
   treated:    { label: 'Topical Treated',  color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
 };
 
