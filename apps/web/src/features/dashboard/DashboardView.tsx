@@ -298,7 +298,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
                 style={{ textAlign: 'start', height: 44, display: 'flex', alignItems: 'center', gap: 12 }}
                 onClick={() => onNavigate('skincare')}
               >
-                <Sparkles size={18} color="#0d9488" />
+                <Sparkles size={18} color="#0F766E" />
                 <span>{tx('العناية بالبشرة والسبا والمساج', 'Skin Care & Spa')}</span>
               </Button>
               <Button

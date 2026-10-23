@@ -59,7 +59,7 @@ export function SkinCareSpaCombinedView({ initialTab = 'skincare' }: SkinCareSpa
                 value: 'spa',
                 label: (
                   <Space size={6}>
-                    <Bath size={16} color="#0d9488" />
+                    <Bath size={16} color="#0F766E" />
                     <span style={{ fontWeight: 700 }}>
                       {tx('السبا والمساج والحمام المغربي (Spa & Massage)', 'Spa, Massage & Moroccan Bath')}
                     </span>

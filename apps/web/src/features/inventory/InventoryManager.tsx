@@ -360,7 +360,7 @@ export function InventoryManager() {
         <Col xs={12} sm={6}>
           <Card size="small" style={{ borderRadius: 10, border: '1px solid #ccfbf1' }}>
             <Text type="secondary" style={{ fontSize: 12 }}>ماسكات البشرة المرطبة</Text>
-            <div style={{ fontWeight: 800, fontSize: 20, color: '#0d9488' }}>
+            <div style={{ fontWeight: 800, fontSize: 20, color: '#0F766E' }}>
               {items.filter((i) => i.category === 'عناية بالبشرة وماسكات').reduce((acc, c) => acc + c.currentStock, 0)} ماسك
             </div>
           </Card>

@@ -771,7 +771,7 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
                     <Button
                       size="small"
                       type="primary"
-                      style={{ backgroundColor: '#0d9488', borderColor: '#0d9488', fontWeight: 700 }}
+                      style={{ backgroundColor: '#0F766E', borderColor: '#0F766E', fontWeight: 700 }}
                       onClick={() => {
                         const apptSrvName = matchedAppointment.serviceName || matchedAppointment.serviceCategory;
                         const apptPrice = matchedAppointment.priceEgp || 0;
@@ -802,7 +802,7 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
             size="small"
             title={
               <Space>
-                <ShoppingCart size={15} color="#0d9488" />
+                <ShoppingCart size={15} color="#0F766E" />
                 <span style={{ fontWeight: 700 }}>2. إضافة باقات وعروض العيادة أو خدمات فردية للفاتورة</span>
               </Space>
             }
@@ -865,7 +865,7 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
               <Button
                 type="primary"
                 icon={<Plus size={15} />}
-                style={{ backgroundColor: '#0d9488', borderColor: '#0d9488', fontWeight: 700 }}
+                style={{ backgroundColor: '#0F766E', borderColor: '#0F766E', fontWeight: 700 }}
                 onClick={() => selectedServiceId && addServiceToInvoice(selectedServiceId)}
                 disabled={!selectedServiceId}
               >

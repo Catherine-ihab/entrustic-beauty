@@ -577,7 +577,7 @@ export const SkinCareWorkspaceView: React.FC = () => {
           <div style={{ fontSize: 11, color: '#64748B', marginTop: 3 }}>
             {tx('الماسكات:', 'Masks:')} {r.selectedMasks.join(' • ')}
           </div>
-          <div style={{ fontSize: 11, color: '#0d9488', marginTop: 1 }}>
+          <div style={{ fontSize: 11, color: '#0F766E', marginTop: 1 }}>
             {tx('الأجهزة:', 'Devices:')} {r.selectedDevices.join(' • ')}
           </div>
         </div>
@@ -862,7 +862,7 @@ export const SkinCareWorkspaceView: React.FC = () => {
                           <Tag color="gold" style={{ fontSize: 11, borderRadius: 4 }}>
                             {bundle.badge}
                           </Tag>
-                          <span style={{ fontSize: 11, color: '#0d9488', fontWeight: 600 }}>
+                          <span style={{ fontSize: 11, color: '#0F766E', fontWeight: 600 }}>
                             {bundle.maskIds.length} {tx('ماسك', 'mask')} + {bundle.deviceIds.length} {tx('أجهزة', 'devices')}
                           </span>
                         </div>
@@ -953,7 +953,7 @@ export const SkinCareWorkspaceView: React.FC = () => {
                   title={
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Space>
-                        <Cpu size={16} color="#0d9488" />
+                        <Cpu size={16} color="#0F766E" />
                         <span style={{ fontWeight: 700 }}>
                           {tx('3. أجهزة الوجه المسعرة (Facial Devices Checkboxes)', '3. Facial Devices Checkboxes')}
                         </span>
@@ -962,7 +962,7 @@ export const SkinCareWorkspaceView: React.FC = () => {
                         size="small"
                         type="link"
                         icon={<Plus size={12} />}
-                        style={{ padding: 0, fontSize: 12, color: '#0d9488', fontWeight: 700 }}
+                        style={{ padding: 0, fontSize: 12, color: '#0F766E', fontWeight: 700 }}
                         onClick={() => setIsAddDeviceModalOpen(true)}
                       >
                         {tx('+ إضافة جهاز مسعر جديد', '+ Add Priced Device')}
@@ -1032,7 +1032,7 @@ export const SkinCareWorkspaceView: React.FC = () => {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Space size={8}>
-                  <DollarSign size={18} color="#0d9488" />
+                  <DollarSign size={18} color="#0F766E" />
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 13, color: '#0F172A' }}>
                       {selectionMode === 'bundle'
@@ -1256,7 +1256,7 @@ export const SkinCareWorkspaceView: React.FC = () => {
       <Modal
         title={
           <Space>
-            <Cpu size={18} color="#0d9488" />
+            <Cpu size={18} color="#0F766E" />
             <span style={{ fontWeight: 700 }}>
               {tx('إضافة جهاز وجه مسعر جديد (إلزامي السعر)', 'Add New Priced Facial Device')}
             </span>
