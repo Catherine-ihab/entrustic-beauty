@@ -356,7 +356,7 @@ export function PackagesManagerView() {
         bodyStyle={{ padding: '22px 28px' }}
       >
         <Row justify="space-between" align="middle" gutter={[16, 16]}>
-          <Col xs={24} md={16}>
+          <Col xs={24} md={14}>
             <Space align="center" size={14}>
               <div
                 style={{
@@ -381,8 +381,8 @@ export function PackagesManagerView() {
               </div>
             </Space>
           </Col>
-          <Col xs={24} md={8} style={{ textAlign: 'left' }}>
-            <Space>
+          <Col xs={24} md={10} style={{ textAlign: 'end' }}>
+            <Space wrap size={12}>
               <Button
                 type="primary"
                 size="large"
