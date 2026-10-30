@@ -2,84 +2,84 @@
   {
     "id": "01",
     "file": "scene-01.html",
-    "dur": 9.24,
+    "dur": 8.1,
     "kind": "hero",
     "media": null
   },
   {
     "id": "02",
     "file": "scene-02.html",
-    "dur": 9.05,
-    "kind": "two",
+    "dur": 8.94,
+    "kind": "split",
     "media": "dashboard.png"
   },
   {
     "id": "03",
     "file": "scene-03.html",
-    "dur": 7.65,
-    "kind": "two",
+    "dur": 8.34,
+    "kind": "split",
     "media": "patients.png"
   },
   {
     "id": "04",
     "file": "scene-04.html",
-    "dur": 5.69,
-    "kind": "two",
-    "media": "laser.png"
+    "dur": 7.38,
+    "kind": "split",
+    "media": "laser.mp4"
   },
   {
     "id": "05",
     "file": "scene-05.html",
-    "dur": 5.9,
-    "kind": "two",
-    "media": "injectables.png"
+    "dur": 7.64,
+    "kind": "split",
+    "media": "injectables.mp4"
   },
   {
     "id": "06",
     "file": "scene-06.html",
-    "dur": 6.84,
-    "kind": "two",
-    "media": "skincare.png"
+    "dur": 9.47,
+    "kind": "split",
+    "media": "skincare.mp4"
   },
   {
     "id": "07",
     "file": "scene-07.html",
-    "dur": 6,
-    "kind": "two",
+    "dur": 9.13,
+    "kind": "split",
     "media": "packages.png"
   },
   {
     "id": "08",
     "file": "scene-08.html",
-    "dur": 4.87,
-    "kind": "two",
-    "media": "appointments.png"
+    "dur": 8.46,
+    "kind": "split",
+    "media": "appointments.mp4"
   },
   {
     "id": "09",
     "file": "scene-09.html",
-    "dur": 6.26,
-    "kind": "two",
-    "media": "invoices.png"
+    "dur": 8,
+    "kind": "split",
+    "media": "invoices.mp4"
   },
   {
     "id": "10",
     "file": "scene-10.html",
-    "dur": 6.17,
-    "kind": "two",
+    "dur": 7.02,
+    "kind": "split",
     "media": "inventory.png"
   },
   {
     "id": "11",
     "file": "scene-11.html",
-    "dur": 5.52,
-    "kind": "wide",
-    "media": "reports.png+audit.png"
+    "dur": 8.34,
+    "kind": "duo",
+    "media": "reports.mp4+audit.png"
   },
   {
     "id": "12",
     "file": "scene-12.html",
-    "dur": 6.69,
+    "dur": 7.4,
     "kind": "outro",
     "media": null
   }

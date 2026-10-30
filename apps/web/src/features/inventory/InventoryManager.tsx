@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import {
+  Empty,
   Table,
   Button,
   Tag,
@@ -426,6 +427,7 @@ export function InventoryManager() {
           columns={columns}
           rowKey="id"
           pagination={{ pageSize: 8 }}
+          locale={{ emptyText: <Empty description="لا توجد أصناف في المخزون حتى الآن" /> }}
           scroll={{ x: 800 }}
         />
       </Card>

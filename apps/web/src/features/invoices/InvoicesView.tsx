@@ -1,13 +1,13 @@
 import { useState, useMemo, useEffect } from 'react';
 import {
-  Table, Button, Tag, Modal, Form, Select, Typography, message,
+  Table, Button, Tag, Modal, Empty, Form, Select, Typography, message, Popconfirm,
   InputNumber, Progress, Space, Segmented, Divider,
   Row, Col, Card, Alert,
 } from 'antd';
 import { IInvoice, InvoiceStatus } from '@clinic/shared-types';
 import {
   Plus, CreditCard, Receipt, Wallet, Trash2, ShoppingCart,
-  User, DollarSign, CheckCircle2, Send, Ticket, UserCheck,
+  User, DollarSign, CheckCircle2, Send, Ticket, UserCheck, Printer,
 } from 'lucide-react';
 import dayjs from 'dayjs';
 import { CashierView } from '../cashier/CashierView';
@@ -25,6 +25,7 @@ import {
   addClinicInvoice,
   recordInvoicePayment,
   subscribeToInvoices,
+  syncInvoicesFromApi,
 } from '../../lib/clinicInvoices';
 
 const { Title, Text } = Typography;
@@ -82,6 +83,17 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
   const [activeTab, setActiveTab] = useState<'invoices' | 'cashier' | 'doctor-settlements'>('invoices');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [payModalId, setPayModalId] = useState<string | null>(null);
+  const [printInvoice, setPrintInvoice] = useState<IInvoice | null>(null);
+  const [creatingInvoice, setCreatingInvoice] = useState(false);
+  const [recordingPayment, setRecordingPayment] = useState(false);
+
+  const handlePrint = (inv: IInvoice) => {
+    setPrintInvoice(inv);
+    setTimeout(() => {
+      window.print();
+    }, 300);
+  };
+
   const [form] = Form.useForm();
   const [payForm] = Form.useForm();
 
@@ -108,6 +120,10 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
       setClinicPackages(getClinicPackages());
     }
   }, [isModalOpen]);
+
+  useEffect(() => {
+    syncInvoicesFromApi();
+  }, []);
 
   useEffect(() => {
     const unsub = subscribeToPackages(() => {
@@ -250,7 +266,9 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
     return () => unsubInv();
   }, []);
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
+    setCreatingInvoice(true);
+    try {
     if (!selectedPatient) {
       message.error('برجاء اختيار الحالة / العميلة أولاً');
       return;
@@ -370,6 +388,9 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
     setIsModalOpen(false);
     resetModal();
     message.success(`✅ تم إنشاء الفاتورة ${newInvoice.invoiceNumber} بإجمالي ${finalTotal.toLocaleString()} ج.م`);
+    } finally {
+      setCreatingInvoice(false);
+    }
   };
 
   const sendInvoiceToDoctor = (inv: IInvoice) => {
@@ -400,12 +421,17 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
     message.success(`🚀 تم إرسال الحالة (${pName}) لقائمة انتظار الطبيبة بنجاح`);
   };
 
-  const handleRecordPayment = (values: any) => {
+  const handleRecordPayment = async (values: any) => {
+    setRecordingPayment(true);
+    try {
     if (!payModalId) return;
     recordInvoicePayment(payModalId, Number(values.amount));
     setPayModalId(null);
     payForm.resetFields();
     message.success('✅ تم تسجيل الدفعة بنجاح');
+    } finally {
+      setRecordingPayment(false);
+    }
   };
 
   const statusColorMap: Record<string, string> = {
@@ -583,6 +609,14 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
                 إرسال للطبيبة
               </Button>
             )}
+            <Button
+              size="small"
+              icon={<Printer size={12} />}
+              style={{ borderRadius: 6, fontSize: 11 }}
+              onClick={() => handlePrint(r)}
+            >
+              طباعة
+            </Button>
           </Space>
         );
       },
@@ -646,6 +680,7 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
             columns={columns}
             rowKey="id"
             pagination={{ pageSize: 10 }}
+            locale={{ emptyText: <Empty description="لا توجد فواتير مسجلة حتى الآن" /> }}
             expandable={{
               expandedRowRender: (record) => (
                 <div style={{ margin: '8px 0' }}>
@@ -686,6 +721,7 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
         open={isModalOpen}
         onCancel={() => { setIsModalOpen(false); resetModal(); }}
         onOk={handleCreate}
+        confirmLoading={creatingInvoice}
         okText={`✅ إنشاء الفاتورة — ${finalTotal.toLocaleString()} ج.م`}
         cancelText="إلغاء"
         width={760}
@@ -925,12 +961,18 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
                     key: 'remove',
                     width: 40,
                     render: (_: any, item: InvoiceLineItem) => (
-                      <Button
-                        type="text"
-                        size="small"
-                        icon={<Trash2 size={14} color="#B91C1C" />}
-                        onClick={() => removeLineItem(item.serviceId)}
-                      />
+                      <Popconfirm
+                        title="Remove service item?"
+                        onConfirm={() => removeLineItem(item.serviceId)}
+                        okText="Yes"
+                        cancelText="No"
+                      >
+                        <Button
+                          type="text"
+                          size="small"
+                          icon={<Trash2 size={14} color="#B91C1C" />}
+                        />
+                      </Popconfirm>
                     ),
                   },
                 ]}
@@ -1105,6 +1147,7 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
         open={!!payModalId}
         onCancel={() => setPayModalId(null)}
         onOk={() => payForm.submit()}
+        confirmLoading={recordingPayment}
         okText="✅ تسجيل الدفعة"
         cancelText="إلغاء"
         okButtonProps={{ style: { backgroundColor: '#047857', borderColor: '#047857', fontWeight: 700 } }}
@@ -1137,6 +1180,85 @@ export function InvoicesView({ currency = 'EGP' }: { currency?: string }) {
           </Form.Item>
         </Form>
       </Modal>
+
+      {/* ======= INVOICE PRINT RECEIPT MODAL ======= */}
+      <Modal
+        open={!!printInvoice}
+        onCancel={() => setPrintInvoice(null)}
+        footer={[
+          <Button key="close" onClick={() => setPrintInvoice(null)}>إغلاق</Button>,
+          <Button key="print" type="primary" icon={<Printer size={14} />} onClick={() => window.print()} style={{ backgroundColor: '#be185d', borderColor: '#be185d' }}>طباعة الإيصال</Button>
+        ]}
+        width={480}
+        title="إيصال الفاتورة للعميل"
+      >
+        {printInvoice && (
+          <div id="printable-invoice-receipt" style={{ padding: '16px', fontFamily: 'sans-serif', color: '#1e293b' }}>
+            <div style={{ textAlign: 'center', borderBottom: '2px dashed #cbd5e1', paddingBottom: '12px', marginBottom: '12px' }}>
+              <h2 style={{ margin: 0, color: '#be185d', fontSize: '20px' }}>عيادة الجمال التخصصية</h2>
+              <div style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>إيصال استلام وسداد خدمات</div>
+              <div style={{ fontSize: '11px', color: '#94a3b8' }}>التاريخ: {dayjs(printInvoice.issueDate).format('YYYY-MM-DD hh:mm A')}</div>
+            </div>
+
+            <div style={{ fontSize: '13px', marginBottom: '12px', lineHeight: '1.8' }}>
+              <div><strong>رقم الفاتورة:</strong> {printInvoice.invoiceNumber}</div>
+              <div><strong>العميلة / الحالة:</strong> {patientNameMap[printInvoice.patientId] || printInvoice.patientId}</div>
+              <div><strong>الحالة:</strong> {statusLabelAr[printInvoice.status] || printInvoice.status}</div>
+            </div>
+
+            <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse', marginBottom: '12px' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #e2e8f0', textAlign: 'right' }}>
+                  <th style={{ padding: '6px 0' }}>البند / الخدمة</th>
+                  <th style={{ padding: '6px 0', textAlign: 'center' }}>العدد</th>
+                  <th style={{ padding: '6px 0', textAlign: 'left' }}>المبلغ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(printInvoice.items || []).map((item, idx) => (
+                  <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <td style={{ padding: '6px 0' }}>{item.description}</td>
+                    <td style={{ padding: '6px 0', textAlign: 'center' }}>{item.quantity}</td>
+                    <td style={{ padding: '6px 0', textAlign: 'left' }}>{Number(item.lineTotal).toLocaleString()} {printInvoice.currency}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div style={{ borderTop: '2px dashed #cbd5e1', paddingTop: '10px', fontSize: '13px', lineHeight: '1.8' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>الإجمالي:</span>
+                <span>{Number(printInvoice.subtotal).toLocaleString()} {printInvoice.currency}</span>
+              </div>
+              {Number(printInvoice.discountAmount) > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#047857' }}>
+                  <span>الخصم:</span>
+                  <span>- {Number(printInvoice.discountAmount).toLocaleString()} {printInvoice.currency}</span>
+                </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '15px', color: '#0f172a' }}>
+                <span>الصافي المطلوب:</span>
+                <span>{Number(printInvoice.total).toLocaleString()} {printInvoice.currency}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#047857', fontWeight: 'bold' }}>
+                <span>المدفوع:</span>
+                <span>{Number(printInvoice.paidAmount).toLocaleString()} {printInvoice.currency}</span>
+              </div>
+              {Number(printInvoice.total) - Number(printInvoice.paidAmount) > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#b91c1c', fontWeight: 'bold' }}>
+                  <span>المتبقي:</span>
+                  <span>{(Number(printInvoice.total) - Number(printInvoice.paidAmount)).toLocaleString()} {printInvoice.currency}</span>
+                </div>
+              )}
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '11px', color: '#94a3b8', borderTop: '1px solid #e2e8f0', paddingTop: '8px' }}>
+              نتمنى لكم دوام الصحة والجمال ✨ شكراً لزيارتكم!
+            </div>
+          </div>
+        )}
+      </Modal>
+
     </div>
   );
 }

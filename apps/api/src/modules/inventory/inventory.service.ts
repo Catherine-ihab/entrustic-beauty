@@ -20,28 +20,41 @@ const EXPIRY_ALERT_DAYS = 90;
 interface ItemRow {
   id: string;
   name: string;
+  name_en: string | null;
   sku: string | null;
   category: string | null;
   unit: string;
   reorder_level: number;
+  unit_cost: string | null;
+  sale_price: string | null;
+  notes: string | null;
   default_vendor: string | null;
   is_active: boolean;
   available: number;
   batch_count: number;
+  nearest_expiry: string | null;
 }
+
+const num = (v: string | null): number | undefined =>
+  v === null || v === undefined ? undefined : Number(v);
 
 function toItemDto(r: ItemRow): IInventoryItem {
   return {
     id: r.id,
     name: r.name,
+    nameEn: r.name_en ?? undefined,
     sku: r.sku ?? undefined,
     category: r.category ?? undefined,
     unit: r.unit,
     reorderLevel: r.reorder_level,
+    unitCost: num(r.unit_cost),
+    salePrice: num(r.sale_price),
+    notes: r.notes ?? undefined,
     defaultVendor: r.default_vendor ?? undefined,
     isActive: r.is_active,
     available: r.available,
     batchCount: r.batch_count,
+    nearestExpiry: r.nearest_expiry ?? undefined,
   };
 }
 
@@ -59,10 +72,11 @@ export class InventoryService {
   ) {}
 
   private readonly itemSelect = `
-    SELECT i.id, i.name, i.sku, i.category, i.unit, i.reorder_level,
-           i.default_vendor, i.is_active,
+    SELECT i.id, i.name, i.name_en, i.sku, i.category, i.unit, i.reorder_level,
+           i.unit_cost, i.sale_price, i.notes, i.default_vendor, i.is_active,
            COALESCE(SUM(b.quantity_remaining), 0)::int AS available,
-           COUNT(b.id)::int AS batch_count
+           COUNT(b.id)::int AS batch_count,
+           MIN(CASE WHEN b.quantity_remaining > 0 THEN b.expiry_date END) AS nearest_expiry
     FROM inventory_items i
     LEFT JOIN inventory_batches b
       ON b.item_id = i.id AND b.clinic_id = i.clinic_id
@@ -119,10 +133,14 @@ export class InventoryService {
     const item = this.itemRepo.create({
       clinic_id: clinicId,
       name: dto.name.trim(),
+      name_en: dto.nameEn?.trim() || null,
       sku: dto.sku?.trim() || null,
       category: dto.category?.trim() || null,
       unit: dto.unit?.trim() || 'unit',
       reorder_level: Math.max(0, dto.reorderLevel ?? 0),
+      unit_cost: dto.unitCost !== undefined ? String(dto.unitCost) : null,
+      sale_price: dto.salePrice !== undefined ? String(dto.salePrice) : null,
+      notes: dto.notes?.trim() || null,
       default_vendor: dto.defaultVendor?.trim() || null,
       is_active: true,
     });
@@ -130,14 +148,19 @@ export class InventoryService {
     return toItemDto({
       id: saved.id,
       name: saved.name,
+      name_en: saved.name_en,
       sku: saved.sku,
       category: saved.category,
       unit: saved.unit,
       reorder_level: saved.reorder_level,
+      unit_cost: saved.unit_cost,
+      sale_price: saved.sale_price,
+      notes: saved.notes,
       default_vendor: saved.default_vendor,
       is_active: saved.is_active,
       available: 0,
       batch_count: 0,
+      nearest_expiry: null,
     });
   }
 
@@ -153,32 +176,43 @@ export class InventoryService {
     if (!item) throw new NotFoundException('Inventory item not found');
 
     if (dto.name !== undefined) item.name = dto.name.trim();
+    if (dto.nameEn !== undefined) item.name_en = dto.nameEn.trim() || null;
     if (dto.sku !== undefined) item.sku = dto.sku.trim() || null;
     if (dto.category !== undefined) item.category = dto.category.trim() || null;
     if (dto.unit !== undefined) item.unit = dto.unit.trim() || 'unit';
     if (dto.reorderLevel !== undefined) item.reorder_level = Math.max(0, dto.reorderLevel);
+    if (dto.unitCost !== undefined) item.unit_cost = dto.unitCost === null ? null : String(dto.unitCost);
+    if (dto.salePrice !== undefined) item.sale_price = dto.salePrice === null ? null : String(dto.salePrice);
+    if (dto.notes !== undefined) item.notes = dto.notes.trim() || null;
     if (dto.defaultVendor !== undefined) item.default_vendor = dto.defaultVendor.trim() || null;
     if (dto.isActive !== undefined) item.is_active = dto.isActive;
 
     const saved = await this.itemRepo.save(item);
 
     const total = await this.dataSource.query(
-      `SELECT COALESCE(SUM(b.quantity_remaining), 0)::int AS available, COUNT(b.id)::int AS batch_count
+      `SELECT COALESCE(SUM(b.quantity_remaining), 0)::int AS available,
+              COUNT(b.id)::int AS batch_count,
+              MIN(CASE WHEN b.quantity_remaining > 0 THEN b.expiry_date END) AS nearest_expiry
        FROM inventory_batches b WHERE b.clinic_id = $1 AND b.item_id = $2`,
       [clinicId, id],
     );
-    const r = total[0] ?? { available: 0, batch_count: 0 };
+    const r = total[0] ?? { available: 0, batch_count: 0, nearest_expiry: null };
     return toItemDto({
       id: saved.id,
       name: saved.name,
+      name_en: saved.name_en,
       sku: saved.sku,
       category: saved.category,
       unit: saved.unit,
       reorder_level: saved.reorder_level,
+      unit_cost: saved.unit_cost,
+      sale_price: saved.sale_price,
+      notes: saved.notes,
       default_vendor: saved.default_vendor,
       is_active: saved.is_active,
       available: r.available,
       batch_count: r.batch_count,
+      nearest_expiry: r.nearest_expiry,
     });
   }
 
@@ -232,6 +266,10 @@ export class InventoryService {
   /**
    * Consume stock FIFO-style across non-expired batches (earliest expiry first).
    * Writes per-batch decrements + movements atomically inside one transaction.
+   *
+   * When `referenceId` is supplied (e.g. the clinical session that used the
+   * product), a retry of the same request returns `duplicate: true` instead of
+   * deducting the stock a second time.
    */
   async consumeStock(
     clinicId: string,
@@ -239,7 +277,12 @@ export class InventoryService {
     quantity: number,
     reason: string | null,
     createdBy: string | null,
-  ): Promise<{ consumed: number; batches: Array<{ batchId: string; quantity: number }> }> {
+    referenceId: string | null = null,
+  ): Promise<{
+    consumed: number;
+    duplicate?: boolean;
+    batches: Array<{ batchId: string; quantity: number }>;
+  }> {
     if (!quantity || quantity <= 0) {
       throw new BadRequestException('Quantity must be a positive number');
     }
@@ -250,6 +293,19 @@ export class InventoryService {
       );
       if (!item) {
         throw new BadRequestException('Inventory item not found');
+      }
+
+      if (referenceId) {
+        const [already] = await qr.query(
+          `SELECT id FROM inventory_movements
+            WHERE clinic_id = $1 AND item_id = $2 AND reference_id = $3
+              AND movement_type = 'consume'
+            LIMIT 1`,
+          [clinicId, itemId, referenceId],
+        );
+        if (already) {
+          return { consumed: 0, duplicate: true, batches: [] };
+        }
       }
 
       // FIFO candidates: skip expired batches; order by earliest expiry first.
@@ -283,9 +339,9 @@ export class InventoryService {
         );
         await qr.query(
           `INSERT INTO inventory_movements
-             (id, clinic_id, item_id, batch_id, movement_type, quantity, reason, created_by)
-           VALUES (uuid_generate_v4(), $1, $2, $3, 'consume', $4, $5, $6)`,
-          [clinicId, itemId, batch.id, -take, reason?.trim() || 'Consumed', createdBy],
+             (id, clinic_id, item_id, batch_id, movement_type, quantity, reason, reference_id, created_by)
+           VALUES (uuid_generate_v4(), $1, $2, $3, 'consume', $4, $5, $6, $7)`,
+          [clinicId, itemId, batch.id, -take, reason?.trim() || 'Consumed', referenceId, createdBy],
         );
         movements.push({ batchId: batch.id, quantity: take });
         remaining -= take;

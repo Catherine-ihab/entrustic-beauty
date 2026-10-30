@@ -21,6 +21,7 @@ import {
   Calendar,
   Alert,
   Checkbox,
+  Empty,
 } from 'antd';
 import {
   CalendarPlus,
@@ -42,8 +43,10 @@ import {
   Columns,
   LayoutGrid,
   ShieldAlert,
+  RefreshCw,
 } from 'lucide-react';
 import dayjs, { Dayjs } from 'dayjs';
+import { apiClient } from '../../lib/api-client';
 import { getRegisteredPatients, RegisteredPatient } from '../../lib/patientsDirectory';
 import { getClinicPackages, ClinicPackage, subscribeToPackages } from '../../lib/packagesDirectory';
 import { addToQueue, detectServiceCategory } from '../../lib/clinicQueue';
@@ -314,7 +317,68 @@ export function AppointmentsView() {
     return () => unsub();
   }, []);
 
+  const [apptLoading, setApptLoading] = useState(false);
+
+  const fetchAppointmentsFromApi = async () => {
+    try {
+      setApptLoading(true);
+      const res: any = await apiClient.get('/appointments');
+      const payload = res?.data ?? res;
+      const list = Array.isArray(payload) ? payload : Array.isArray(payload?.items) ? payload.items : [];
+      if (list.length > 0) {
+        const mapped: ClinicAppointment[] = list.map((a: any) => {
+          const pName = `${a.patient?.first_name || ''} ${a.patient?.last_name || ''}`.trim() || 'Patient';
+          const sName = a.service?.name || a.notes || 'استشارة عامة';
+          const category = detectServiceCategory(sName);
+          const docName = a.provider
+            ? `د. ${a.provider.first_name} ${a.provider.last_name || ''}`.trim()
+            : 'د. سارة القاضي';
+
+          let qStatus: QueueStatus = 'waiting';
+          if (a.status === 'completed') qStatus = 'completed';
+          else if (a.status === 'in_progress') qStatus = 'in_doctor';
+          else if (a.status === 'cancelled') qStatus = 'cancelled';
+
+          return {
+            id: a.id,
+            name: pName,
+            phone: a.patient?.phone || '',
+            patientNumber: a.patient?.patient_number || '',
+            serviceCategory: category,
+            serviceName: sName,
+            date: dayjs(a.start_time).format('YYYY-MM-DD'),
+            time: dayjs(a.start_time).format('HH:mm'),
+            doctor: docName,
+            room: a.room_code || 'غرفة 1',
+            priceEgp: Number(a.service?.current_price || 0),
+            status: qStatus,
+            notes: a.notes || '',
+          };
+        });
+
+        setAppointments((prev) => {
+          const serverIds = new Set(mapped.map((m) => m.id));
+          const localAppts = prev.filter((a) => a.id.startsWith('apt-') && !serverIds.has(a.id));
+          const combined = [...mapped, ...localAppts];
+          try {
+            localStorage.setItem(LS_APPOINTMENTS, JSON.stringify(combined));
+          } catch (_) {}
+          return combined;
+        });
+      }
+    } catch (err) {
+      console.warn('Could not load appointments from server:', err);
+    } finally {
+      setApptLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAppointmentsFromApi();
+  }, []);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [savingAppt, setSavingAppt] = useState(false);
   const [editingAppt, setEditingAppt] = useState<ClinicAppointment | null>(null);
   const [form] = Form.useForm();
 
@@ -359,12 +423,19 @@ export function AppointmentsView() {
     const next = appointments.map((a) => (a.id === id ? { ...a, status: newStatus } : a));
     saveAppointments(next);
     message.success('تم تحديث حالة الموعد');
+    if (id.length > 20 && !id.startsWith('apt-')) {
+      const apiStatus = newStatus === 'completed' ? 'completed' : newStatus === 'in_doctor' ? 'in_progress' : newStatus === 'cancelled' ? 'cancelled' : 'scheduled';
+      apiClient.patch(`/appointments/${id}`, { status: apiStatus }).catch(() => {});
+    }
   };
 
   const handleDelete = (id: string) => {
     const next = appointments.filter((a) => a.id !== id);
     saveAppointments(next);
     message.success('تم حذف الموعد');
+    if (id.length > 20 && !id.startsWith('apt-')) {
+      apiClient.delete(`/appointments/${id}`).catch(() => {});
+    }
   };
 
   // Helper: check if a doctor is off on a specific date
@@ -486,6 +557,8 @@ export function AppointmentsView() {
   };
 
   const proceedSave = (values: any, dateStr: string, timeStr: string) => {
+    setSavingAppt(true);
+    try {
     const docObj = doctors.find((d) => d.name === values.doctor);
     if (editingAppt) {
       const next = appointments.map((a) =>
@@ -522,6 +595,9 @@ export function AppointmentsView() {
     }
     setIsModalOpen(false);
     form.resetFields();
+    } finally {
+      setSavingAppt(false);
+    }
   };
 
   // WhatsApp contextual generator
@@ -657,6 +733,15 @@ export function AppointmentsView() {
                 onClick={() => setIsDoctorsModalOpen(true)}
               >
                 مواعيد وإجازات الطبيبات
+              </Button>
+              <Button
+                size="large"
+                icon={<RefreshCw size={16} />}
+                loading={apptLoading}
+                onClick={() => fetchAppointmentsFromApi()}
+                style={{ borderRadius: 8, fontWeight: 600 }}
+              >
+                تحديث
               </Button>
               <Button
                 type="primary"
@@ -896,11 +981,17 @@ export function AppointmentsView() {
           {/* VIEW MODE A: STANDARD KANBAN BY STATUS */}
           {queueMode === 'doctor_focused' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {STATUS_ORDER.map((status) => {
-                const cfg = STATUS_CONFIG[status];
-                const items = filteredQueue.filter((a) => a.status === status);
-                return (
-                  <div key={status}>
+              {filteredQueue.length === 0 ? (
+                <Card style={{ borderRadius: 14, textAlign: 'center', padding: '36px 0', border: '1px dashed #CBD5E1' }}>
+                  <Empty description="لا توجد مواعيد مسجلة في طابور اليوم حتى الآن" />
+                </Card>
+              ) : (
+                STATUS_ORDER.map((status) => {
+                  const cfg = STATUS_CONFIG[status];
+                  const items = filteredQueue.filter((a) => a.status === status);
+                  if (items.length === 0) return null;
+                  return (
+                    <div key={status}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                       <span
                         style={{
@@ -1051,8 +1142,9 @@ export function AppointmentsView() {
                     </div>
                   </div>
                 );
-              })}
-            </div>
+              })
+            )}
+          </div>
           )}
 
           {/* VIEW MODE B: SIDE-BY-SIDE LANES FOR MULTIPLE DOCTORS AT THE SAME TIME */}
@@ -1290,7 +1382,12 @@ export function AppointmentsView() {
       {activeTab === 'all_list' && (
         <Card style={{ borderRadius: 14, border: '1px solid #E2E8F0' }} bodyStyle={{ padding: 0 }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {appointments.map((appt) => (
+            {appointments.length === 0 ? (
+              <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                <Empty description="لا توجد أي مواعيد في الأرشيف حتى الآن" />
+              </div>
+            ) : (
+              appointments.map((appt) => (
               <div
                 key={appt.id}
                 style={{
@@ -1328,7 +1425,8 @@ export function AppointmentsView() {
                   </Popconfirm>
                 </Space>
               </div>
-            ))}
+            ))
+            )}
           </div>
         </Card>
       )}
@@ -1339,6 +1437,7 @@ export function AppointmentsView() {
         open={isModalOpen}
         onCancel={() => { setIsModalOpen(false); form.resetFields(); }}
         onOk={() => form.submit()}
+        confirmLoading={savingAppt}
         okText={editingAppt ? 'حفظ التعديلات' : 'تأكيد الحجز'}
         cancelText="إلغاء"
         width={640}

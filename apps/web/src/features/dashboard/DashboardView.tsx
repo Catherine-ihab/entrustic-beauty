@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Card, Table, Typography, Space, Button, Progress, Tag, Divider, Empty, Spin } from 'antd';
+import { Row, Col, Card, Table, Typography, Space, Button, Progress, Tag, Divider, Empty, Spin, Alert } from 'antd';
 import {
   Users,
   Calendar,
@@ -93,6 +93,45 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
           </Space>
         }
       />
+
+      {/* Prominent Low-Stock Alert Banner for Front Desk */}
+      {(data?.lowStock?.length ?? 0) > 0 && (
+        <Alert
+          message={
+            <div style={{ fontWeight: 600, fontSize: 14, color: '#991B1B' }}>
+              {tx('⚠️ تنبيه نواقص المستلزمات (أوشكت على النفاد):', '⚠️ Low Inventory Alert (Items Depleting Soon):')}
+            </div>
+          }
+          description={
+            <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+              {data!.lowStock.map((item) => (
+                <Tag
+                  key={item.id}
+                  color="error"
+                  style={{ fontSize: 12, padding: '3px 10px', borderRadius: 6, fontWeight: 500 }}
+                >
+                  <strong>{item.name}</strong>: {tx('المتبقي', 'Remaining')} {item.remaining} {item.unit || ''}{' '}
+                  <span style={{ opacity: 0.8 }}>({tx('الحد الأدنى', 'Reorder Level')}: {item.reorderLevel})</span>
+                </Tag>
+              ))}
+            </div>
+          }
+          type="error"
+          showIcon
+          action={
+            <Button
+              size="small"
+              type="primary"
+              danger
+              onClick={() => onNavigate('inventory')}
+              style={{ borderRadius: 6, fontWeight: 600, marginTop: 4 }}
+            >
+              {tx('فتح المخزن والطلب', 'Manage Inventory')}
+            </Button>
+          }
+          style={{ marginBottom: 20, borderRadius: 10, border: '1px solid #FECACA', backgroundColor: '#FEF2F2' }}
+        />
+      )}
 
       {/* Primary KPI Metrics Grid */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>

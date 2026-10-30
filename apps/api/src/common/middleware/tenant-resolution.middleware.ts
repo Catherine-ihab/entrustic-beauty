@@ -24,9 +24,26 @@ export class TenantResolutionMiddleware implements NestMiddleware {
       }
     }
 
+    // Fallback from header (works across devices/IPs)
+    if (!slug && req.headers['x-tenant-slug']) {
+      const headerSlug = (req.headers['x-tenant-slug'] as string).trim().toLowerCase();
+      if (headerSlug) slug = headerSlug;
+    }
+
     // Fallback for local development headers if configured
     if (!slug && process.env.NODE_ENV !== 'production' && req.headers['x-tenant-slug']) {
       slug = (req.headers['x-tenant-slug'] as string).toLowerCase();
+    }
+
+    // Fallback to default tenant slug from env if configured
+    if (!slug && process.env.SEED_CLINIC_SLUG) {
+      slug = process.env.SEED_CLINIC_SLUG.trim().toLowerCase();
+    }
+    if (!slug && process.env.DEFAULT_TENANT_SLUG) {
+      slug = process.env.DEFAULT_TENANT_SLUG.trim().toLowerCase();
+    }
+    if (!slug && process.env.VITE_TENANT_SLUG) {
+      slug = process.env.VITE_TENANT_SLUG.trim().toLowerCase();
     }
 
     if (slug) {

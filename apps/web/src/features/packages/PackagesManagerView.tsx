@@ -18,6 +18,7 @@ import {
   Popconfirm,
   Tabs,
   Checkbox,
+  Empty,
 } from 'antd';
 import {
   Ticket,
@@ -444,6 +445,7 @@ export function PackagesManagerView() {
                   rowKey="id"
                   columns={enrollmentColumns}
                   pagination={{ pageSize: 8 }}
+                  locale={{ emptyText: <Empty description="لا توجد باقات مشتركة للعملاء حتى الآن" /> }}
                   scroll={{ x: 800 }}
                 />
               ),
@@ -479,6 +481,7 @@ export function PackagesManagerView() {
                     rowKey="id"
                     columns={templateColumns}
                     pagination={{ pageSize: 8 }}
+                    locale={{ emptyText: <Empty description="لا توجد باقات معتمدة في الدليل حتى الآن" /> }}
                     scroll={{ x: 750 }}
                   />
                 </div>

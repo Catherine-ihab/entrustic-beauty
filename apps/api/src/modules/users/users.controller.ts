@@ -34,8 +34,17 @@ export class UsersController {
       phone?: string;
       roleIds: string[];
     },
+    @Req() req: any,
   ) {
-    const clinicId = this.cls.get(TENANT_ID_KEY);
+    const clinicId =
+      this.cls.get(TENANT_ID_KEY) ||
+      req?.user?.clinic_id ||
+      req?.user?.clinicId ||
+      req?.user?.clinic?.id ||
+      null;
+    if (!clinicId) {
+      throw new UnauthorizedException('Clinic context missing');
+    }
     return this.usersService.createStaff(clinicId, dto);
   }
 

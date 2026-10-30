@@ -15,7 +15,8 @@ import {
   Select,
   message,
   Popconfirm,
-} from 'antd';
+  Empty,
+} from 'antd'
 import {
   Plus,
   Eye,
@@ -385,6 +386,7 @@ export function BeforeAfterView() {
           columns={columns}
           rowKey="id"
           pagination={{ pageSize: 6 }}
+          locale={{ emptyText: <Empty description="لا توجد مقارنات قبل وبعد مسجلة حتى الآن" /> }}
           scroll={{ x: 800 }}
         />
       </Card>

@@ -26,6 +26,8 @@ export class InventoryMovement {
   @Column({ type: 'varchar', length: 10 }) movement_type: InventoryMovementType;
   @Column({ type: 'integer' }) quantity: number;
   @Column({ type: 'text', nullable: true }) reason: string | null;
+  /** Session / visit that caused this movement — used for idempotent retries. */
+  @Column({ type: 'varchar', length: 120, nullable: true }) reference_id: string | null;
   @Column({ type: 'uuid', nullable: true }) created_by: string | null;
   @CreateDateColumn({ type: 'timestamptz' }) created_at: Date;
 }

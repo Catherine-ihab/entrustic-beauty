@@ -1,11 +1,12 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Table, Button, Tag, Space, Input, Modal, Form, Select, Typography, message, DatePicker, Popconfirm, Tooltip } from 'antd';
+import { Table, Button, Tag, Space, Input, Modal, Form, Select, Typography, message, DatePicker, Popconfirm, Tooltip, Empty } from 'antd';
 import { Plus, Search, Wrench, AlertTriangle, Cpu, Edit2, Trash2, RotateCcw } from 'lucide-react';
 import dayjs from 'dayjs';
 import { ClinicType } from '@clinic/shared-types';
 import { useAuthStore } from '../../store/auth-store';
 import { SPECIALTY_LOCK } from '../../specialties';
 import { useLang } from '../../lib/useLang';
+import { apiClient } from '../../lib/api-client';
 
 const { Title } = Typography;
 
@@ -733,6 +734,46 @@ export function DevicesView() {
   const storageKey = `clinic_devices_${currentSpecialty}_${clinic?.id || 'default'}`;
 
   // Initialize devices from localStorage or specialty defaults
+  const [loading, setLoading] = useState(false);
+
+  // Sync devices with API
+  useEffect(() => {
+    let cancelled = false;
+    const fetchApiDevices = async () => {
+      try {
+        setLoading(true);
+        const res = await apiClient.get('/devices');
+        const apiList = res?.data ?? res;
+        if (Array.isArray(apiList) && apiList.length > 0 && !cancelled) {
+          const mapped = apiList.map((d) => ({
+            id: d.id,
+            name: d.name,
+            deviceType: d.deviceType || d.device_type || 'equipment',
+            manufacturer: d.manufacturer || '',
+            model: d.model || '',
+            serialNumber: d.serialNumber || d.serial_number || '',
+            lastCalibration: d.lastCalibration || d.last_calibration ? String(d.lastCalibration || d.last_calibration).slice(0, 10) : undefined,
+            nextCalibration: d.nextCalibration || d.next_calibration ? String(d.nextCalibration || d.next_calibration).slice(0, 10) : undefined,
+            status: d.status || 'active',
+            specifications: d.notes || d.specifications || '',
+          }));
+          setDevices(mapped);
+          try {
+            localStorage.setItem(storageKey, JSON.stringify(mapped));
+          } catch {}
+        }
+      } catch (err) {
+        // Fallback to local
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    fetchApiDevices();
+    return () => {
+      cancelled = true;
+    };
+  }, [storageKey]);
+
   const [devices, setDevices] = useState<IDevice[]>(() => {
     try {
       const saved = localStorage.getItem(storageKey);
@@ -836,11 +877,30 @@ export function DevicesView() {
       status: values.status || 'active',
     };
 
+    const apiPayload = {
+      name: formatted.name,
+      device_type: formatted.deviceType,
+      manufacturer: formatted.manufacturer || null,
+      model: formatted.model || null,
+      serial_number: formatted.serialNumber || null,
+      notes: formatted.specifications || null,
+      last_calibration: formatted.lastCalibration || null,
+      next_calibration: formatted.nextCalibration || null,
+      status: formatted.status,
+    };
+
     if (editingDevice) {
+      if (editingDevice.id.length > 20) {
+        apiClient.patch(`/devices/${editingDevice.id}`, apiPayload).catch(console.warn);
+      }
       const updated = devices.map((d) => (d.id === editingDevice.id ? formatted : d));
       persistDevices(updated);
       message.success(tx('تم تحديث بيانات الجهاز', 'Device details updated successfully'));
     } else {
+      apiClient.post('/devices', apiPayload).then((res) => {
+        const created = res?.data ?? res;
+        if (created?.id) formatted.id = created.id;
+      }).catch(console.warn);
       persistDevices([formatted, ...devices]);
       message.success('Clinical equipment registered successfully');
     }
@@ -852,6 +912,9 @@ export function DevicesView() {
 
   // Delete device
   const handleDelete = (id: string) => {
+    if (id.length > 20) {
+      apiClient.delete(`/devices/${id}`).catch(console.warn);
+    }
     const updated = devices.filter((d) => d.id !== id);
     persistDevices(updated);
     message.success('Medical device deleted successfully');
@@ -1021,7 +1084,9 @@ export function DevicesView() {
         dataSource={filteredDevices}
         columns={columns}
         rowKey="id"
+        loading={loading}
         pagination={{ pageSize: 8 }}
+        locale={{ emptyText: <Empty description="لا توجد أجهزة مطابقة أو مسجلة حتى الآن" /> }}
         style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid #E2E8F0', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
       />
 

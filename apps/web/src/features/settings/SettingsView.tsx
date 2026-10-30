@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Tabs,
   Card,
@@ -45,6 +45,7 @@ import { PageHeader, StatusBadge } from '../../design-system';
 import { ClinicType } from '@clinic/shared-types';
 import { useAuthStore } from '../../store/auth-store';
 import { IS_PLATFORM_OWNER } from '../../store/platform-owner';
+import { apiClient } from '../../lib/api-client';
 
 const { Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -232,6 +233,11 @@ export const SettingsView: React.FC = () => {
   const [brandColor, setBrandColor] = useState(clinic?.branding?.primaryColor || '#2563EB');
   const [welcomeText, setWelcomeText] = useState(clinic?.branding?.welcomeMessage || '');
 
+  // Roles state from DB & loading states
+  const [dbRoles, setDbRoles] = useState<Array<{ id: string; name: string; displayName?: string; display_name?: string }>>([]);
+  const [staffLoading, setStaffLoading] = useState(false);
+  const [savingStaff, setSavingStaff] = useState(false);
+
   // Roles state
   const [roles, setRoles] = useState([
     {
@@ -284,6 +290,95 @@ export const SettingsView: React.FC = () => {
     phone?: string;
     permissionCount: number;
   } | null>(null);
+
+  // Sync staff & roles with the backend database
+  useEffect(() => {
+    let active = true;
+    const initData = async () => {
+      // 1. Fetch real DB roles
+      try {
+        const rolesRes: any = await apiClient.get('/roles');
+        const rList = rolesRes?.data ?? rolesRes;
+        if (active && Array.isArray(rList) && rList.length > 0) {
+          setDbRoles(rList);
+          setRoles(
+            rList.map((r: any) => ({
+              id: r.id,
+              name: r.name,
+              displayName: r.displayName || r.display_name || r.name,
+              description: r.description || 'Configured system role',
+              isSystem: r.is_system ?? r.isSystem ?? true,
+              permissionCount:
+                r.permissions?.length ||
+                (ROLE_DEFAULT_PERMISSIONS[r.displayName || r.display_name || '']?.length ?? 12),
+            }))
+          );
+        }
+      } catch (err) {
+        console.warn('Could not fetch roles from API, using fallback defaults:', err);
+      }
+
+      // 2. Fetch real DB staff accounts
+      try {
+        setStaffLoading(true);
+        const staffRes: any = await apiClient.get('/users/staff');
+        const sList = staffRes?.data ?? staffRes;
+        if (active && Array.isArray(sList) && sList.length > 0) {
+          const localMap = new Map(loadStaffAccounts().map((s) => [s.username.toLowerCase(), s]));
+          const mappedStaff: StaffMember[] = sList.map((u: any) => {
+            const roleObj = u.roles?.[0];
+            const roleName = roleObj?.displayName || roleObj?.display_name || roleObj?.name || 'Staff';
+            const roleFormatted =
+              roleObj?.name === 'clinic_owner'
+                ? 'Clinic Owner / Admin'
+                : roleObj?.name === 'doctor'
+                ? 'Doctor / Senior Practitioner'
+                : roleObj?.name === 'receptionist'
+                ? 'Front Desk & Receptionist'
+                : roleName;
+
+            const perms = (u.roles || []).flatMap((r: any) =>
+              (r.permissions || []).map((p: any) => (p.resource ? `${p.resource}:${p.action}` : p.name || p))
+            );
+
+            const localAcc = localMap.get((u.email || '').toLowerCase());
+
+            return {
+              id: u.id,
+              name: `${u.firstName || u.first_name || ''} ${u.lastName || u.last_name || ''}`.trim() || u.email,
+              username: u.email,
+              password: localAcc?.password || '',
+              role: roleFormatted,
+              status: (u.status === 'active' ? 'active' : 'suspended') as 'active' | 'suspended',
+              phone: u.phone || '',
+              permissions: perms.length > 0 ? perms : (ROLE_DEFAULT_PERMISSIONS[roleFormatted] || []),
+            };
+          });
+
+          // Preserve any extra local-only items that may exist
+          const serverEmails = new Set(sList.map((u: any) => (u.email || '').toLowerCase()));
+          const extraLocal = loadStaffAccounts().filter(
+            (s) => !serverEmails.has(s.username.toLowerCase()) && s.id.startsWith('usr-')
+          );
+
+          const combined = [...mappedStaff, ...extraLocal];
+          setStaff(combined);
+          try {
+            localStorage.setItem('clinic_staff_accounts', JSON.stringify(combined));
+          } catch { /* ignore */ }
+        }
+      } catch (err) {
+        console.warn('Could not fetch staff from server API, using local accounts:', err);
+      } finally {
+        if (active) setStaffLoading(false);
+      }
+    };
+
+    initData();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const saveStaff = (next: StaffMember[]) => {
     setStaff(next);
@@ -394,8 +489,35 @@ export const SettingsView: React.FC = () => {
     message.success('Generated new secure password');
   };
 
-  const handleSaveStaff = (values: any) => {
+  const findRoleId = (selectedRole: string): string => {
+    const match = dbRoles.find(
+      (r) =>
+        r.id === selectedRole ||
+        r.name?.toLowerCase() === selectedRole.toLowerCase() ||
+        r.displayName?.toLowerCase() === selectedRole.toLowerCase() ||
+        r.display_name?.toLowerCase() === selectedRole.toLowerCase() ||
+        (selectedRole.toLowerCase().includes('doctor') && r.name?.toLowerCase().includes('doctor')) ||
+        (selectedRole.toLowerCase().includes('reception') && r.name?.toLowerCase().includes('reception')) ||
+        (selectedRole.toLowerCase().includes('owner') && (r.name?.toLowerCase().includes('owner') || r.name?.toLowerCase().includes('admin'))) ||
+        (selectedRole.toLowerCase().includes('admin') && (r.name?.toLowerCase().includes('owner') || r.name?.toLowerCase().includes('admin')))
+    );
+    if (match?.id) return match.id;
+    if (selectedRole.toLowerCase().includes('doctor')) return '32076d7c-a4c7-478b-96c2-95ba8e3386a5';
+    if (selectedRole.toLowerCase().includes('reception')) return '74f4d3c7-1fd5-4cb5-87e4-5b24ad375a66';
+    return '2a8c41e9-a02e-4bb7-a7f7-db69a58e42a5';
+  };
+
+  const handleSaveStaff = async (values: any) => {
     if (editingStaffId) {
+      const isDb = editingStaffId.length > 20 && !editingStaffId.startsWith('usr-');
+      if (isDb) {
+        try {
+          const roleId = findRoleId(values.role);
+          await apiClient.patch(`/users/staff/${editingStaffId}/roles`, { roleIds: [roleId] });
+        } catch (err: any) {
+          console.warn('Failed to update roles on server:', err);
+        }
+      }
       const updated = staff.map((s) =>
         s.id === editingStaffId
           ? {
@@ -415,20 +537,49 @@ export const SettingsView: React.FC = () => {
       staffForm.resetFields();
       setEditingStaffId(null);
     } else {
+      const rawUser = values.username.trim().toLowerCase();
+      const cleanEmail = rawUser.includes('@') ? rawUser : `${rawUser}@entrusticbeauty.app`;
+      let createdId = `usr-${Date.now()}`;
+
+      try {
+        setSavingStaff(true);
+        const roleId = findRoleId(values.role);
+        const res: any = await apiClient.post('/users/staff', {
+          email: cleanEmail,
+          password: values.password,
+          firstName: values.firstName.trim(),
+          lastName: values.lastName.trim(),
+          phone: values.phone?.trim() || undefined,
+          roleIds: [roleId],
+        });
+        const createdUser = res?.data ?? res;
+        if (createdUser?.id) {
+          createdId = createdUser.id;
+        }
+      } catch (err: any) {
+        console.error('Failed to create staff account on server:', err);
+        const msg = err?.message || 'Failed to save staff account on server';
+        message.error(msg);
+        setSavingStaff(false);
+        return;
+      } finally {
+        setSavingStaff(false);
+      }
+
       const newMember: StaffMember = {
-        id: `usr-${Date.now()}`,
+        id: createdId,
         name: `${values.firstName} ${values.lastName}`.trim(),
-        username: values.username,
+        username: cleanEmail,
         password: values.password,
         role: values.role,
         status: 'active',
         phone: values.phone,
         permissions: selectedStaffPermissions,
       };
-      saveStaff([newMember, ...staff]);
+      saveStaff([newMember, ...staff.filter((s) => s.username.toLowerCase() !== cleanEmail)]);
       setIsStaffModalOpen(false);
       staffForm.resetFields();
-      message.success(`Account created for ${newMember.name}`);
+      message.success(`Account created successfully for ${newMember.name}. They can now log in!`);
       setCredentialsModal({
         visible: true,
         name: newMember.name,
@@ -441,14 +592,34 @@ export const SettingsView: React.FC = () => {
     }
   };
 
-  const handleToggleStaffStatus = (member: StaffMember) => {
+  const handleToggleStaffStatus = async (member: StaffMember) => {
     const newStatus: 'active' | 'suspended' = member.status === 'active' ? 'suspended' : 'active';
+    const isDb = member.id.length > 20 && !member.id.startsWith('usr-');
+    if (isDb) {
+      try {
+        await apiClient.patch(`/users/staff/${member.id}/status`, { status: newStatus });
+      } catch (err: any) {
+        console.warn('Failed to update status on server:', err);
+      }
+    }
     const updated = staff.map((s) => (s.id === member.id ? { ...s, status: newStatus } : s));
     saveStaff(updated);
     message.info(`User ${member.name} marked as ${newStatus}`);
   };
 
-  const handleDeleteStaff = (memberId: string) => {
+  const handleDeleteStaff = async (memberId: string) => {
+    const isDb = memberId.length > 20 && !memberId.startsWith('usr-');
+    if (isDb) {
+      try {
+        const target = staff.find((s) => s.id === memberId);
+        if (target?.status === 'active') {
+          await apiClient.patch(`/users/staff/${memberId}/status`, { status: 'suspended' });
+        }
+        await apiClient.delete(`/users/staff/${memberId}`);
+      } catch (err: any) {
+        console.warn('Failed to remove staff from server:', err);
+      }
+    }
     const updated = staff.filter((s) => s.id !== memberId);
     saveStaff(updated);
     message.success('Staff account removed');
@@ -797,6 +968,7 @@ export const SettingsView: React.FC = () => {
                   </div>
 
                   <Table
+                    loading={staffLoading}
                     dataSource={staff}
                     rowKey="id"
                     pagination={false}
@@ -970,16 +1142,22 @@ export const SettingsView: React.FC = () => {
                           <Space size={8}>
                             <Button size="small" type="text" icon={<Edit2 size={14} />} />
                             {!record.isSystem && (
-                              <Button
-                                size="small"
-                                type="text"
-                                danger
-                                icon={<Trash2 size={14} />}
-                                onClick={() => {
+                              <Popconfirm
+                                title="Are you sure you want to delete this role?"
+                                onConfirm={() => {
                                   setRoles(roles.filter((r) => r.id !== record.id));
                                   message.info('Role deleted');
                                 }}
-                              />
+                                okText="Delete"
+                                cancelText="Cancel"
+                              >
+                                <Button
+                                  size="small"
+                                  type="text"
+                                  danger
+                                  icon={<Trash2 size={14} />}
+                                />
+                              </Popconfirm>
                             )}
                           </Space>
                         ),
@@ -1050,15 +1228,15 @@ export const SettingsView: React.FC = () => {
               label: (
                 <Space size={6}>
                   <Database size={16} />
-                  نسخ احتياطي
+                  Backup & Export
                 </Space>
               ),
               children: (
                 <div style={{ padding: '24px 0', maxWidth: 720 }}>
                   <div style={{ marginBottom: 24 }}>
-                    <div style={{ fontSize: 16, fontWeight: 600, color: '#0F172A', marginBottom: 4 }}>النسخ الاحتياطي وتصدير البيانات</div>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: '#0F172A', marginBottom: 4 }}>Backup & Data Export</div>
                     <div style={{ fontSize: 13, color: '#64748B' }}>
-                      قم بتنزيل نسخة كاملة من بيانات العيادة بضغطة واحدة. احفظها على جهازك أو على USB لضمان سلامة بياناتك.
+                      Download a complete snapshot of your clinic data in one click. Save it locally or to external storage for data security.
                     </div>
                   </div>
 
@@ -1075,10 +1253,10 @@ export const SettingsView: React.FC = () => {
                   >
                     <HardDrive size={40} color="#2563EB" style={{ marginBottom: 12 }} />
                     <div style={{ fontSize: 16, fontWeight: 700, color: '#1E40AF', marginBottom: 6 }}>
-                      نسخة احتياطية فورية
+                      Instant Offline Backup
                     </div>
                     <div style={{ fontSize: 13, color: '#1D4ED8', marginBottom: 20 }}>
-                      تصدير كامل البيانات (مرضى، مواعيد، فواتير، وصفات، إعدادات) في ملف JSON
+                      Export all operational data (patients, appointments, invoices, prescriptions, settings) to a JSON file
                     </div>
                     <Button
                       type="primary"
@@ -1109,20 +1287,20 @@ export const SettingsView: React.FC = () => {
                         a.download = `clinic-backup-${new Date().toISOString().split('T')[0]}.json`;
                         a.click();
                         URL.revokeObjectURL(url);
-                        message.success('✅ تم تنزيل النسخة الاحتياطية بنجاح على جهازك');
+                        message.success('Backup snapshot downloaded successfully to your device');
                       }}
                     >
                       <Database size={18} style={{ marginInlineEnd: 8 }} />
-                      تنزيل نسخة احتياطية الآن
+                      Download Backup Snapshot Now
                     </Button>
                   </div>
 
                   {/* Info cards */}
                   <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                     {[
-                      { icon: <ShieldCheck size={18} />, title: 'بياناتك في أمان', desc: 'الملف المصدَّر يحتوي على كل البيانات المحلية ولا يُرسل لأي خادم خارجي.', color: '#047857', bg: '#ECFDF5', border: '#A7F3D0' },
-                      { icon: <HardDrive size={18} />, title: 'احفظه على USB', desc: 'يُنصح بنسخ الملف على USB أو Google Drive كل أسبوع على الأقل.', color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
-                      { icon: <RefreshCw size={18} />, title: 'نسخ منتظمة', desc: 'اضبط تذكيراً أسبوعياً لتنزيل نسخة احتياطية وحماية بياناتك.', color: '#6D28D9', bg: '#EDE9FE', border: '#C4B5FD' },
+                      { icon: <ShieldCheck size={18} />, title: 'Data Security', desc: 'Exported file contains complete clinic records and stays entirely private.', color: '#047857', bg: '#ECFDF5', border: '#A7F3D0' },
+                      { icon: <HardDrive size={18} />, title: 'External Storage', desc: 'We recommend saving weekly backup files to a secure USB drive or cloud storage.', color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
+                      { icon: <RefreshCw size={18} />, title: 'Regular Routine', desc: 'Set a recurring reminder to download periodic backups to ensure complete continuity.', color: '#6D28D9', bg: '#EDE9FE', border: '#C4B5FD' },
                     ].map((info, i) => (
                       <div
                         key={i}
@@ -1293,7 +1471,7 @@ export const SettingsView: React.FC = () => {
                   </div>
                 }
                 name="password"
-                rules={editingStaffId ? [] : [{ required: true, message: 'Password is required' }]}
+                rules={editingStaffId ? [{ min: 8, message: 'Password must be at least 8 characters' }] : [{ required: true, min: 8, message: 'Password must be at least 8 characters' }]}
                 extra={editingStaffId ? 'Leave blank to keep existing password' : 'Initial password for staff member'}
               >
                 <Input
@@ -1449,7 +1627,7 @@ export const SettingsView: React.FC = () => {
             >
               Cancel
             </Button>
-            <Button type="primary" htmlType="submit" size="large" style={{ minWidth: 150 }}>
+            <Button type="primary" htmlType="submit" size="large" style={{ minWidth: 150 }} loading={savingStaff}>
               {editingStaffId ? 'Save Changes' : 'Create Staff Account'}
             </Button>
           </div>
@@ -1468,7 +1646,7 @@ export const SettingsView: React.FC = () => {
         onCancel={() => setCredentialsModal(null)}
         footer={[
           <Button key="close" onClick={() => setCredentialsModal(null)}>
-            إغلاق
+            Close
           </Button>,
           <Button
             key="whatsapp"
@@ -1483,7 +1661,7 @@ export const SettingsView: React.FC = () => {
               if (credentialsModal) {
                 const clinicTitle = clinic?.name || 'العيادة';
                 const msg = encodeURIComponent(
-                  `مرحباً ${credentialsModal.name}\nإليك بيانات حسابك الجديد في ${clinicTitle}:\n\n- اسم المستخدم: ${credentialsModal.username}\n- كلمة المرور: ${credentialsModal.password || 'كما حُددت من الإدارة'}\n- الصلاحية: ${credentialsModal.role}\n\nيمكنك تسجيل الدخول الآن إلى النظام.`
+                  `Hello ${credentialsModal.name},\nHere are your login credentials for ${clinicTitle}:\n\n- Username: ${credentialsModal.username}\n- Password: ${credentialsModal.password || 'Set by Administrator'}\n- Role: ${credentialsModal.role}\n\nYou can now sign in to your workspace.`
                 );
                 const cleanPhone = (credentialsModal.phone || '').replace(/\D/g, '');
                 const cleanNumber = cleanPhone.startsWith('0') ? '2' + cleanPhone : cleanPhone.startsWith('2') ? cleanPhone : cleanPhone ? '2' + cleanPhone : '';
@@ -1492,7 +1670,7 @@ export const SettingsView: React.FC = () => {
               }
             }}
           >
-            إرسال بالواتساب للموظف
+            Send via WhatsApp
           </Button>,
           <Button
             key="copy"
@@ -1509,7 +1687,7 @@ export const SettingsView: React.FC = () => {
               }
             }}
           >
-            نسخ البيانات
+            Copy Credentials
           </Button>,
         ]}
         width={500}

@@ -17,10 +17,16 @@ export class InventoryItem {
   @Column('uuid') @Index() clinic_id: string;
   @ManyToOne(() => Clinic, { onDelete: 'CASCADE' }) @JoinColumn({ name: 'clinic_id' }) clinic: Clinic;
   @Column({ type: 'varchar', length: 200 }) name: string;
+  @Column({ type: 'varchar', length: 200, nullable: true }) name_en: string | null;
   @Column({ type: 'varchar', length: 80, nullable: true }) sku: string | null;
   @Column({ type: 'varchar', length: 80, nullable: true }) category: string | null;
   @Column({ type: 'varchar', length: 40, default: 'unit' }) unit: string;
   @Column({ type: 'integer', default: 0 }) reorder_level: number;
+  /** Purchase cost per unit, in the clinic currency. */
+  @Column({ type: 'numeric', precision: 12, scale: 2, nullable: true }) unit_cost: string | null;
+  /** Price charged to the patient per unit. */
+  @Column({ type: 'numeric', precision: 12, scale: 2, nullable: true }) sale_price: string | null;
+  @Column({ type: 'text', nullable: true }) notes: string | null;
   @Column({ type: 'varchar', length: 150, nullable: true }) default_vendor: string | null;
   @Column({ type: 'boolean', default: true }) is_active: boolean;
   @CreateDateColumn({ type: 'timestamptz' }) created_at: Date;

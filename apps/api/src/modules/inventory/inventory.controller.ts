@@ -95,6 +95,7 @@ export class InventoryController {
       dto.quantity,
       dto.reason ?? null,
       req.user?.sub ?? null,
+      dto.referenceId ?? null,
     );
   }
 }

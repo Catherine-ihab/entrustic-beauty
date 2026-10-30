@@ -1,3 +1,5 @@
+import { apiClient } from './api-client';
+import dayjs from 'dayjs';
 // Unified Aesthetic Clinic Inventory & Consumables Store (دليل المستلزمات والمخزن الطبي التجميلي)
 // Connects inventory with Injectables, Skincare, Laser, Body Care, Spa, and Post-Care Treatments
 
@@ -568,3 +570,40 @@ export function subscribeToInventory(callback: () => void): () => void {
   };
 }
 
+
+export async function syncInventoryFromApi(): Promise<ClinicInventoryItem[]> {
+  try {
+    const res: any = await apiClient.get('/inventory');
+    const payload = res?.data ?? res;
+    const list = Array.isArray(payload) ? payload : Array.isArray(payload?.items) ? payload.items : [];
+    if (list.length > 0) {
+      const mapped: ClinicInventoryItem[] = list.map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        nameEn: item.nameEn || item.name_en || item.name,
+        sku: item.sku || '',
+        category: (item.category as InventoryCategory) || 'حقن وبوتوكس وفيلر',
+        currentStock: Number(item.availableQuantity ?? item.available ?? 0),
+        unit: item.unit || 'علبة',
+        reorderLevel: Number(item.reorderLevel ?? item.reorder_level ?? 5),
+        batchLotNumber: item.lotNumber || 'LOT-2026',
+        expiryDate: item.nearestExpiry
+          ? dayjs(item.nearestExpiry).format('YYYY-MM-DD')
+          : dayjs().add(12, 'month').format('YYYY-MM-DD'),
+        unitCostEgp: Number(item.unitCost ?? item.unit_cost ?? 100),
+        clinicPriceEgp: Number(item.salePrice ?? item.sale_price ?? 150),
+        notes: item.notes || '',
+      }));
+
+      // Keep any local-only mock items that are not yet on server
+      const serverIds = new Set(mapped.map((m) => m.id));
+      const localOnly = getClinicInventory().filter((i) => i.id.startsWith('inv-') && !serverIds.has(i.id));
+      const merged = [...mapped, ...localOnly];
+      saveClinicInventory(merged);
+      return merged;
+    }
+  } catch (err) {
+    console.warn('Could not sync inventory from API, using cached inventory:', err);
+  }
+  return getClinicInventory();
+}

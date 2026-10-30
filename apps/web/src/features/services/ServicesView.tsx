@@ -1,9 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, InputNumber, Typography, message, Space, Popconfirm, Tooltip, Switch } from 'antd';
+import { Table, Button, Modal, Form, Input, InputNumber, Typography, message, Space, Popconfirm, Tooltip, Switch, Empty } from 'antd';
 import { useLang } from '../../lib/useLang';
 import { IClinicService, ClinicType } from '@clinic/shared-types';
 import { Plus, Search, Edit2, Trash2, RotateCcw, Clock, DollarSign } from 'lucide-react';
 import { useAuthStore } from '../../store/auth-store';
+import { apiClient } from '../../lib/api-client';
 import { SPECIALTY_LOCK } from '../../specialties';
 
 const { Title } = Typography;
@@ -185,22 +186,56 @@ export function ServicesView({ currency = 'EGP' }: { currency?: string }) {
     return defaultServices;
   });
 
-  // Reload when specialty changes
+  // Reload when specialty changes & fetch from PostgreSQL
   useEffect(() => {
+    let active = true;
     try {
       const saved = localStorage.getItem(storageKey);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
           setServices(parsed);
-          return;
         }
       }
     } catch {
       /* ignore */
     }
-    setServices(defaultServices);
-  }, [storageKey, defaultServices]);
+
+    apiClient
+      .get('/services')
+      .then((res: any) => {
+        const payload = res?.data ?? res;
+        const list = Array.isArray(payload) ? payload : Array.isArray(payload?.items) ? payload.items : [];
+        if (active && list.length > 0) {
+          const mapped: IClinicService[] = list.map((s: any, idx: number) => ({
+            id: s.id,
+            clinicId: s.clinic_id || s.clinicId || clinic?.id || 'current-clinic',
+            name: s.name,
+            description: s.description || '',
+            defaultDurationMinutes: Number(s.default_duration_minutes ?? s.defaultDurationMinutes ?? 30),
+            currentPrice: Number(s.current_price ?? s.currentPrice ?? 0),
+            currency: s.currency || currency,
+            isActive: s.is_active ?? s.isActive ?? true,
+            sortOrder: Number(s.sort_order ?? s.sortOrder ?? idx + 1),
+            createdAt: s.created_at || s.createdAt || new Date().toISOString(),
+            updatedAt: s.updated_at || s.updatedAt || new Date().toISOString(),
+          }));
+          setServices(mapped);
+          try {
+            localStorage.setItem(storageKey, JSON.stringify(mapped));
+          } catch {
+            /* ignore */
+          }
+        }
+      })
+      .catch((err) => {
+        console.warn('Could not load services from API:', err);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [storageKey, defaultServices, clinic?.id, currency]);
 
   const persistServices = (updated: IClinicService[]) => {
     setServices(updated);
@@ -287,6 +322,9 @@ export function ServicesView({ currency = 'EGP' }: { currency?: string }) {
     const updated = services.filter((s) => s.id !== id);
     persistServices(updated);
     message.success('Service removed from catalog');
+    if (id.length > 20 && !id.startsWith('srv-')) {
+      apiClient.delete(`/services/${id}`).catch(() => {});
+    }
   };
 
   // Toggle active status
@@ -422,6 +460,7 @@ export function ServicesView({ currency = 'EGP' }: { currency?: string }) {
         columns={columns}
         rowKey="id"
         pagination={{ pageSize: 8 }}
+        locale={{ emptyText: <Empty description="لا توجد خدمات مطابقة أو مسجلة حتى الآن" /> }}
         style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid #E2E8F0', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
       />
 

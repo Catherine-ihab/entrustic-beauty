@@ -28,3 +28,6 @@ capture-out/
 
 # Raw screen recordings used to build the demo video (large, local only)
 apps/web/public/_demo/shots/*.mp4
+
+# Database dumps written by apps/api/scripts/db-tools.cjs (contain patient data)
+backups/

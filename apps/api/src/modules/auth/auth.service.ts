@@ -42,11 +42,14 @@ export class AuthService {
       clinicId = clinic.id;
     }
 
-    // Try finding user within tenant context, or platform admin if no tenant slug
-    let user = await this.usersService.findByEmailAndClinic(dto.email, clinicId);
+    // Try finding user within tenant context if tenant was specified,
+    // otherwise look up user across clinics by unique email:
+    let user = clinicId
+      ? await this.usersService.findByEmailAndClinic(dto.email, clinicId)
+      : await this.usersService.findByEmail(dto.email);
 
-    // Allow platform admins to log in via the platform admin portal (no tenant slug)
-    if (!user && !tenantSlug) {
+    // Also allow platform admins to log in from any device/context
+    if (!user) {
       user = await this.usersService.findPlatformAdminByEmail(dto.email);
     }
 

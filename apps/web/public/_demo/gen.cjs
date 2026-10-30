@@ -1,279 +1,535 @@
-/* Generates Entrustic Beauty demo video scene pages (1920x1080) served by Vite from /public/_demo/
+/* Entrustic Beauty — demo video scene generator (v2, "beauty" edition)
  *
- * Unlike the dental generator, every scene here is ANIMATED:
- *   - a slide-up reveal sequence (tag -> title -> sub -> bullets -> shot)
- *   - the browser shot card drifts + scales slowly (ken-burns)
- *   - an ambient orb float in the background
- *   - a progress bar at the very bottom
- * The animation is driven by CSS only, so the same page can be screen-recorded
- * (or captured frame-by-frame by record.cjs) and always looks alive.
+ * Writes one self-contained HTML page per scene into ./scenes/.
+ *
+ * Two things make this different from a slideshow:
+ *   1. Pages that were screen-recorded play the REAL recording inside the
+ *      device card (see `media.type === 'video'`) — the picture is genuinely
+ *      moving, not a still with a fake pan.
+ *   2. Every animation is *time-addressable*: record.cjs calls
+ *      window.__frame(t) for each output frame, which pauses all CSS
+ *      animations and seeks them to exactly t. No wall-clock drift, no
+ *      dropped frames, and video seeks are frame-accurate.
+ *
+ * Scene lengths come from timing.json (written by voiceover.py) so the
+ * narration and the picture can never drift apart.
  */
 const fs = require('fs');
 const path = require('path');
 
-const OUT = path.join(__dirname, 'scenes');
+const HERE = __dirname;
+const OUT = path.join(HERE, 'scenes');
 fs.mkdirSync(OUT, { recursive: true });
 
-/* Scene lengths are driven by the narration, not the other way round:
- * voiceover.py measures every recorded line and writes timing.json, and each
- * scene is stretched to lead-in + speech + tail so sound and picture stay in
- * sync. Without timing.json the `dur` values below are used as-is. */
-const TIMING = path.join(__dirname, 'timing.json');
+const TIMING = path.join(HERE, 'timing.json');
 const timings = fs.existsSync(TIMING)
   ? Object.fromEntries(JSON.parse(fs.readFileSync(TIMING, 'utf8')).map((t) => [t.id, t.dur]))
   : {};
 
-/* Total on-screen duration per scene, in seconds. Bump these to slow a scene down. */
+/* Palette — built around the clinic's real brand (rose) instead of the
+ * generic tech-navy the first cut used. Everything is high contrast on ink. */
+const PALETTE = {
+  ink: '#0B0710',
+  rose: '#EC4899',
+  roseSoft: '#F9A8D4',
+  gold: '#E8C07D',
+  cream: '#FFF7F2',
+};
+
+/* media.start / media.rate let a 7s recording cover a 6s scene smoothly:
+ * video time = start + t * rate. rate < 1 plays it a touch slower, which
+ * reads as "cinematic" rather than "rushed screen capture". */
 const scenes = [
   {
-    id: '01', kind: 'hero', dur: 6.0,
-    title1: 'Entrustic Beauty Web App', title2: 'معمول مخصوص لعيادتك',
-    hook: 'بتدوري على سيستم يدير عيادة التجميل من الاستقبال للفاتورة — بهويتك، وبدون اشتراكات شهرية؟',
-    sub: 'نظام واحد يدير جلسات الليزر والحقن والعناية بالبشرة والجسم، مع المخزون والفواتير والتقارير.',
-    pills: ['جلسات ليزر', 'بوتوكس وفيلر', 'عناية بالبشرة', 'سبا ومساج', 'باقات وعروض', 'مخزون وأجهزة', 'فواتير وتقارير'],
+    id: '01',
+    kind: 'hero',
+    tag: 'Entrustic Beauty',
+    title: 'نظام واحد\nلعيادتك',
+    hook: 'من أول مكالمة لحد آخر فاتورة.',
+    sub: 'ليزر، وحقن، وعناية بالبشرة، وباقات، ومخزون وفواتير — نظام إدارة عيادة أو مركز تجميل.',
+    pills: ['ليزر', 'حقن تجميلي', 'عناية بالبشرة', 'باقات', 'مواعيد', 'مخزون وأجهزة', 'فواتير', 'تقارير'],
+    sideMedia: ['dashboard.png', 'invoices.png'],
   },
   {
-    id: '02', kind: 'two', tag: 'نظرة عامة', img: 'dashboard.png', dur: 5.4,
-    title: 'لوحة تحكم حيّة لكل عيادة',
-    sub: 'كل أرقام اليوم في شاشة واحدة — إيرادات، مواعيد، تنبيهات المخزون وحالة الأجهزة.',
-    bullets: ['متابعة الإيرادات والمحصّل لحظياً', 'مواعيد اليوم وحالة كل حالة', 'تنبيه المخزون المنخفض والأجهزة'],
+    id: '02',
+    kind: 'split',
+    tag: 'النهاردة',
+    title: 'كل أرقام النهاردة\nفي شاشة واحدة',
+    sub: 'الدخل، والحالات، ونواقص المخزن — من غير ما تسألي حد.',
+    bullets: ['دخل اليوم واللي اتقبض', 'عدد الحالات وحالتها', 'تنبيه قبل ما المخزون يخلص'],
+    media: { type: 'image', src: 'dashboard.png' },
   },
   {
-    id: '03', kind: 'two', tag: 'سجل الحالات', img: 'patients.png', dur: 5.2,
-    title: 'ملف كامل لكل عميلة',
-    sub: 'سجل الحالات بيجمع التاريخ الطبي والجلسات والفواتير وحساسية البشرة في مكان واحد.',
-    bullets: ['بحث فوري بالاسم أو رقم الملف', 'الحساسيات والحالات المزمنة ظاهرة', 'ربط الجلسات والفواتير بالملف'],
+    id: '03',
+    kind: 'split',
+    tag: 'سجل الحالات',
+    title: 'ملف واحد\nلكل عميلة',
+    sub: 'تاريخها الطبي، وحساسية بشرتها، وكل جلساتها وفواتيرها.',
+    bullets: ['بحث فوري بالاسم أو الرقم', 'الحساسية ظاهرة قبل الجلسة', 'الجلسات والفواتير متربطة بالملف'],
+    media: { type: 'image', src: 'patients.png' },
   },
   {
-    id: '04', kind: 'two', tag: 'جلسات الليزر', img: 'laser.png', dur: 5.2,
-    title: 'منظومة جلسات الليزر وإزالة الشعر',
-    sub: 'خطة جلسات كاملة لكل منطقة جسم، بمتابعة التقدم وعدد الجلسات المتبقية.',
-    bullets: ['متابعة المناطق ونسبة التقدّم', 'خطة جلسات ومواعيد تلقائية', 'ربط الجهاز والمستلزمات بكل جلسة'],
+    id: '04',
+    kind: 'split',
+    tag: 'الليزر',
+    title: 'خطة جلسات\nلكل منطقة',
+    sub: 'تعرفي فاضل كام جلسة، ووصلت لفين في كل منطقة.',
+    bullets: ['مناطق الجسم ووصلت لفين', 'الجلسات المتبقية', 'ربط الجهاز والمستلزمات'],
+    media: { type: 'video', src: 'laser.mp4', start: 0.8, rate: 0.85 },
   },
   {
-    id: '05', kind: 'two', tag: 'الحقن التجميلية', img: 'injectables.png', dur: 5.2,
-    title: 'البوتوكس وحقن الفيلر',
-    sub: 'تسجيل الوحدات والمناطق المعالجة لكل جلسة، مع متابعة النتيجة على الخط الزمني.',
-    bullets: ['مناطق الوجه والوحدات المستخدمة', 'ربط المنتج بالمخزون تلقائياً', 'متابعة النتيجة بالمقارنة قبل وبعد'],
+    id: '05',
+    kind: 'split',
+    tag: 'الحقن التجميلي',
+    title: 'بوتوكس وفيلر\nبالمخزون',
+    sub: 'تسجّلي الوحدات والمناطق، والمخزون يتخصم لوحده.',
+    bullets: ['الوحدات والمناطق المعالجة', 'خصم تلقائي من المخزون', 'متابعة النتيجة قبل وبعد'],
+    media: { type: 'video', src: 'injectables.mp4', start: 1.8, rate: 0.85 },
   },
   {
-    id: '06', kind: 'two', tag: 'العناية بالبشرة', img: 'skincare.png', dur: 5.0,
-    title: 'العناية ببشرة الوجه والماسكات',
-    sub: 'خطة عناية مسعّرة بماسكات وأنواع علاجية، تُرحّل تلقائياً إلى فاتورة العميلة.',
-    bullets: ['أنواع ماسكات وعلاجات مسعّرة', 'تخصيص الخطة حسب نوع البشرة', 'طباعة/إرسال الخطة للعميلة'],
+    id: '06',
+    kind: 'split',
+    tag: 'العناية بالبشرة',
+    title: 'خطة على حسب\nنوع البشرة',
+    sub: 'ماسكات وعلاجات مسعّرة، بتتحوّل لفاتورة على طول.',
+    bullets: ['خطة مخصّصة لكل بشرة', 'أسعار واضحة', 'تتحوّل لفاتورة بضغطة'],
+    media: { type: 'video', src: 'skincare.mp4', start: 0.2, rate: 0.9 },
   },
   {
-    id: '07', kind: 'two', tag: 'الباقات والعروض', img: 'packages.png', dur: 5.0,
-    title: 'باقات وعروض الجلسات',
-    sub: 'بيع باقات جلسات بأسعار مخفّضة وخصم من رصيد الجلسات مع كل زيارة.',
-    bullets: ['باقات مخصّصة بعدد جلسات', 'خصم تلقائي من الرصيد عند الزيارة', 'متابعة الجلسات المتبقية لكل عميلة'],
+    id: '07',
+    kind: 'split',
+    tag: 'الباقات والعروض',
+    title: 'رصيد الجلسات\nمظبوط لوحده',
+    sub: 'تبيعي الباقة مرة، والرصيد يتخصم مع كل زيارة.',
+    bullets: ['باقات بأي عدد جلسات', 'خصم تلقائي من الرصيد', 'فاضل كام جلسة لكل عميلة'],
+    media: { type: 'image', src: 'packages.png' },
   },
   {
-    id: '08', kind: 'two', tag: 'طابور العمل', img: 'appointments.png', dur: 5.0,
-    title: 'طابور الحالات والمواعيد',
-    sub: 'مواعيد ومهام كل طبيبة في عرض واحد، مع تغيير الحالة بنقرة واحدة.',
-    bullets: ['طابور لكل طبيبة بالوردية', 'تغيير الحالة بنقرة (وصول ← كشف ← تم)', 'رسالة واتساب جاهزة باسم العميلة'],
+    id: '08',
+    kind: 'split',
+    tag: 'المواعيد',
+    title: 'طابور لكل دكتورة\nبنقرة',
+    sub: 'المواعيد والانتظار في شاشة واحدة، والحالة بتتغيّر بنقرة.',
+    bullets: ['طابور بالوردية', 'وصول ← كشف ← تم', 'رسالة واتساب جاهزة'],
+    media: { type: 'video', src: 'appointments.mp4', start: 0.0, rate: 0.95 },
   },
   {
-    id: '09', kind: 'two', tag: 'الماليات', img: 'invoices.png', dur: 5.0,
-    title: 'الفواتير والمالية والخزينة',
-    sub: 'فاتورة بخصم وضريبة، مع تحصيل ومتبقٍ لكل فاتورة وحركة خزينة يومية.',
-    bullets: ['فاتورة ضريبية بخصم وضريبة', 'محصّل ومتبقٍ لكل فاتورة', 'حركة الخزينة والإيراد اليومي'],
+    id: '09',
+    kind: 'split',
+    tag: 'الفواتير',
+    title: 'اتقبض كام\nوفاضل كام',
+    sub: 'فاتورة بضريبة وخصم، وحركة خزينة يومية.',
+    bullets: ['ضريبة وخصم تلقائي', 'اتقبض / لسه', 'حركة الخزينة'],
+    media: { type: 'video', src: 'invoices.mp4', start: 3.2, rate: 0.9 },
   },
   {
-    id: '10', kind: 'two', tag: 'المخزون والأجهزة', img: 'inventory.png', dur: 5.0,
-    title: 'المخزون والمستلزمات والأجهزة',
-    sub: 'رصيد المستلزمات وحركات الصرف، ومتابعة أجهزة العيادة والمعايرة الدورية.',
-    bullets: ['رصيد المستلزمات وتنبيه الحد الأدنى', 'حركات صرف وربطها بالجلسات', 'سجل الأجهزة ومواعيد المعايرة'],
+    id: '10',
+    kind: 'split',
+    tag: 'المخزون والأجهزة',
+    title: 'قبل ما تخلص\nبيقولك',
+    sub: 'حد أدنى للمستلزمات، وحركات صرف، وصيانة الأجهزة.',
+    bullets: ['بينبّهك قبل ما تخلص', 'حركات الصرف', 'صيانة الأجهزة'],
+    media: { type: 'image', src: 'inventory.png' },
   },
   {
-    id: '11', kind: 'wide', tag: 'التقارير والإدارة', dur: 5.4,
-    title: 'التقارير والأمان وإعدادات العيادة',
-    sub: 'مؤشرات يومية وإيرادات، سجل رقابة كامل بكل حركة، وهوية عيادتك في كل شاشة.',
-    bullets: ['تقرير يومي ومؤشرات الإيراد', 'سجل رقابة لكل عملية', 'هوية وألوان وصلاحيات فريقك'],
-    images: [{ file: 'reports.png', w: 903 }, { file: 'audit.png', w: 673 }],
+    id: '11',
+    kind: 'duo',
+    tag: 'التقارير والأمان',
+    title: 'الشهر ماشي إزاي\nومين عمل إيه',
+    sub: 'تقارير تفصيلية، وسجل بكل حركة اتعملت في النظام.',
+    bullets: ['تقرير الشهر', 'سجل كامل', 'صلاحيات الفريق'],
+    media: [
+      { type: 'video', src: 'reports.mp4', start: 0.0, rate: 0.95 },
+      { type: 'image', src: 'audit.png' },
+    ],
   },
   {
-    id: '12', kind: 'outro', dur: 5.0,
-    title1: 'Entrustic', title2: 'Beauty Web App',
-    hook: 'جاهزين نجهّز نسخة عيادتك — باسمك ولوجو عيادتك؟',
-    sub: 'تواصل معنا واحصل على عرض مخصّص لعيادتك.',
+    id: '12',
+    kind: 'outro',
+    title: 'جاهزة\nتبدأي؟',
+    sub: 'نظام واحد لعيادتك — باسمك، وبألوانك، وباللوجو بتاعك.',
+    pills: ['باسم عيادتك', 'بياناتك ليك', 'دعم بالعربي'],
   },
 ];
 
+/* ---------- CSS ---------- */
 const css = `
-:root{--navy:#12124F;--indigo:#3838DA;--cyan:#12B4C8;--muted:#B7C4F2;--light:#E7EDFF}
+:root{
+  --ink:${PALETTE.ink}; --rose:${PALETTE.rose}; --rose-soft:${PALETTE.roseSoft};
+  --gold:${PALETTE.gold}; --cream:${PALETTE.cream}; --muted:#DCC9DF;
+}
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:#080826}
-body{width:1920px;height:1080px;overflow:hidden}
-#scene{position:relative;width:1920px;height:1080px;overflow:hidden;color:#fff;
-font-family:'Cairo','Segoe UI',Tahoma,Arial,sans-serif;
-background:radial-gradient(1100px 700px at 90% -14%,rgba(56,56,218,.62),transparent 60%),radial-gradient(1000px 700px at 2% 114%,rgba(18,180,200,.46),transparent 62%),linear-gradient(135deg,#0A0A2E 0%,#15155C 54%,#082850 100%)}
+html,body{margin:0;padding:0;background:var(--ink)}
+body{width:1920px;height:1080px;overflow:hidden;
+  font-family:'Almarai','Cairo','Segoe UI',Tahoma,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
 
-/* ---------- ambient motion (background orbs) ---------- */
-.orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.5;pointer-events:none;z-index:0}
-.orb.a{width:620px;height:620px;left:-160px;top:-180px;background:radial-gradient(circle,rgba(56,56,218,.85),transparent 68%);animation:float1 11s ease-in-out infinite}
-.orb.b{width:700px;height:700px;right:-200px;bottom:-240px;background:radial-gradient(circle,rgba(18,180,200,.75),transparent 68%);animation:float2 13s ease-in-out infinite}
-@keyframes float1{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(70px,60px,0)}}
-@keyframes float2{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(-80px,-50px,0)}}
+#scene{position:relative;width:1920px;height:1080px;overflow:hidden;color:var(--cream);
+  direction:rtl;
+  background:
+    radial-gradient(1000px 720px at 84% -12%,rgba(236,72,153,.40),transparent 62%),
+    radial-gradient(820px 620px at 2% 110%,rgba(232,192,125,.20),transparent 60%),
+    radial-gradient(1400px 900px at 50% 50%,rgba(96,28,96,.34),transparent 72%),
+    linear-gradient(158deg,#170B1D 0%,#0B0710 52%,#140820 100%)}
+/* vignette for depth */
+#scene:after{content:'';position:absolute;inset:0;pointer-events:none;z-index:2;
+  background:radial-gradient(ellipse at 50% 44%,transparent 38%,rgba(0,0,0,.58) 100%)}
 
-/* ---------- shared chrome ---------- */
-.topbar{position:absolute;top:38px;left:64px;height:54px;display:flex;align-items:center;z-index:6;animation:revealDown .7s .05s both}
-.chip{background:#fff;border-radius:14px;padding:8px 18px;display:flex;align-items:center;box-shadow:0 20px 44px -20px rgba(0,0,0,.85)}
-.topbar .chip img{height:38px;display:block}
-.brandline{position:absolute;top:48px;right:64px;z-index:6;display:flex;align-items:center;gap:12px;animation:revealDown .7s .1s both}
-.brandline .bname{font-size:24px;font-weight:900;letter-spacing:.2px;color:#EAF2FF}
-.brandline .bsub{font-size:15px;font-weight:700;color:#9FB0E8}
-.tag{display:inline-flex;align-items:center;font-weight:800;font-size:22px;color:#DCE6FF;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.24);padding:8px 18px;border-radius:999px}
-.title{font-weight:900;line-height:1.18;letter-spacing:-.5px;color:#fff}
-.sub{color:var(--muted);font-weight:600;line-height:1.72}
-.bullets{display:flex;flex-direction:column;gap:14px;margin-top:26px}
-.bullet{display:flex;align-items:center;gap:12px;font-weight:700;font-size:23px;color:var(--light)}
-.bullet .ic{flex:0 0 30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--indigo),var(--cyan));color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;box-shadow:0 8px 18px -8px rgba(56,56,218,.9)}
-.shot{border-radius:18px;overflow:hidden;background:#fff;border:1px solid rgba(255,255,255,.55);
-box-shadow:0 0 0 10px rgba(255,255,255,.055),0 54px 120px -42px rgba(0,0,0,.9),0 18px 46px -20px rgba(0,0,0,.6)}
-.bar{height:46px;display:flex;align-items:center;gap:9px;padding:0 16px;background:linear-gradient(180deg,#1C1C66,#10104A)}
-.dot{width:11px;height:11px;border-radius:50%}
-.url{flex:1;height:26px;border-radius:13px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:13px;color:#CBD6FF;direction:ltr}
-.shot img{display:block;width:100%;height:auto}
-.footer{position:absolute;left:64px;right:64px;bottom:30px;display:flex;align-items:center;justify-content:space-between;color:#8B97CE;font-size:18px;font-weight:700;z-index:6}
-.footer .fl{display:flex;align-items:center;gap:12px}
-.footer .fchip{background:#fff;border-radius:10px;padding:5px 12px;display:flex;align-items:center}
-.footer .fchip img{height:22px;display:block}
+/* ---------- ambient light blobs ---------- */
+.orb{position:absolute;border-radius:50%;pointer-events:none;z-index:0;filter:blur(70px)}
+.orb.a{width:660px;height:660px;right:-190px;top:-220px;
+  background:radial-gradient(circle,rgba(236,72,153,.55),transparent 68%);
+  animation:drift1 14s ease-in-out infinite}
+.orb.b{width:720px;height:720px;left:-230px;bottom:-280px;
+  background:radial-gradient(circle,rgba(232,192,125,.36),transparent 70%);
+  animation:drift2 17s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-60px,70px,0) scale(1.08)}}
+@keyframes drift2{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(70px,-50px,0) scale(1.06)}}
 
-/* ---------- reveal animations ---------- */
-@keyframes revealUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
-@keyframes revealDown{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
-@keyframes revealRight{from{opacity:0;transform:translateX(-38px)}to{opacity:1;transform:translateX(0)}}
-@keyframes shotIn{from{opacity:0;transform:translateY(34px) scale(.965)}to{opacity:1;transform:translateY(0) scale(1)}}
-/* slow ken-burns drift on the screenshot itself */
-@keyframes kenburns{0%{transform:scale(1) translate(0,0)}50%{transform:scale(1.045) translate(-8px,-10px)}100%{transform:scale(1.02) translate(4px,6px)}}
-/* bottom progress bar */
-@keyframes progress{from{width:0%}to{width:100%}}
+/* ---------- entry transitions ---------- */
+@keyframes rise{from{opacity:0;transform:translateY(30px) scale(.985);filter:blur(7px)}
+                to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes riseSmall{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes cardIn{from{opacity:0;transform:translate3d(-70px,46px,0) rotateY(13deg) rotateX(4deg) scale(.93)}
+                  to{opacity:1;transform:none}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes sheen{0%{transform:translateX(-140%) rotate(18deg);opacity:0}
+                 12%{opacity:.55}30%{opacity:0}100%{transform:translateX(240%) rotate(18deg);opacity:0}}
+@keyframes kb{from{transform:scale(1.02) translate3d(0,0,0)}to{transform:scale(1.10) translate3d(-14px,-10px,0)}}
+@keyframes wipe{from{transform:translateX(0)}to{transform:translateX(-104%)}}
+@keyframes underline{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes popIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+@keyframes prog{from{width:var(--p0)}to{width:var(--p1)}}
 
-.a-tag{animation:revealUp .6s .15s both}
-.a-title{animation:revealUp .65s .32s both}
-.a-sub{animation:revealUp .65s .5s both}
-.a-b1{animation:revealRight .6s .72s both}
-.a-b2{animation:revealRight .6s .86s both}
-.a-b3{animation:revealRight .6s 1s both}
-.a-shot{animation:shotIn .85s .3s both}
-.a-shot2{animation:shotIn .85s .5s both}
-.kenburns img{animation:kenburns SCENE_DURATION ease-in-out both}
+/* ---------- top bar ---------- */
+.topbar{position:absolute;top:36px;right:0;left:0;height:64px;z-index:6;
+  display:flex;align-items:center;justify-content:space-between;padding:0 54px;
+  animation:riseSmall .6s .05s both}
+.logochip{background:var(--cream);border-radius:16px;padding:9px 20px;display:flex;align-items:center;
+  box-shadow:0 18px 40px -18px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.5) inset}
+.logochip img{height:34px;display:block}
+.step{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:#C9B7CD;
+  letter-spacing:.5px;direction:ltr}
+.step b{color:var(--cream);font-size:20px}
+.step .sep{opacity:.45}
 
-/* ---------- layout: two ---------- */
-.two{position:absolute;inset:0;display:flex;align-items:center;gap:48px;padding:0 56px;z-index:3}
-.two .text{flex:0 0 448px;width:448px;padding-top:8px}
-.two .card{flex:1;display:flex;justify-content:center}
-.two .shot{width:1312px}
-.two .title{font-size:54px;margin-top:18px}
-.two .sub{font-size:23px;margin-top:16px}
+/* ---------- split layout ---------- */
+.split{position:absolute;inset:0;display:flex;align-items:center;gap:26px;
+  padding:0 54px 40px;z-index:3}
+.split .text{flex:0 0 486px;padding-bottom:10px}
+.split .stage{flex:1;min-width:0}
 
-/* ---------- layout: wide ---------- */
-.wide{position:absolute;inset:0;display:flex;flex-direction:column;padding:112px 72px 0;z-index:3}
-.wide .head{display:block}
-.wide .t{max-width:1400px;width:1400px}
-.wide .title{font-size:52px;margin-top:16px}
-.wide .sub{font-size:23px;margin-top:10px}
-.wide .cards{display:flex;gap:26px;justify-content:center;align-items:flex-start;margin-top:26px}
-.wide .shot{width:860px}
-.wide .bullets{flex-direction:row;gap:30px;justify-content:center;margin-top:22px}
-.wide .bullet{font-size:22px}
+.tag{display:inline-flex;align-items:center;gap:9px;font-size:20px;font-weight:800;
+  color:#FFD9EC;background:rgba(236,72,153,.18);border:1px solid rgba(236,72,153,.45);
+  padding:8px 18px;border-radius:999px;animation:riseSmall .6s .18s both}
+.tag .dot{width:8px;height:8px;border-radius:50%;background:var(--rose);
+  box-shadow:0 0 14px 2px rgba(236,72,153,.9)}
+.title{font-size:56px;font-weight:800;line-height:1.18;letter-spacing:-.8px;margin-top:22px;color:#fff}
+.title .ln{display:block;animation:rise .8s both}
+.rule{height:3px;width:96px;border-radius:3px;margin-top:20px;transform-origin:right center;
+  background:linear-gradient(90deg,var(--rose),var(--gold));animation:underline .7s .5s both}
+.sub{font-size:24px;font-weight:400;line-height:1.65;color:var(--muted);margin-top:18px;
+  animation:riseSmall .7s .55s both}
+.bullets{display:flex;flex-direction:column;gap:15px;margin-top:30px}
+.bullet{display:flex;align-items:center;gap:13px;font-size:23px;font-weight:700;color:#F3E9F5;
+  animation:riseSmall .55s both}
+.bullet .ic{flex:0 0 26px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(236,72,153,.22);border:1px solid rgba(236,72,153,.55);color:var(--rose-soft);
+  font-size:14px;font-weight:900}
+.bullet:nth-child(1){animation-delay:1.15s}
+.bullet:nth-child(2){animation-delay:1.34s}
+.bullet:nth-child(3){animation-delay:1.53s}
 
-/* ---------- layout: hero / outro ---------- */
-.hero{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;padding:0 90px;z-index:3}
-.hero .lcard{background:#fff;border-radius:22px;padding:22px 36px;box-shadow:0 34px 80px -34px rgba(0,0,0,.65);animation:revealUp .8s .1s both}
-.hero .lcard img{height:76px;display:block}
-.hero h1{font-size:66px;font-weight:900;margin:40px 0 0;line-height:1.16;animation:revealUp .8s .35s both}
-.hero .hook{margin-top:26px;font-size:33px;font-weight:800;max-width:1460px;line-height:1.55;color:#EAF2FF;animation:revealUp .8s .6s both}
-.hero .sub2{margin-top:22px;font-size:24px;color:#BCC9F4;font-weight:600;max-width:1240px;line-height:1.7;animation:revealUp .8s .85s both}
-.hero .kicker{margin-top:32px;display:flex;gap:14px;flex-wrap:wrap;justify-content:center;max-width:1640px}
-.hero .pill{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.24);color:#EAF2FF;padding:10px 22px;border-radius:999px;font-size:21px;font-weight:700;animation:revealUp .5s both}
+/* ---------- screen card ---------- */
+.stage{position:relative;perspective:1700px;animation:cardIn 1s cubic-bezier(.16,.84,.28,1) .1s both}
+.stage .glow{position:absolute;inset:6% 4% 2%;border-radius:40px;filter:blur(58px);z-index:0;
+  background:radial-gradient(ellipse at 50% 60%,rgba(236,72,153,.55),rgba(232,192,125,.16) 55%,transparent 72%)}
+.card{position:relative;z-index:2;width:100%;aspect-ratio:16/9;border-radius:22px;overflow:hidden;
+  background:#0E0A14;border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 60px 110px -40px rgba(0,0,0,.95),0 0 0 7px rgba(255,255,255,.045),
+             0 30px 60px -30px rgba(236,72,153,.45)}
+.card .inner{position:absolute;inset:0;overflow:hidden;border-radius:22px}
+.card .inner img,.card .inner video{width:100%;height:100%;object-fit:cover;display:block}
+.card .inner img.kb{animation:kb 15s linear both}
+.card .inner video{transform:scale(1.045)}
+/* diagonal light sweep across the card */
+.card .sheen{position:absolute;top:-30%;bottom:-30%;width:34%;left:0;z-index:3;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);
+  animation:sheen 4.2s 1.6s ease-in-out both}
+.card .edge{position:absolute;inset:0;border-radius:22px;z-index:4;pointer-events:none;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10),
+             inset 0 -90px 90px -60px rgba(0,0,0,.55)}
 
-/* ---------- progress bar ---------- */
-.progress{position:absolute;left:0;bottom:0;height:6px;z-index:9;background:linear-gradient(90deg,var(--indigo),var(--cyan));animation:progress SCENE_DURATION linear both}
+/* ---------- duo layout ---------- */
+.duo{position:absolute;inset:0;z-index:3;padding:118px 54px 52px;display:flex;flex-direction:column}
+.duo .head{flex:0 0 auto;max-width:1180px}
+.duo .title{font-size:46px;margin-top:16px}
+.duo .sub{font-size:22px;margin-top:12px}
+.duo .cards{flex:1 1 auto;display:flex;align-items:center;gap:24px;justify-content:center;min-height:0}
+.duo .stage{animation:cardIn 1s cubic-bezier(.16,.84,.28,1) both}
+.duo .stage.big{flex:0 0 940px;width:940px}
+.duo .stage.small{flex:0 0 592px;width:592px;animation-delay:.16s}
+.duo .stage .card{aspect-ratio:16/9}
+.duo .bullets{flex:0 0 auto;flex-direction:row;gap:34px;justify-content:center;margin-top:18px}
+.duo .bullet{font-size:21px}
+.duo .bullet:nth-child(n){animation-delay:1.5s}
+
+/* ---------- hero / outro ---------- */
+.hero{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;padding:0 120px;
+  animation:heroPush SCENE_DURATION linear both}
+/* a very slow push-in: the frame is never truly still, even when the text has
+   finished appearing (this is what separates a "slide" from a video) */
+@keyframes heroPush{from{transform:scale(1)}to{transform:scale(1.05)}}
+.hero .logowrap{background:var(--cream);border-radius:24px;padding:20px 34px;
+  box-shadow:0 40px 90px -34px rgba(0,0,0,.85),0 0 0 1px rgba(255,255,255,.6) inset;
+  animation:popIn .8s cubic-bezier(.2,.9,.3,1.2) .15s both}
+.hero .logowrap img{height:78px;display:block}
+.hero h1{font-size:92px;font-weight:800;line-height:1.1;letter-spacing:-2px;margin:40px 0 0;color:#fff}
+.hero h1 .ln{display:block;animation:rise .9s both}
+.hero h1 .ln:nth-child(1){animation-delay:.35s}
+.hero h1 .ln:nth-child(2){animation-delay:.5s}
+.hero .hook{margin-top:22px;font-size:34px;font-weight:800;color:#FFE3F0;line-height:1.45;
+  max-width:1360px;animation:riseSmall .8s .7s both}
+.hero .sub2{margin-top:16px;font-size:25px;color:var(--muted);font-weight:400;max-width:1180px;
+  line-height:1.6;animation:riseSmall .8s .9s both}
+.hero .pills{margin-top:34px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:1500px}
+.hero .pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.20);
+  color:#F6ECF8;padding:9px 20px;border-radius:999px;font-size:20px;font-weight:700;
+  backdrop-filter:blur(6px);animation:popIn .45s both}
+.hero .cta{margin-top:34px;display:inline-flex;align-items:center;gap:12px;
+  background:linear-gradient(100deg,var(--rose),#F472B6);color:#fff;font-weight:800;font-size:24px;
+  padding:15px 34px;border-radius:999px;box-shadow:0 22px 50px -18px rgba(236,72,153,.9);
+  animation:popIn .7s 1.5s both}
+
+/* hero side screens (depth, slightly out of focus) */
+.sidescreen{position:absolute;z-index:1;border-radius:18px;overflow:hidden;
+  border:1px solid rgba(255,255,255,.14);box-shadow:0 50px 90px -40px #000}
+.sidescreen img{width:100%;height:100%;object-fit:cover;display:block}
+.sidescreen.l{width:560px;height:315px;left:-190px;top:120px;opacity:.5;filter:blur(2px) saturate(.9);
+  animation:ssL SCENE_DURATION ease-in-out both}
+.sidescreen.r{width:620px;height:349px;right:-220px;bottom:70px;opacity:.55;filter:blur(2px) saturate(.9);
+  animation:ssR SCENE_DURATION ease-in-out both}
+@keyframes ssL{from{transform:rotate(-7deg) translate3d(0,0,0)}to{transform:rotate(-5deg) translate3d(34px,-26px,0)}}
+@keyframes ssR{from{transform:rotate(6deg) translate3d(0,0,0)}to{transform:rotate(4deg) translate3d(-30px,20px,0)}}
+
+/* ---------- footer / progress ---------- */
+.footer{position:absolute;left:0;right:0;bottom:0;height:64px;z-index:7;
+  display:flex;align-items:center;justify-content:space-between;padding:0 54px 10px}
+.fbrand{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:700;color:#B9A6BF}
+.fbrand .d{width:7px;height:7px;border-radius:50%;background:var(--rose)}
+.dots{display:flex;gap:7px;align-items:center;direction:ltr}
+.dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.22)}
+.dots i.on{background:var(--rose);width:20px;border-radius:4px}
+.track{position:absolute;left:0;right:0;bottom:0;height:4px;z-index:8;background:rgba(255,255,255,.10)}
+.track i{display:block;height:100%;width:var(--p0);
+  background:linear-gradient(90deg,var(--rose),#FFB4D8,var(--gold));
+  box-shadow:0 0 18px rgba(236,72,153,.9);animation:prog SCENE_DURATION linear both}
+
+/* ---------- hard cut wipe between scenes ---------- */
+.wipe{position:absolute;inset:0;z-index:20;pointer-events:none;
+  background:linear-gradient(100deg,#1A0A22 0%,#2B0D33 45%,#1A0A22 100%);
+  animation:wipe .42s cubic-bezier(.65,0,.35,1) both}
 `;
 
-const barHtml = () =>
-  `<div class="bar"><span class="dot" style="background:#FF6058"></span><span class="dot" style="background:#FFBD2E"></span><span class="dot" style="background:#28CA42"></span><div class="url">app.entrustic.com</div></div>`;
-const shotCard = (img, w, cls) =>
-  `<div class="shot ${cls}"${w ? ` style="width:${w}px"` : ''}>${barHtml()}<div class="kenburns"><img src="../shots/${img}" alt=""></div></div>`;
-const logoChip = () => `<div class="chip"><img src="../brand/entrustic-logo.png" alt="Entrustic"></div>`;
-const topbar = () => `<div class="topbar">${logoChip()}</div>`;
-const brandline = () =>
-  `<div class="brandline"><div class="bname">Entrustic Beauty</div><div class="bsub">Clinic Management</div></div>`;
-const footer = (n) =>
-  `<div class="footer"><div class="fl"><div class="fchip"><img src="../brand/entrustic-logo.png" alt="Entrustic"></div><span>Entrustic Beauty</span></div><span>${n}</span></div>`;
-const bullets = (arr) => {
-  const cls = ['a-b1', 'a-b2', 'a-b3', 'a-b1'];
-  return `<div class="bullets">${arr
-    .map((b, i) => `<div class="bullet ${cls[i % 4]}"><span class="ic">\u2713</span><span>${b}</span></div>`)
-    .join('')}</div>`;
-};
+/* ---------- builders ---------- */
 const orbs = () => `<div class="orb a"></div><div class="orb b"></div>`;
 
-const shell = (s, body) => `<!doctype html>
-<html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>Entrustic Beauty ${s.id}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<style>${css.replace(/SCENE_DURATION/g, s.dur + 's')}</style></head>
-<body><div id="scene" role="img" aria-label="scene-${s.id}">${orbs()}${brandline()}${body}<div class="progress"></div></div></body></html>`;
+const mediaEl = (m) => {
+  if (!m) return '';
+  if (m.type === 'video') {
+    return `<video src="../shots/${m.src}" muted playsinline preload="auto"
+      data-start="${m.start || 0}" data-rate="${m.rate || 1}"></video>`;
+  }
+  return `<img class="kb" src="../shots/${m.src}" alt="">`;
+};
 
-function renderHero(s) {
-  const pills = s.pills
-    .map((p, i) => `<span class="pill" style="animation-delay:${1.05 + i * 0.11}s">${p}</span>`)
-    .join('');
-  return shell(s, `<div class="hero">
-    <div class="lcard"><img src="../brand/entrustic-logo.png" alt="Entrustic"></div>
-    <h1>${s.title1}<br>${s.title2}</h1>
-    <div class="hook">${s.hook}</div>
-    <div class="sub2">${s.sub}</div>
-    <div class="kicker">${pills}</div>
-  </div>`);
-}
-function renderOutro(s) {
-  return shell(s, `<div class="hero">
-    <div class="lcard"><img src="../brand/entrustic-logo.png" alt="Entrustic"></div>
-    <h1>${s.title1}<br>${s.title2}</h1>
-    <div class="hook">${s.hook}</div>
-    <div class="sub2">${s.sub}</div>
-  </div>`);
-}
-function renderTwo(s, n) {
-  return shell(s, `${topbar()}
-  <div class="two">
-    <div class="text">
-      <span class="tag a-tag">${s.tag}</span>
-      <div class="title a-title">${s.title}</div>
-      <div class="sub a-sub">${s.sub}</div>
-      ${bullets(s.bullets)}
+const cardEl = (m) => `<div class="stage">
+    <div class="glow"></div>
+    <div class="card">
+      <div class="inner">${mediaEl(m)}</div>
+      <div class="sheen"></div>
+      <div class="edge"></div>
     </div>
-    <div class="card">${shotCard(s.img, null, 'a-shot')}</div>
-  </div>${footer(n)}`);
-}
-function renderWide(s, n) {
-  const cards = s.images
-    .map((im, i) => shotCard(im.file, im.w, i === 0 ? 'a-shot' : 'a-shot2'))
+  </div>`;
+
+const logoChip = () => `<div class="logochip"><img src="../logo.png" alt="Entrustic"></div>`;
+
+const topbar = (i, n) => `<div class="topbar">${logoChip()}
+  <div class="step"><b>${String(i).padStart(2, '0')}</b><span class="sep">/</span><span>${String(n).padStart(2, '0')}</span></div>
+</div>`;
+
+const dots = (i, n) =>
+  `<div class="dots">${Array.from({ length: n }, (_, k) => `<i class="${k + 1 === i ? 'on' : ''}"></i>`).join('')}</div>`;
+
+const bulletsEl = (arr) =>
+  `<div class="bullets">${arr
+    .map((b) => `<div class="bullet"><span class="ic">\u2713</span><span>${b}</span></div>`)
+    .join('')}</div>`;
+
+const titleEl = (title, delay = 0.3) =>
+  title
+    .split('\n')
+    .map((ln, k) => `<span class="ln" style="animation-delay:${(delay + k * 0.13).toFixed(2)}s">${ln}</span>`)
     .join('');
-  return shell(s, `${topbar()}
-  <div class="wide">
-    <div class="head"><div class="t"><span class="tag a-tag">${s.tag}</span><div class="title a-title">${s.title}</div><div class="sub a-sub">${s.sub}</div></div></div>
-    <div class="cards">${cards}</div>
-    ${bullets(s.bullets)}
-  </div>${footer(n)}`);
+
+const footerEl = (i, n) =>
+  `<div class="footer"><div class="fbrand"><span class="d"></span>Entrustic Beauty</div>${dots(i, n)}</div>`;
+
+const shell = (s, i, n, body, p0, p1) => `<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>Entrustic ${s.id}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+<style>${css.replace(/SCENE_DURATION/g, s.dur + 's')}
+.track i{--p0:${p0}%;--p1:${p1}%}</style></head>
+<body><div id="scene">${orbs()}${body}
+  <div class="track"><i></i></div>
+  <div class="wipe"></div>
+</div>
+<script>
+/* ---- frame driver (used by record.cjs) -------------------------------- */
+window.__ready = async () => {
+  await (document.fonts ? document.fonts.ready : Promise.resolve());
+  await Promise.all([...document.images].map((im) => (im.decode ? im.decode().catch(() => {}) : null)));
+  for (const v of document.querySelectorAll('video')) {
+    v.pause();
+    if (v.readyState < 2) await new Promise((r) => v.addEventListener('loadeddata', r, { once: true }));
+  }
+};
+const vids = [...document.querySelectorAll('video')];
+window.__frame = async (t) => {
+  for (const a of document.getAnimations()) { a.pause(); a.currentTime = t * 1000; }
+  await Promise.all(vids.map((v) => {
+    const s = parseFloat(v.dataset.start || '0');
+    const r = parseFloat(v.dataset.rate || '1');
+    const dur = (v.duration || 10) - 0.06;
+    const target = Math.min(s + t * r, dur);
+    if (Math.abs(v.currentTime - target) < 0.004) return null;
+    return new Promise((res) => {
+      let done = false;
+      const fin = () => { if (!done) { done = true; res(); } };
+      v.addEventListener('seeked', fin, { once: true });
+      v.currentTime = target;
+      setTimeout(fin, 350);
+    });
+  }));
+};
+</script>
+</body></html>`;
+
+function renderHero(s, i, n, p0, p1) {
+  const pills = s.pills
+    .map((p, k) => `<span class="pill" style="animation-delay:${(1.2 + k * 0.07).toFixed(2)}s">${p}</span>`)
+    .join('');
+  return shell(
+    s,
+    i,
+    n,
+    `<div class="sidescreen l"><img src="../shots/${s.sideMedia[0]}" alt=""></div>
+     <div class="sidescreen r"><img src="../shots/${s.sideMedia[1]}" alt=""></div>
+     <div class="hero">
+       <div class="logowrap"><img src="../logo.png" alt="Entrustic"></div>
+       <h1>${titleEl(s.title, 0.35)}</h1>
+       <div class="hook">${s.hook}</div>
+       <div class="sub2">${s.sub}</div>
+       <div class="pills">${pills}</div>
+     </div>
+     <div class="footer"><div class="fbrand"><span class="d"></span>Entrustic Beauty</div>${dots(i, n)}</div>`,
+    p0,
+    p1,
+  );
 }
+
+function renderOutro(s, i, n, p0, p1) {
+  const pills = s.pills
+    .map((p, k) => `<span class="pill" style="animation-delay:${(1.35 + k * 0.1).toFixed(2)}s">${p}</span>`)
+    .join('');
+  return shell(
+    s,
+    i,
+    n,
+    `<div class="hero">
+       <div class="logowrap"><img src="../logo.png" alt="Entrustic"></div>
+       <h1>${titleEl(s.title, 0.4)}</h1>
+       <div class="sub2" style="margin-top:26px">${s.sub}</div>
+       <div class="pills">${pills}</div>
+       <div class="cta">Entrustic Beauty \u2022 نظام عيادتك</div>
+     </div>
+     <div class="footer"><div class="fbrand"><span class="d"></span>Entrustic Beauty</div>${dots(i, n)}</div>`,
+    p0,
+    p1,
+  );
+}
+
+function renderSplit(s, i, n, p0, p1) {
+  return shell(
+    s,
+    i,
+    n,
+    `${topbar(i, n)}
+     <div class="split">
+       <div class="text">
+         <span class="tag"><span class="dot"></span>${s.tag}</span>
+         <div class="title">${titleEl(s.title, 0.3)}</div>
+         <div class="rule"></div>
+         <div class="sub">${s.sub}</div>
+         ${bulletsEl(s.bullets)}
+       </div>
+       ${cardEl(s.media)}
+     </div>
+     ${footerEl(i, n)}`,
+    p0,
+    p1,
+  );
+}
+
+function renderDuo(s, i, n, p0, p1) {
+  const [a, b] = s.media;
+  return shell(
+    s,
+    i,
+    n,
+    `${topbar(i, n)}
+     <div class="duo">
+       <div class="head">
+         <span class="tag"><span class="dot"></span>${s.tag}</span>
+         <div class="title">${titleEl(s.title, 0.3)}</div>
+         <div class="rule"></div>
+         <div class="sub">${s.sub}</div>
+       </div>
+       <div class="cards">
+         <div class="stage big"><div class="glow"></div><div class="card"><div class="inner">${mediaEl(a)}</div><div class="sheen"></div><div class="edge"></div></div></div>
+         <div class="stage small"><div class="glow"></div><div class="card"><div class="inner">${mediaEl(b)}</div><div class="edge"></div></div></div>
+       </div>
+       ${bulletsEl(s.bullets)}
+     </div>
+     ${footerEl(i, n)}`,
+    p0,
+    p1,
+  );
+}
+
+/* ---------- write everything ---------- */
+let total = 0;
+for (const s of scenes) if (timings[s.id]) s.dur = timings[s.id];
+const grand = scenes.reduce((a, s) => a + s.dur, 0);
 
 const manifest = [];
-let total = 0;
-for (let i = 0; i < scenes.length; i++) {
-  const s = scenes[i];
-  if (timings[s.id]) s.dur = timings[s.id];
-  const n = String(i + 1).padStart(2, '0') + ' / ' + scenes.length;
+for (let k = 0; k < scenes.length; k++) {
+  const s = scenes[k];
+  const i = k + 1;
+  const n = scenes.length;
+  const p0 = ((total / grand) * 100).toFixed(3);
+  const p1 = (((total + s.dur) / grand) * 100).toFixed(3);
+  total += s.dur;
+
   let html;
-  if (s.kind === 'hero') html = renderHero(s);
-  else if (s.kind === 'outro') html = renderOutro(s);
-  else if (s.kind === 'wide') html = renderWide(s, n);
-  else html = renderTwo(s, n);
+  if (s.kind === 'hero') html = renderHero(s, i, n, p0, p1);
+  else if (s.kind === 'outro') html = renderOutro(s, i, n, p0, p1);
+  else if (s.kind === 'duo') html = renderDuo(s, i, n, p0, p1);
+  else html = renderSplit(s, i, n, p0, p1);
+
   const file = `scene-${s.id}.html`;
   fs.writeFileSync(path.join(OUT, file), html, 'utf8');
   manifest.push({
@@ -281,10 +537,10 @@ for (let i = 0; i < scenes.length; i++) {
     file,
     dur: s.dur,
     kind: s.kind,
-    media: s.images ? s.images.map((x) => x.file).join('+') : s.img || null,
+    media: s.media ? (Array.isArray(s.media) ? s.media.map((m) => m.src).join('+') : s.media.src) : null,
   });
-  total += s.dur;
 }
-fs.writeFileSync(path.join(__dirname, 'manifest.json'), JSON.stringify(manifest, null, 2), 'utf8');
-console.log('scenes:', manifest.length, 'total seconds:', total);
-console.log(manifest.map((m) => m.file + ' @ ' + m.dur + 's  [' + m.media + ']').join('\n'));
+
+fs.writeFileSync(path.join(HERE, 'manifest.json'), JSON.stringify(manifest, null, 2), 'utf8');
+console.log('scenes:', manifest.length, '| total:', grand.toFixed(2) + 's');
+console.log(manifest.map((m) => `  ${m.file}  ${m.dur}s  [${m.media || '-'}]`).join('\n'));

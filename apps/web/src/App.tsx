@@ -257,7 +257,43 @@ export function App() {
     },
   ];
 
+  // Role-based navigation filtering
+  const userRoles = (user?.roles || ['admin']).map((r) =>
+    (typeof r === 'string' ? r : (r as any)?.name || '').toLowerCase()
+  );
+  const hasRole = (keyword: string) => userRoles.some((r) => r.includes(keyword));
+
+  const isOwnerOrAdmin =
+    hasRole('admin') ||
+    hasRole('owner') ||
+    Boolean(user?.isPlatformAdmin);
+  const isDoctor = hasRole('doctor') || hasRole('physician');
+  const isReception = hasRole('reception') || hasRole('secretary');
+  const isCashier = hasRole('cashier') || hasRole('accountant');
+
+  const filteredMenuItems = menuItems.filter((item) => {
+    if (isOwnerOrAdmin) return true;
+    if (isDoctor) {
+      return ['dashboard', 'patients', 'laser', 'injectables', 'skincare', 'bodycare', 'spa', 'appointments', 'before-after'].includes(item.key);
+    }
+    if (isReception) {
+      return ['dashboard', 'appointments', 'patients', 'packages', 'invoices', 'reports'].includes(item.key);
+    }
+    if (isCashier) {
+      return ['dashboard', 'invoices', 'reports'].includes(item.key);
+    }
+    return true;
+  });
+
   const renderContent = () => {
+    // Role guard: if user tries to render a tab they do not have access to, return to dashboard
+    if (!isOwnerOrAdmin && selectedTab !== 'dashboard') {
+      const allowed = filteredMenuItems.map((m) => m.key);
+      if (!allowed.includes(selectedTab)) {
+        return <DashboardView onNavigate={(tab) => setSelectedTab(tab)} />;
+      }
+    }
+
     switch (selectedTab) {
       case 'patients':
         return <PatientsView />;
@@ -456,7 +492,14 @@ export function App() {
                   {user ? `${user.firstName} ${user.lastName}` : (currentLanguage === 'ar' ? 'د. سارة الشريف' : 'Dr. Sara El-Sherif')}
                 </div>
                 <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>
-                  {user?.roles?.[0] || (currentLanguage === 'ar' ? 'مدير المركز' : 'Clinic Admin')}
+                  {(() => {
+                    const r = (user?.roles?.[0] || '').toLowerCase();
+                    if (r === 'clinic_owner' || r.includes('owner')) return currentLanguage === 'ar' ? 'مالك العيادة' : 'Clinic Owner';
+                    if (r === 'doctor' || r.includes('doctor')) return currentLanguage === 'ar' ? 'طبيب معالج' : 'Doctor';
+                    if (r === 'receptionist' || r.includes('reception')) return currentLanguage === 'ar' ? 'الاستقبال' : 'Receptionist';
+                    if (r === 'cashier' || r.includes('cashier')) return currentLanguage === 'ar' ? 'كاشير' : 'Cashier';
+                    return user?.roles?.[0] || (currentLanguage === 'ar' ? 'مدير المركز' : 'Clinic Admin');
+                  })()}
                 </div>
               </div>
             </div>
@@ -493,7 +536,7 @@ export function App() {
               mode="inline"
               selectedKeys={[selectedTab]}
               onClick={({ key }) => setSelectedTab(key)}
-              items={menuItems}
+              items={filteredMenuItems}
               style={{
                 borderInlineEnd: 'none',
                 paddingTop: 16,

@@ -33,7 +33,7 @@ export function LoginView({ clinicName, clinicColor, clinicInitial, onLoggedIn }
 
     try {
       const res: any = await apiClient.post('/auth/login', {
-        email: values.email,
+        email: values.email.trim().toLowerCase(),
         password: values.password,
       });
 

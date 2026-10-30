@@ -1,13 +1,14 @@
-/* Records the Entrustic Beauty demo scenes into a single MP4.
+/* Renders the demo scenes to an MP4 — deterministically.
  *
- * Pipeline per scene:
- *   1. open the scene HTML in headless Chrome at 1920x1080
- *   2. take a screenshot every FRAME_MS milliseconds for the scene duration
- *   3. ffmpeg stitches the PNG sequence into an H.264 mp4 segment
- * Then all segments are concatenated into demo.mp4
+ * The old recorder screenshotted in real time and hoped for the best. This one
+ * asks the page to freeze itself at an exact timestamp for every single frame
+ * (window.__frame(t), see gen.cjs), so:
+ *   - CSS animations land on the exact same frame every run
+ *   - embedded screen recordings are seeked frame-accurately
+ *   - nothing drifts if the machine hiccups
  *
- * Needs: puppeteer-core (drives the installed Chrome) + ffmpeg on PATH or FFMPEG env var.
  * Usage:  node record.cjs
+ * Env:    FPS (default 30), QUALITY (crf, default 17), ONLY=04,05 (subset)
  */
 const fs = require('fs');
 const path = require('path');
@@ -19,8 +20,9 @@ const MANIFEST = path.join(HERE, 'manifest.json');
 const OUT = path.join(HERE, 'video');
 const WORK = path.join(os.tmpdir(), 'entrustic-beauty-record');
 
-const FPS = 30;
-const FRAME_MS = Math.round(1000 / FPS);
+const FPS = Number(process.env.FPS || 30);
+const CRF = String(process.env.QUALITY || 17);
+const ONLY = (process.env.ONLY || '').split(',').filter(Boolean);
 
 const MODULES = [
   path.join('C:', 'Users', 'msi', 'AppData', 'Local', 'Temp', 'opencode', 'rec', 'node_modules'),
@@ -63,28 +65,37 @@ function findChrome() {
   throw new Error('Chrome/Edge not found');
 }
 
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
 async function main() {
   const ffmpeg = findFfmpeg();
   const puppeteer = loadPuppeteer();
-  const manifest = JSON.parse(fs.readFileSync(MANIFEST, 'utf8'));
+  const manifest = JSON.parse(fs.readFileSync(MANIFEST, 'utf8')).filter(
+    (s) => !ONLY.length || ONLY.includes(s.id),
+  );
 
   fs.rmSync(WORK, { recursive: true, force: true });
   fs.mkdirSync(WORK, { recursive: true });
   fs.mkdirSync(OUT, { recursive: true });
 
-  console.log('ffmpeg :', ffmpeg);
-  console.log('chrome :', findChrome());
+  console.log('ffmpeg:', ffmpeg);
+  console.log('chrome:', findChrome());
+  console.log('frames:', manifest.reduce((a, s) => a + Math.round(s.dur * FPS), 0), '@', FPS, 'fps');
 
   const browser = await puppeteer.launch({
     executablePath: findChrome(),
     headless: 'new',
-    args: ['--force-device-scale-factor=1', '--hide-scrollbars', '--disable-gpu', '--font-render-hinting=none'],
-    defaultViewport: { width: 1920, height: 1080 },
+    args: [
+      '--force-device-scale-factor=1',
+      '--hide-scrollbars',
+      '--font-render-hinting=none',
+      '--autoplay-policy=no-user-gesture-required',
+      '--allow-file-access-from-files',
+    ],
+    defaultViewport: { width: 1920, height: 1080, deviceScaleFactor: 1 },
   });
 
   const segments = [];
+  const t0 = Date.now();
+
   for (const s of manifest) {
     const url = 'file:///' + path.join(HERE, 'scenes', s.file).replace(/\\/g, '/');
     const frames = Math.round(s.dur * FPS);
@@ -92,16 +103,24 @@ async function main() {
     fs.mkdirSync(dir, { recursive: true });
 
     const page = await browser.newPage();
-    await page.setViewport({ width: 1920, height: 1080 });
-    await page.goto(url, { waitUntil: 'networkidle0' });
-    // let webfonts settle, then restart the CSS animations from 0
-    await page.evaluate(() => document.fonts && document.fonts.ready);
-    const started = Date.now();
+    await page.setViewport({ width: 1920, height: 1080, deviceScaleFactor: 1 });
+    await page.goto(url, { waitUntil: 'networkidle0', timeout: 60000 });
+    await page.evaluate(() => window.__ready());
+    await new Promise((r) => setTimeout(r, 250));
+
     for (let i = 0; i < frames; i++) {
-      await page.screenshot({ path: path.join(dir, String(i).padStart(4, '0') + '.png') });
-      const target = started + (i + 1) * FRAME_MS;
-      const wait = target - Date.now();
-      if (wait > 0) await sleep(wait);
+      await page.evaluate((t) => window.__frame(t), i / FPS);
+      // JPEG, not PNG: Chrome's PNG encoder costs ~450ms/frame at 1080p while
+      // JPEG q95 is ~78ms, and the frames are re-encoded to H.264 anyway.
+      await page.screenshot({
+        path: path.join(dir, String(i).padStart(4, '0') + '.jpg'),
+        type: 'jpeg',
+        quality: 96,
+      });
+      if (i % 30 === 0) {
+        const el = (Date.now() - t0) / 1000;
+        process.stdout.write(`\r  scene ${s.id}: ${i}/${frames} frames  (${el.toFixed(0)}s elapsed)   `);
+      }
     }
     await page.close();
 
@@ -111,32 +130,47 @@ async function main() {
       [
         '-y', '-hide_banner', '-loglevel', 'error',
         '-framerate', String(FPS),
-        '-i', path.join(dir, '%04d.png'),
-        '-c:v', 'libx264', '-preset', 'medium', '-crf', '18',
-        '-pix_fmt', 'yuv420p', '-r', String(FPS),
+        '-i', path.join(dir, '%04d.jpg'),
+        '-c:v', 'libx264', '-preset', 'slow', '-crf', CRF,
+        '-pix_fmt', 'yuv420p', '-r', String(FPS), '-g', String(FPS * 2),
         seg,
       ],
       { stdio: 'inherit' },
     );
     segments.push(seg);
-    console.log('scene ' + s.id + ' -> ' + frames + ' frames, ' + s.dur + 's');
+    // Keep a copy per scene: re-rendering one scene later (ONLY=04) then only
+    // needs to re-concat, instead of re-rendering the whole video.
+    const keepDir = path.join(OUT, 'segments');
+    fs.mkdirSync(keepDir, { recursive: true });
+    fs.copyFileSync(seg, path.join(keepDir, `seg-${s.id}.mp4`));
+    console.log(`\n  scene ${s.id} -> ${frames} frames, ${s.dur}s  [${s.media || 'no media'}]`);
   }
 
   const listFile = path.join(WORK, 'list.txt');
-  fs.writeFileSync(listFile, segments.map((p) => "file '" + p.replace(/\\/g, '/') + "'").join('\n'), 'utf8');
+  // concat every scene that has a segment, in manifest order -- so a partial
+  // re-render (ONLY=...) still produces the full video
+  const all = JSON.parse(fs.readFileSync(MANIFEST, 'utf8'));
+  const keepDir = path.join(OUT, 'segments');
+  const ordered = all
+    .map((s) => path.join(keepDir, `seg-${s.id}.mp4`))
+    .filter((p) => fs.existsSync(p));
+  if (ordered.length !== all.length) {
+    console.warn(`! only ${ordered.length}/${all.length} scene segments exist; run without ONLY to render the rest`);
+  }
+  fs.writeFileSync(listFile, ordered.map((p) => "file '" + p.replace(/\\/g, '/') + "'").join('\n'), 'utf8');
 
   const finalOut = path.join(OUT, '_raw.mp4');
   execFileSync(
     ffmpeg,
-    ['-y', '-hide_banner', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', listFile, '-c', 'copy', finalOut],
+    ['-y', '-hide_banner', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', listFile,
+     '-c', 'copy', '-movflags', '+faststart', finalOut],
     { stdio: 'inherit' },
   );
   await browser.close();
 
-  const size = fs.statSync(finalOut).size;
-  console.log('\nDONE ->', finalOut);
-  console.log('size:', (size / 1024 / 1024).toFixed(1), 'MB');
-  console.log('next: node mux.cjs   (adds the narration track)');
+  const mb = (fs.statSync(finalOut).size / 1024 / 1024).toFixed(1);
+  console.log(`\nDONE -> ${finalOut}  (${mb} MB, ${((Date.now() - t0) / 60000).toFixed(1)} min)`);
+  console.log('next: node mux.cjs');
 }
 
 main().catch((e) => {

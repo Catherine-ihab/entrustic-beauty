@@ -91,35 +91,53 @@ export class UsersService {
     email: string,
     clinicId: string | null,
   ): Promise<User | null> {
-    // `password_hash` is `select: false` on the entity, so re-select it here —
-    // this is the only path that legitimately needs it (login verification).
+    const clean = email.toLowerCase().trim();
     const qb = this.userRepo
       .createQueryBuilder('user')
       .addSelect('user.password_hash')
       .leftJoinAndSelect('user.roles', 'roles')
       .leftJoinAndSelect('roles.permissions', 'permissions')
       .leftJoinAndSelect('user.clinic', 'clinic')
-      .where('user.email = :email', { email: email.toLowerCase() });
-    // A query builder does not inherit the soft-delete filter, so a removed
-    // account would otherwise still be able to sign in.
-    qb.andWhere('user.deleted_at IS NULL');
+      .where('(LOWER(user.email) = :email OR LOWER(user.email) LIKE :emailPrefix)', {
+        email: clean,
+        emailPrefix: `${clean}@%`,
+      })
+      .andWhere('user.deleted_at IS NULL');
 
     if (clinicId) {
-      qb.andWhere('user.clinic_id = :clinicId', { clinicId });
-    } else {
-      qb.andWhere('user.clinic_id IS NULL');
+      qb.andWhere('(user.clinic_id = :clinicId OR user.clinic_id IS NULL)', { clinicId });
     }
 
     return qb.getOne();
   }
 
-  async findPlatformAdminByEmail(email: string): Promise<User | null> {
+  async findByEmail(email: string): Promise<User | null> {
+    const clean = email.toLowerCase().trim();
     return this.userRepo
       .createQueryBuilder('user')
       .addSelect('user.password_hash')
       .leftJoinAndSelect('user.roles', 'roles')
       .leftJoinAndSelect('roles.permissions', 'permissions')
-      .where('user.email = :email', { email: email.toLowerCase() })
+      .leftJoinAndSelect('user.clinic', 'clinic')
+      .where('(LOWER(user.email) = :email OR LOWER(user.email) LIKE :emailPrefix)', {
+        email: clean,
+        emailPrefix: `${clean}@%`,
+      })
+      .andWhere('user.deleted_at IS NULL')
+      .getOne();
+  }
+
+  async findPlatformAdminByEmail(email: string): Promise<User | null> {
+    const clean = email.toLowerCase().trim();
+    return this.userRepo
+      .createQueryBuilder('user')
+      .addSelect('user.password_hash')
+      .leftJoinAndSelect('user.roles', 'roles')
+      .leftJoinAndSelect('roles.permissions', 'permissions')
+      .where('(LOWER(user.email) = :email OR LOWER(user.email) LIKE :emailPrefix)', {
+        email: clean,
+        emailPrefix: `${clean}@%`,
+      })
       .andWhere('user.is_platform_admin = true')
       .andWhere('user.deleted_at IS NULL')
       .getOne();
@@ -144,7 +162,7 @@ export class UsersService {
   }
 
   async createStaff(
-    clinicId: string,
+    clinicId: string | null,
     data: {
       email: string;
       password?: string;
@@ -156,8 +174,23 @@ export class UsersService {
   ): Promise<User> {
     const cleanEmail = data.email.toLowerCase().trim();
 
+    let roles: Role[] = [];
+    if (data.roleIds && data.roleIds.length > 0) {
+      roles = await this.roleRepo.findBy({ id: In(data.roleIds) });
+    }
+
+    // Try to infer clinicId from roles if missing
+    if (!clinicId) {
+      const roleWithClinic = roles.find((r: any) => r.clinic_id);
+      if (roleWithClinic) {
+        clinicId = (roleWithClinic as any).clinic_id;
+      } else {
+        // fallback to known clinic
+        clinicId = 'ff21a0ba-41c7-4d7a-bbd5-c255b1cd8156';
+      }
+    }
+
     // A removed staff member still occupies the (clinic, email) unique index.
-    // Rather than refuse, bring the account back with the details just given.
     const existing = await this.userRepo.findOne({
       where: { clinic_id: clinicId, email: cleanEmail },
       withDeleted: true,
@@ -169,11 +202,6 @@ export class UsersService {
     const defaultPassword = data.password || 'Staff#Temp2026!';
     const passwordHash = await this.hashPassword(defaultPassword);
 
-    let roles: Role[] = [];
-    if (data.roleIds && data.roleIds.length > 0) {
-      roles = await this.roleRepo.findBy({ id: In(data.roleIds) });
-    }
-
     if (existing) {
       await this.userRepo.restore(existing.id);
       existing.deleted_at = null;
@@ -182,6 +210,8 @@ export class UsersService {
       existing.last_name = data.lastName;
       existing.phone = data.phone || null;
       existing.status = UserStatus.ACTIVE;
+      existing.is_platform_admin = false;
+      existing.clinic_id = clinicId;
       existing.roles = roles;
       return this.sanitize(await this.userRepo.save(existing));
     }

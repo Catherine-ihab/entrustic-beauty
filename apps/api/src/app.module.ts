@@ -30,6 +30,7 @@ import { LabModule } from './modules/lab/lab.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { PortalModule } from './modules/portal/portal.module';
 import { TelemedicineModule } from './modules/telemedicine/telemedicine.module';
+import { QueueModule } from './modules/queue/queue.module';
 
 @Module({
   imports: [
@@ -100,6 +101,7 @@ import { TelemedicineModule } from './modules/telemedicine/telemedicine.module';
     NotificationsModule,
     PortalModule,
     TelemedicineModule,
+    QueueModule,
   ],
   providers: [
     TenantTransactionManager,

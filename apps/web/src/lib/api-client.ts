@@ -34,11 +34,9 @@ apiClient.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
-  // If running in development with custom tenant override parameter
+  // Always send tenant slug so tenant-aware endpoints resolve correctly
   const overrideSlug = localStorage.getItem('dev_tenant_slug');
-  if (overrideSlug && import.meta.env.DEV) {
-    config.headers['x-tenant-slug'] = overrideSlug;
-  }
+  config.headers['x-tenant-slug'] = overrideSlug || DEFAULT_TENANT_SLUG;
 
   return config;
 });
