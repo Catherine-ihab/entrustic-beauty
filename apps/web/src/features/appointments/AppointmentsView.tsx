@@ -44,6 +44,9 @@ import {
   LayoutGrid,
   ShieldAlert,
   RefreshCw,
+  Cpu,
+  AlertTriangle,
+  Layers,
 } from 'lucide-react';
 import dayjs, { Dayjs } from 'dayjs';
 import { apiClient } from '../../lib/api-client';
@@ -66,10 +69,29 @@ export interface ClinicAppointment {
   time: string; // HH:mm
   doctor: string;
   room: string;
+  deviceId?: string;
+  deviceName?: string;
   priceEgp: number;
   status: QueueStatus;
   notes?: string;
 }
+
+export const CLINIC_ROOMS = [
+  { id: 'room-1', name: 'غرفة ليزر 1 (كانديلا)', type: 'laser' },
+  { id: 'room-2', name: 'غرفة ليزر 2 (ديكا)', type: 'laser' },
+  { id: 'room-3', name: 'عيادة الحقن والتجميل', type: 'injectable' },
+  { id: 'room-4', name: 'جناح العناية بالبشرة والهيدرافيشل', type: 'skincare' },
+  { id: 'room-5', name: 'جناح الحمام المغربي والسبا', type: 'spa' },
+  { id: 'room-6', name: 'غرفة العناية بالجسم والسنفرة', type: 'bodycare' },
+];
+
+export const CLINIC_SHARED_DEVICES = [
+  { id: 'candela_pro', name: 'كانديلا جنتل ماكس برو بلس (Candela Pro Plus)', type: 'laser' },
+  { id: 'hydrafacial_syndeo', name: 'هيدرافيشل إيليت إم دي سينديو (Hydrafacial Syndeo)', type: 'skincare' },
+  { id: 'deka_again', name: 'ديكا أجين ليزر (Deka Again Laser)', type: 'laser' },
+  { id: 'dermapen_4', name: 'ديرمابن 4 ميكرونيدلينج (Dermapen 4)', type: 'derma' },
+  { id: 'skin_analyzer', name: 'جهاز فحص وتحليل البشرة الرقمي (Visia Skin Analyzer)', type: 'diagnostics' },
+];
 
 export interface DoctorSchedule {
   id: string;
@@ -189,7 +211,9 @@ const INITIAL_APPOINTMENTS: ClinicAppointment[] = [
     date: dayjs().format('YYYY-MM-DD'),
     time: '10:00',
     doctor: 'د. سارة القاضي',
-    room: 'غرفة ليزر 1',
+    room: 'غرفة ليزر 1 (كانديلا)',
+    deviceId: 'candela_pro',
+    deviceName: 'كانديلا جنتل ماكس برو بلس (Candela Pro Plus)',
     priceEgp: 1800,
     status: 'completed',
   },
@@ -215,9 +239,11 @@ const INITIAL_APPOINTMENTS: ClinicAppointment[] = [
     serviceCategory: 'عناية بالبشرة وهيدرافيشل',
     serviceName: 'تنظيف عميق هيدرافيشل Syndeo',
     date: dayjs().format('YYYY-MM-DD'),
-    time: '12:30',
+    time: '12:00',
     doctor: 'أخصائية البشرة ندى',
-    room: 'غرفة العناية بالبشرة',
+    room: 'جناح العناية بالبشرة والهيدرافيشل',
+    deviceId: 'hydrafacial_syndeo',
+    deviceName: 'هيدرافيشل إيليت إم دي سينديو (Hydrafacial Syndeo)',
     priceEgp: 1500,
     status: 'waiting',
   },
@@ -299,11 +325,50 @@ export function AppointmentsView() {
     return INITIAL_DOCTORS;
   });
 
-  const [activeTab, setActiveTab] = useState<'today_queue' | 'calendar' | 'all_list'>('today_queue');
+  const [activeTab, setActiveTab] = useState<'today_queue' | 'calendar' | 'all_list' | 'room_device_matrix'>('today_queue');
   const [queueMode, setQueueMode] = useState<'doctor_focused' | 'multi_lanes'>('doctor_focused');
   const [selectedDoctorFilter, setSelectedDoctorFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDate, setSelectedDate] = useState<string>(dayjs().format('YYYY-MM-DD'));
+
+  // Conflict calculation for Rooms and Shared Devices
+  const matrixConflicts = useMemo(() => {
+    const list = appointments.filter((a) => a.date === selectedDate && a.status !== 'cancelled');
+    const warnings: string[] = [];
+
+    // Room conflicts
+    const roomMap = new Map<string, ClinicAppointment[]>();
+    list.forEach((a) => {
+      const key = `${a.room}__${a.time}`;
+      if (!roomMap.has(key)) roomMap.set(key, []);
+      roomMap.get(key)!.push(a);
+    });
+    roomMap.forEach((appts, key) => {
+      if (appts.length > 1) {
+        const [rName, t] = key.split('__');
+        warnings.push(`تعارض بالغرفة [${rName}] في توقيت ${t} بين [${appts.map((x) => x.name).join(' و ')}]`);
+      }
+    });
+
+    // Device conflicts
+    const devMap = new Map<string, ClinicAppointment[]>();
+    list.forEach((a) => {
+      if (a.deviceId) {
+        const key = `${a.deviceId}__${a.time}`;
+        if (!devMap.has(key)) devMap.set(key, []);
+        devMap.get(key)!.push(a);
+      }
+    });
+    devMap.forEach((appts, key) => {
+      if (appts.length > 1) {
+        const [, t] = key.split('__');
+        const devTitle = appts[0].deviceName || 'جهاز مشترك';
+        warnings.push(`تعارض بالجهاز [${devTitle}] في توقيت ${t} بين الطبيبات [${appts.map((x) => x.doctor).join(' و ')}]`);
+      }
+    });
+
+    return warnings;
+  }, [appointments, selectedDate]);
 
   // Modals & Connected Directories
   const [registeredPatients] = useState<RegisteredPatient[]>(getRegisteredPatients);
@@ -527,24 +592,32 @@ export function AppointmentsView() {
       return;
     }
 
-    // Check doctor or room time slot collision
+    // Check doctor, room, or shared device time slot collision
     const docObj = doctors.find((d) => d.name === chosenDoctor);
-    const targetRoom = values.room || docObj?.room || 'غرفة العلاج 1';
+    const targetRoom = values.room || docObj?.room || "غرفة ليزر 1 (كانديلا)";
+    const targetDeviceId = values.deviceId;
+
     const conflict = appointments.find(
       (a) =>
         a.id !== editingAppt?.id &&
         a.date === dateStr &&
         a.time === timeStr &&
-        a.status !== 'cancelled' &&
-        (a.doctor === chosenDoctor || a.room === targetRoom)
+        a.status !== "cancelled" &&
+        (a.doctor === chosenDoctor || a.room === targetRoom || (targetDeviceId && a.deviceId === targetDeviceId))
     );
 
     if (conflict) {
+      const conflictMsg = (targetDeviceId && conflict.deviceId === targetDeviceId)
+        ? `الجهاز المشترك [${conflict.deviceName || "جهاز الجلسة"}] محجوز بالفعل في هذا التوقيت (${timeStr})!`
+        : conflict.room === targetRoom
+        ? `الغرفة [${targetRoom}] محجوزة بالفعل في هذا التوقيت (${timeStr})!`
+        : `الطبيبة [${conflict.doctor}] لديها موعد آخر مسجل في نفس التوقيت (${timeStr})!`;
+
       Modal.confirm({
-        title: '⚠️ تنبيه: تعارض في وقت الموعد أو الغرفة!',
-        content: `يوجد حجز مسبق في نفس التوقيت (${timeStr}) لـ [${conflict.doctor}] أو [${targetRoom}] للحالة: ${conflict.name} (${conflict.serviceName}).\n\nهل ترغبين بالتأكيد كحجز مزدوج أم الرجوع لتعديل الوقت؟`,
-        okText: 'تأكيد الحجز المزدوج',
-        cancelText: 'الرجوع لتعديل الوقت',
+        title: "⚠️ تنبيه: تعارض في حجز الغرفة أو الجهاز المشترك!",
+        content: `${conflictMsg}\nالحجز الحالي مسجل للدكتورة [${conflict.doctor}] للمريضة: ${conflict.name} (${conflict.serviceName}).\n\nهل ترغبين بالتأكيد وتجاوز التعارض كحجز استثنائي أم الرجوع لتعديل الحجز؟`,
+        okText: "تأكيد الحجز الاستثنائي",
+        cancelText: "الرجوع لتعديل الحجز",
         okButtonProps: { danger: true },
         onOk: () => {
           proceedSave(values, dateStr, timeStr);
@@ -560,6 +633,9 @@ export function AppointmentsView() {
     setSavingAppt(true);
     try {
     const docObj = doctors.find((d) => d.name === values.doctor);
+    const devObj = CLINIC_SHARED_DEVICES.find((d) => d.id === values.deviceId);
+    const resolvedDeviceName = values.deviceName || devObj?.name || undefined;
+
     if (editingAppt) {
       const next = appointments.map((a) =>
         a.id === editingAppt.id
@@ -567,31 +643,35 @@ export function AppointmentsView() {
               ...a,
               ...values,
               room: values.room || docObj?.room || a.room,
+              deviceId: values.deviceId,
+              deviceName: resolvedDeviceName,
               date: dateStr,
               time: timeStr,
             }
           : a
       );
       saveAppointments(next);
-      message.success('تم تعديل بيانات الحجز');
+      message.success("تم تعديل بيانات الحجز وتحديث تخصيص الغرفة والجهاز");
     } else {
       const newAppt: ClinicAppointment = {
         id: `apt-${Date.now()}`,
         name: values.name,
-        phone: values.phone || '',
+        phone: values.phone || "",
         patientNumber: values.patientNumber || `PAT-00${Math.floor(Math.random() * 900) + 100}`,
         serviceCategory: values.serviceCategory,
         serviceName: values.serviceName || values.serviceCategory,
         date: dateStr,
         time: timeStr,
-        doctor: values.doctor || 'د. سارة القاضي',
-        room: values.room || docObj?.room || 'غرفة العلاج 1',
+        doctor: values.doctor || "د. سارة القاضي",
+        room: values.room || docObj?.room || "غرفة ليزر 1 (كانديلا)",
+        deviceId: values.deviceId,
+        deviceName: resolvedDeviceName,
         priceEgp: values.priceEgp || 0,
-        status: values.status || 'waiting',
-        notes: values.notes || '',
+        status: values.status || "waiting",
+        notes: values.notes || "",
       };
       saveAppointments([newAppt, ...appointments]);
-      message.success(`تم حجز موعد جديد للحالة: ${newAppt.name} مع ${newAppt.doctor}`);
+      message.success(`تم حجز موعد جديد للحالة: ${newAppt.name} مع ${newAppt.doctor} في [${newAppt.room}]`);
     }
     setIsModalOpen(false);
     form.resetFields();
@@ -599,7 +679,6 @@ export function AppointmentsView() {
       setSavingAppt(false);
     }
   };
-
   // WhatsApp contextual generator
   const sendWhatsAppReminder = (appt: ClinicAppointment) => {
     const phone = appt.phone.replace(/\D/g, '');
@@ -784,6 +863,15 @@ export function AppointmentsView() {
                 <Space>
                   <CalendarIcon size={15} />
                   <span>التقويم والحجوزات المستقبلية</span>
+                </Space>
+              ),
+            },
+            {
+              value: 'room_device_matrix',
+              label: (
+                <Space>
+                  <Cpu size={15} />
+                  <span>جدولة الغرف والأجهزة المشتركة</span>
                 </Space>
               ),
             },
@@ -1379,6 +1467,344 @@ export function AppointmentsView() {
       )}
 
       {/* TAB 3: ALL APPOINTMENTS LIST */}
+      
+      {/* 4. Tab: Room & Shared Equipment Matrix (جدولة الغرف والأجهزة المشتركة) */}
+      {activeTab === 'room_device_matrix' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Header & Date Controller */}
+          <Card
+            style={{
+              background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%)',
+              borderRadius: 14,
+              border: 'none',
+              color: '#ffffff',
+              boxShadow: '0 6px 20px rgba(49, 46, 129, 0.25)',
+            }}
+            bodyStyle={{ padding: '16px 20px' }}
+          >
+            <Row justify="space-between" align="middle" gutter={[12, 12]}>
+              <Col xs={24} md={13}>
+                <Space align="center" size={12}>
+                  <div
+                    style={{
+                      background: 'rgba(255,255,255,0.15)',
+                      borderRadius: 10,
+                      width: 44,
+                      height: 44,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Cpu size={24} color="#ffffff" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#ffffff' }}>
+                      مصفوفة إشغال الغرف والأجهزة المشتركة (Rooms & Equipment Schedule)
+                    </div>
+                    <div style={{ fontSize: 12, color: '#c7d2fe' }}>
+                      تتبع لحظي وتنسيق زمني لغرف الليزر والهيدرافيشل والحقن لمنع التضارب وضمان تشغيل الأجهزة بكفاءة
+                    </div>
+                  </div>
+                </Space>
+              </Col>
+              <Col xs={24} md={11} style={{ textAlign: 'start' }}>
+                <Space wrap>
+                  <DatePicker
+                    value={dayjs(selectedDate)}
+                    onChange={(d) => {
+                      if (d) setSelectedDate(d.format('YYYY-MM-DD'));
+                    }}
+                    style={{ borderRadius: 8 }}
+                  />
+                  <Button
+                    size="small"
+                    style={{
+                      background: selectedDate === dayjs().format('YYYY-MM-DD') ? '#ffffff' : 'rgba(255,255,255,0.2)',
+                      color: selectedDate === dayjs().format('YYYY-MM-DD') ? '#312e81' : '#ffffff',
+                      border: 'none',
+                      fontWeight: 600,
+                    }}
+                    onClick={() => setSelectedDate(dayjs().format('YYYY-MM-DD'))}
+                  >
+                    اليوم
+                  </Button>
+                  <Button
+                    size="small"
+                    style={{
+                      background: selectedDate === dayjs().add(1, 'day').format('YYYY-MM-DD') ? '#ffffff' : 'rgba(255,255,255,0.2)',
+                      color: selectedDate === dayjs().add(1, 'day').format('YYYY-MM-DD') ? '#312e81' : '#ffffff',
+                      border: 'none',
+                      fontWeight: 600,
+                    }}
+                    onClick={() => setSelectedDate(dayjs().add(1, 'day').format('YYYY-MM-DD'))}
+                  >
+                    غداً
+                  </Button>
+                  <Button
+                    type="primary"
+                    icon={<Plus size={14} />}
+                    style={{ background: '#be185d', borderColor: '#be185d', fontWeight: 700, borderRadius: 8 }}
+                    onClick={() => {
+                      setEditingAppt(null);
+                      form.resetFields();
+                      setModalDate(selectedDate);
+                      form.setFieldsValue({ date: dayjs(selectedDate), time: dayjs('10:00', 'HH:mm') });
+                      setIsModalOpen(true);
+                    }}
+                  >
+                    + حجز جديد
+                  </Button>
+                </Space>
+              </Col>
+            </Row>
+          </Card>
+
+          {/* Conflict Alert Banner if any conflict exists on this day */}
+          {matrixConflicts.length > 0 && (
+            <Alert
+              type="error"
+              showIcon
+              icon={<AlertTriangle size={20} color="#b91c1c" />}
+              message={<span style={{ fontWeight: 800 }}>⚠️ اكتشاف تعارض في الغرف أو الأجهزة في يوم {selectedDate}:</span>}
+              description={
+                <ul style={{ margin: '6px 0 0 0', paddingInlineStart: 20 }}>
+                  {matrixConflicts.map((c, i) => (
+                    <li key={i} style={{ fontWeight: 600 }}>{c}</li>
+                  ))}
+                </ul>
+              }
+              style={{ borderRadius: 10, border: '1px solid #fca5a5', background: '#fef2f2' }}
+            />
+          )}
+
+          {/* 1. ROOMS OCCUPANCY MATRIX */}
+          <Card
+            title={
+              <Space>
+                <Layers size={18} color="#4338ca" />
+                <span style={{ fontWeight: 700 }}>1. جدول إشغال الغرف والأجنحة العلاجية — {selectedDate}</span>
+              </Space>
+            }
+            style={{ borderRadius: 12, border: '1px solid #e2e8f0' }}
+            bodyStyle={{ overflowX: 'auto', padding: '16px' }}
+          >
+            <table style={{ width: '100%', minWidth: 920, borderCollapse: 'collapse', fontSize: 12 }}>
+              <thead>
+                <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
+                  <th style={{ padding: '10px 12px', textAlign: 'right', width: 200, fontWeight: 700, color: '#334155' }}>الغرفة / الجناح</th>
+                  {['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'].map((hour) => (
+                    <th key={hour} style={{ padding: '10px 6px', textAlign: 'center', fontWeight: 600, color: '#64748b', borderInlineStart: '1px solid #e2e8f0' }}>
+                      {hour}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {CLINIC_ROOMS.map((room) => (
+                  <tr key={room.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <td style={{ padding: '12px', fontWeight: 700, color: '#1e293b', background: '#fafafa' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4338ca' }} />
+                        <span>{room.name}</span>
+                      </div>
+                    </td>
+                    {['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'].map((hour) => {
+                      const hourPrefix = hour.split(':')[0];
+                      const matched = appointments.filter(
+                        (a) => a.date === selectedDate && a.status !== 'cancelled' && (a.room === room.name || a.room.includes(room.name.split(' ')[0])) && a.time.startsWith(hourPrefix)
+                      );
+
+                      if (matched.length > 0) {
+                        const isConflict = matched.length > 1;
+                        return (
+                          <td
+                            key={hour}
+                            style={{
+                              padding: 4,
+                              borderInlineStart: '1px solid #f1f5f9',
+                              background: isConflict ? '#fee2e2' : '#f0fdf4',
+                              verticalAlign: 'top',
+                            }}
+                          >
+                            {matched.map((m) => (
+                              <div
+                                key={m.id}
+                                onClick={() => handleOpenEdit(m)}
+                                style={{
+                                  padding: '4px 6px',
+                                  borderRadius: 6,
+                                  background: isConflict ? '#ef4444' : '#047857',
+                                  color: '#ffffff',
+                                  fontSize: 10,
+                                  cursor: 'pointer',
+                                  marginBottom: 2,
+                                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                }}
+                              >
+                                <div style={{ fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                  {m.name}
+                                </div>
+                                <div style={{ opacity: 0.9, fontSize: 9 }}>
+                                  {m.doctor.replace('د. ', '')} • {m.time}
+                                </div>
+                              </div>
+                            ))}
+                          </td>
+                        );
+                      }
+
+                      return (
+                        <td
+                          key={hour}
+                          style={{
+                            padding: 4,
+                            borderInlineStart: '1px solid #f1f5f9',
+                            textAlign: 'center',
+                          }}
+                        >
+                          <Button
+                            type="text"
+                            size="small"
+                            style={{ fontSize: 10, color: '#94a3b8', height: 24, padding: '0 4px', border: '1px dashed #e2e8f0' }}
+                            onClick={() => {
+                              setEditingAppt(null);
+                              form.resetFields();
+                              setModalDate(selectedDate);
+                              form.setFieldsValue({
+                                date: dayjs(selectedDate),
+                                time: dayjs(hour, 'HH:mm'),
+                                room: room.name,
+                              });
+                              setIsModalOpen(true);
+                            }}
+                          >
+                            + متاح
+                          </Button>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+
+          {/* 2. SHARED DEVICES OCCUPANCY MATRIX */}
+          <Card
+            title={
+              <Space>
+                <Cpu size={18} color="#047857" />
+                <span style={{ fontWeight: 700 }}>2. جدول إشغال الأجهزة والمعدات التجميلية المشتركة — {selectedDate}</span>
+              </Space>
+            }
+            style={{ borderRadius: 12, border: '1px solid #e2e8f0' }}
+            bodyStyle={{ overflowX: 'auto', padding: '16px' }}
+          >
+            <table style={{ width: '100%', minWidth: 920, borderCollapse: 'collapse', fontSize: 12 }}>
+              <thead>
+                <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
+                  <th style={{ padding: '10px 12px', textAlign: 'right', width: 220, fontWeight: 700, color: '#334155' }}>الجهاز المشترك</th>
+                  {['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'].map((hour) => (
+                    <th key={hour} style={{ padding: '10px 6px', textAlign: 'center', fontWeight: 600, color: '#64748b', borderInlineStart: '1px solid #e2e8f0' }}>
+                      {hour}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {CLINIC_SHARED_DEVICES.map((dev) => (
+                  <tr key={dev.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <td style={{ padding: '12px', fontWeight: 700, color: '#1e293b', background: '#fafafa' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#047857' }} />
+                        <span>{dev.name}</span>
+                      </div>
+                    </td>
+                    {['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'].map((hour) => {
+                      const hourPrefix = hour.split(':')[0];
+                      const matched = appointments.filter(
+                        (a) => a.date === selectedDate && a.status !== 'cancelled' && a.deviceId === dev.id && a.time.startsWith(hourPrefix)
+                      );
+
+                      if (matched.length > 0) {
+                        const isConflict = matched.length > 1;
+                        return (
+                          <td
+                            key={hour}
+                            style={{
+                              padding: 4,
+                              borderInlineStart: '1px solid #f1f5f9',
+                              background: isConflict ? '#fee2e2' : '#eff6ff',
+                              verticalAlign: 'top',
+                            }}
+                          >
+                            {matched.map((m) => (
+                              <div
+                                key={m.id}
+                                onClick={() => handleOpenEdit(m)}
+                                style={{
+                                  padding: '4px 6px',
+                                  borderRadius: 6,
+                                  background: isConflict ? '#dc2626' : '#2563eb',
+                                  color: '#ffffff',
+                                  fontSize: 10,
+                                  cursor: 'pointer',
+                                  marginBottom: 2,
+                                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                }}
+                              >
+                                <div style={{ fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                  {m.name}
+                                </div>
+                                <div style={{ opacity: 0.9, fontSize: 9 }}>
+                                  {m.doctor.replace('د. ', '')} • {m.room}
+                                </div>
+                              </div>
+                            ))}
+                          </td>
+                        );
+                      }
+
+                      return (
+                        <td
+                          key={hour}
+                          style={{
+                            padding: 4,
+                            borderInlineStart: '1px solid #f1f5f9',
+                            textAlign: 'center',
+                          }}
+                        >
+                          <Button
+                            type="text"
+                            size="small"
+                            style={{ fontSize: 10, color: '#94a3b8', height: 24, padding: '0 4px', border: '1px dashed #e2e8f0' }}
+                            onClick={() => {
+                              setEditingAppt(null);
+                              form.resetFields();
+                              setModalDate(selectedDate);
+                              form.setFieldsValue({
+                                date: dayjs(selectedDate),
+                                time: dayjs(hour, 'HH:mm'),
+                                deviceId: dev.id,
+                                deviceName: dev.name,
+                              });
+                              setIsModalOpen(true);
+                            }}
+                          >
+                            + متاح
+                          </Button>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+        </div>
+      )}
+
       {activeTab === 'all_list' && (
         <Card style={{ borderRadius: 14, border: '1px solid #E2E8F0' }} bodyStyle={{ padding: 0 }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -1540,9 +1966,36 @@ export function AppointmentsView() {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="room" label="الغرفة / الجناح المخصص">
-                <Input placeholder="مثال: غرفة ليزر 1" />
+              <Form.Item name="room" label="الغرفة / الجناح المخصص" rules={[{ required: true, message: 'مطلوب اختيار الغرفة' }]}>
+                <Select
+                  showSearch
+                  placeholder="اختر الغرفة أو الجناح..."
+                  options={CLINIC_ROOMS.map((r) => ({
+                    value: r.name,
+                    label: r.name,
+                  }))}
+                />
               </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="deviceId" label="الجهاز المشترك للجلسة (تلقائي / اختياري)">
+                <Select
+                  allowClear
+                  showSearch
+                  placeholder="اختر الجهاز المستخدم (إن وجد)..."
+                  options={CLINIC_SHARED_DEVICES.map((d) => ({
+                    value: d.id,
+                    label: d.name,
+                  }))}
+                  onChange={(_val, opt: any) => {
+                    form.setFieldsValue({ deviceName: opt?.label || '' });
+                  }}
+                />
+              </Form.Item>
+              <Form.Item name="deviceName" hidden><Input /></Form.Item>
             </Col>
           </Row>
 

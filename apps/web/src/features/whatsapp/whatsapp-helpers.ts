@@ -184,3 +184,78 @@ export function templateLaserPostCare(data: {
 مع تمنياتنا لك ببشرة ناعمة وصافية دائماً.`;
 }
 
+
+
+/**
+ * Template: Retargeting Botox & Dermal Fillers Refill (تذكير تجديد البوتوكس والفيلر بعد 3-6 أشهر)
+ */
+export function templateRetargetingBotoxFiller(data: {
+  clinicName: string;
+  patientName: string;
+  lastProcedureDate?: string;
+  lastProcedureName?: string;
+  doctorName?: string;
+}): string {
+  const { clinicName, patientName, lastProcedureDate, lastProcedureName, doctorName } = data;
+  return `عزيزتي *${patientName}* 🌸
+تحياتنا وتقديرنا لك من عيادة *${clinicName}*.
+
+نود الاطمئنان على جمال ونضارة بشرتك بعد إجراء *${lastProcedureName || 'جلسة الحقن التجميلي'}*${lastProcedureDate ? ` بتاريخ ${lastProcedureDate}` : ''}${doctorName ? ` مع ${doctorName}` : ''}.
+
+💡 *تذكير سريري للعناية بجمالك:*
+مفعول البوتوكس والفيلر يبدأ بالتراجع التدريجي الطبيعي بعد مرور 4 إلى 6 أشهر. ننصح دائماً بحجز جلسة التجديد والرتوش للحفاظ على استرخاء العضلات ونضارة الخطوط قبل أن تعود التجاعيد الحركية.
+
+✨ يسعدنا حجز موعدك القادم واستقبالك مجدداً. هل ترغبين باقتراح أقرب موعد متاح هذا الأسبوع؟`;
+}
+
+/**
+ * Template: Retargeting Next Laser Session (تذكير موعد جلسة الليزر الدورية بعد 4 أسابيع)
+ */
+export function templateRetargetingLaserInterval(data: {
+  clinicName: string;
+  patientName: string;
+  lastSessionDate?: string;
+  areaName?: string;
+}): string {
+  const { clinicName, patientName, lastSessionDate, areaName } = data;
+  return `مرحباً عزيزتي *${patientName}* ✨
+من عيادة *${clinicName}* — قسم الليزر المتطور.
+
+نود تذكيرك بأن موعد جلستك التالية لليزر${areaName ? ` (${areaName})` : ''} قد حان!
+مر على آخر جلسة لك${lastSessionDate ? ` في ${lastSessionDate}` : ''} قرابة 4 أسابيع، وهي الفترة المثالية لاستهداف بصيلات الشعر في مرحلة النمو النشط (Anagen Phase) للوصول لأفضل نعومة وأسرع نتيجة.
+
+📲 يسعدنا تأكيد حجز موعد جلستك هذا الأسبوع بالرد على هذه الرسالة واختيار التوقيت الأنسب لك.`;
+}
+
+/**
+ * Template: Retargeting Monthly Skincare / Hydrafacial (تذكير جلسة النضارة والهيدرافيشل الشهرية)
+ */
+export function templateRetargetingFacialGlow(data: {
+  clinicName: string;
+  patientName: string;
+}): string {
+  const { clinicName, patientName } = data;
+  return `عزيزتي *${patientName}* 🧖‍♀️
+نتمنى أن تكوني بأفضل صحة وإشراقة من *${clinicName}*.
+
+بشرتك تستحق الدلال والتنظيف العميق شهرياً! نود تذكيرك بموعد جلسة *الهيدرافيشل سينديو / تقشير النضارة* الشهرية لتنظيف المسام، تجديد الخلايا، وترطيب البشرة بماسكات الفيتامينات والذهب.
+
+💎 للحجز والاستفادة من عروض العناية الشهرية، ردي على هذه الرسالة وسيقوم فريق الاستقبال بتأكيد موعدك فوراً.`;
+}
+
+/**
+ * Template: Inactive Patient Win-Back (استعادة العميلات الغائبات مع عرض ترحيبي)
+ */
+export function templateRetargetingInactiveWinBack(data: {
+  clinicName: string;
+  patientName: string;
+  specialOffer?: string;
+}): string {
+  const { clinicName, patientName, specialOffer } = data;
+  return `عزيزتي *${patientName}* 💖
+اشتقنا لك في عيادة *${clinicName}*!
+
+مرت فترة منذ زيارتك السابقة، ويسعدنا دائماً أن نكون جزءاً من روتين عنايتك بجمالك وصحة بشرتك.
+${specialOffer ? `\n🎁 *هدية ترحيبية خاصة لك:* ${specialOffer}\n` : '\n🎁 يسعدنا تقديم خصم خاص 15% على أي جلسة نضارة أو ليزر عند الحجز خلال هذا الأسبوع.\n'}
+يسعدنا استقبالك في أي وقت وتنسيق موعدك بما يناسب جدولك.`;
+}

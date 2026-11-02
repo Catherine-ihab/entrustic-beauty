@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import {
   Table,
   Button,
@@ -16,13 +16,22 @@ import {
   message,
   Popconfirm,
   Empty,
-} from 'antd'
+  Slider,
+  Switch,
+} from 'antd';
 import {
   Plus,
   Eye,
+  EyeOff,
   Trash2,
   Sparkles,
   Camera,
+  Sliders,
+  Columns,
+  Layers,
+  Share2,
+  Printer,
+  CheckCircle,
 } from 'lucide-react';
 import dayjs from 'dayjs';
 import { getRegisteredPatients, RegisteredPatient } from '../../lib/patientsDirectory';
@@ -69,8 +78,8 @@ const INITIAL_CASES: BeforeAfterCase[] = [
     date: dayjs().subtract(14, 'day').format('YYYY-MM-DD'),
     doctor: 'د. هبة رمضان',
     notes: 'تحسن ملحوظ في تحديد قوس كيوبيد مع نعومة ومرونة طبيعية بدون أي تكتل أو كدمات.',
-    beforeImageUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80',
-    afterImageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+    beforeImageUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=700&q=80',
+    afterImageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=700&q=80',
     beforeCaption: 'قبل الجلسة: خطوط جفاف رفيعة مع عدم تماثل في الشفة العليا',
     afterCaption: 'بعد أسبوعين: امتلاء متناسق وترطيب عميق واستقامة الحواف',
   },
@@ -86,8 +95,8 @@ const INITIAL_CASES: BeforeAfterCase[] = [
     date: dayjs().subtract(20, 'day').format('YYYY-MM-DD'),
     doctor: 'د. هبة رمضان',
     notes: 'اختفاء كامل لخطوط 11 بين الحاجبين عند الضحك أو الغضب مع ثبات مظهر طبيعي مريح.',
-    beforeImageUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80',
-    afterImageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
+    beforeImageUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=700&q=80',
+    afterImageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=700&q=80',
     beforeCaption: 'قبل الحقن: خطوط حركية عميقة بالجبهة والجلابيلا أثناء التعبير',
     afterCaption: 'بعد 10 أيام: نعومة تامة واسترخاء العضلات مع بقاء حركة الحاجب طبيعية',
   },
@@ -103,8 +112,8 @@ const INITIAL_CASES: BeforeAfterCase[] = [
     date: dayjs().subtract(5, 'day').format('YYYY-MM-DD'),
     doctor: 'أخصائية البشرة ندى',
     notes: 'تضييق فوري للمسام الواسعة وإزالة الرؤوس السوداء مع لمعان وتوهج زجاجي للبشرة.',
-    beforeImageUrl: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=600&q=80',
-    afterImageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80',
+    beforeImageUrl: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=700&q=80',
+    afterImageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=700&q=80',
     beforeCaption: 'قبل الجلسة: مسام متسعة ورؤوس سوداء وجفاف بمنطقة الوجنتين',
     afterCaption: 'بعد الجلسة مباشرة: بشرة نظيفة تماماً، مسام منقبضة وتوهج نضارة واضح',
   },
@@ -120,8 +129,8 @@ const INITIAL_CASES: BeforeAfterCase[] = [
     date: dayjs().subtract(30, 'day').format('YYYY-MM-DD'),
     doctor: 'د. سارة القاضي',
     notes: 'انخفاض كثافة الشعر بنسبة 85% مع اختفاء جلد الوزة والالتهابات السابقة.',
-    beforeImageUrl: 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?auto=format&fit=crop&w=600&q=80',
-    afterImageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80',
+    beforeImageUrl: 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?auto=format&fit=crop&w=700&q=80',
+    afterImageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=80',
     beforeCaption: 'قبل البدء: شعر كثيف وسريع النمو مع انسداد المسام',
     afterCaption: 'بعد 4 جلسات: نعومة فائقة وخلو كامل من التصبغات والشعر النامي تحت الجلد',
   },
@@ -137,8 +146,8 @@ const INITIAL_CASES: BeforeAfterCase[] = [
     date: dayjs().subtract(12, 'day').format('YYYY-MM-DD'),
     doctor: 'أخصائية الجسم مريم',
     notes: 'توحيد لون الجلد وإزالة الخشونة الناتجة عن الاحتكاك.',
-    beforeImageUrl: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=600&q=80',
-    afterImageUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80',
+    beforeImageUrl: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=700&q=80',
+    afterImageUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=700&q=80',
     beforeCaption: 'قبل العلاج: تصبغات داكنة وخشونة بمفصل الركبة',
     afterCaption: 'بعد 3 جلسات: تفتيح واضح ودرجة متناسقة مع لون الجسم الطبيعي',
   },
@@ -160,8 +169,17 @@ export function BeforeAfterView() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCase, setSelectedCase] = useState<BeforeAfterCase | null>(null);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
+  const [isSocialCardOpen, setIsSocialCardOpen] = useState(false);
+
+  // Interactive Comparison Controls
+  const [compareMode, setCompareMode] = useState<'split' | 'side' | 'overlay'>('split');
+  const [sliderPos, setSliderPos] = useState<number>(50); // 0 to 100
+  const [overlayOpacity, setOverlayOpacity] = useState<number>(50); // 0 to 100
+  const [privacyMask, setPrivacyMask] = useState<boolean>(false);
+
   const [registeredPatients] = useState<RegisteredPatient[]>(getRegisteredPatients);
   const [form] = Form.useForm();
+  const sliderContainerRef = useRef<HTMLDivElement>(null);
 
   const saveCases = (next: BeforeAfterCase[]) => {
     setCases(next);
@@ -186,8 +204,8 @@ export function BeforeAfterView() {
       date: dayjs().format('YYYY-MM-DD'),
       doctor: values.doctor || 'د. هبة رمضان',
       notes: values.notes || '',
-      beforeImageUrl: values.beforeImageUrl || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80',
-      afterImageUrl: values.afterImageUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+      beforeImageUrl: values.beforeImageUrl || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=700&q=80',
+      afterImageUrl: values.afterImageUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=700&q=80',
       beforeCaption: values.beforeCaption || 'صورة الحالة قبل الإجراء',
       afterCaption: values.afterCaption || 'صورة النتيجة بعد الجلسة',
     };
@@ -221,6 +239,26 @@ export function BeforeAfterView() {
     }
   };
 
+  // Drag handler for Split Slider
+  const handleSliderMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.buttons !== 1) return; // Only if mouse button is held down
+    const container = sliderContainerRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const pos = Math.max(0, Math.min(100, Math.round((x / rect.width) * 100)));
+    setSliderPos(pos);
+  };
+
+  const handleSliderTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    const container = sliderContainerRef.current;
+    if (!container || !e.touches[0]) return;
+    const rect = container.getBoundingClientRect();
+    const x = e.touches[0].clientX - rect.left;
+    const pos = Math.max(0, Math.min(100, Math.round((x / rect.width) * 100)));
+    setSliderPos(pos);
+  };
+
   const columns = [
     {
       title: 'الحالة وتاريخ التوثيق',
@@ -252,48 +290,61 @@ export function BeforeAfterView() {
       ),
     },
     {
-      title: 'توقيت النتيجة',
-      dataIndex: 'timeElapsed',
-      key: 'time',
-      width: 150,
-      render: (t: string) => (
-        <Tag color="success" style={{ fontWeight: 600 }}>
-          {t}
-        </Tag>
+      title: 'الطبيب والنتيجة',
+      key: 'meta',
+      width: 170,
+      render: (_: any, r: BeforeAfterCase) => (
+        <div>
+          <Tag color="success" style={{ fontWeight: 600, marginBottom: 4 }}>{r.timeElapsed}</Tag>
+          <div style={{ fontSize: 12, color: '#334155' }}>👨‍⚕️ {r.doctor}</div>
+        </div>
       ),
     },
     {
-      title: 'الطبيبة / المعالج',
-      dataIndex: 'doctor',
-      key: 'doctor',
+      title: 'معاينة التحول',
+      key: 'preview',
       width: 130,
-      render: (doc: string) => <span style={{ fontSize: 12 }}>{doc}</span>,
+      render: (_: any, r: BeforeAfterCase) => (
+        <div style={{ display: 'flex', gap: 4 }}>
+          <img
+            src={r.beforeImageUrl}
+            alt="Before"
+            style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6, border: '1px solid #fecaca' }}
+          />
+          <img
+            src={r.afterImageUrl}
+            alt="After"
+            style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6, border: '1px solid #a7f3d0' }}
+          />
+        </div>
+      ),
     },
     {
-      title: 'معاينة المقارنة',
-      key: 'action',
-      width: 170,
+      title: 'إجراءات',
+      key: 'actions',
+      width: 160,
       render: (_: any, r: BeforeAfterCase) => (
-        <Space size={4}>
+        <Space size={6}>
           <Button
             type="primary"
             size="small"
-            icon={<Eye size={13} />}
-            style={{
-              backgroundColor: '#be185d',
-              borderColor: '#be185d',
-              fontWeight: 600,
-              borderRadius: 6,
-            }}
+            icon={<Sliders size={13} />}
+            style={{ background: '#be185d', borderColor: '#be185d', fontWeight: 600 }}
             onClick={() => {
               setSelectedCase(r);
+              setSliderPos(50);
               setIsCompareOpen(true);
             }}
           >
-            عرض قبل وبعد
+            مقارنة تفاعلية
           </Button>
-          <Popconfirm title="حذف هذا السجل؟" onConfirm={() => handleDelete(r.id)} okText="نعم" cancelText="إلغاء">
-            <Button size="small" type="text" danger icon={<Trash2 size={13} />} />
+          <Popconfirm
+            title="حذف سجل الحالة؟"
+            onConfirm={() => handleDelete(r.id)}
+            okText="نعم، حذف"
+            cancelText="إلغاء"
+          >
+            <Button size="small" danger icon={<Trash2 size={13} />} />
           </Popconfirm>
         </Space>
       ),
@@ -331,10 +382,10 @@ export function BeforeAfterView() {
               </div>
               <div>
                 <Title level={4} style={{ color: '#ffffff', margin: 0, fontWeight: 700 }}>
-                  معرض التحولات السريرية (قبل وبعد — Before & After)
+                  معرض التحولات السريرية الذكي (قبل وبعد — AI Interactive Slider)
                 </Title>
                 <Text style={{ color: '#fce7f3', fontSize: 13 }}>
-                  توثيق مصوّر مفروز حسب التخصص الطبي: جلسات البشرة والهيدرافيشل، الليزر، حقن البوتوكس والفيلر، العناية بالجسم والسبا
+                  مقارنة تفاعلية بالسلايدر، مطابقة زوايا الوجه، إخفاء الهوية لحماية الخصوصية، وتصدير كروت السوشيال ميديا
                 </Text>
               </div>
             </Space>
@@ -516,24 +567,37 @@ export function BeforeAfterView() {
         </Form>
       </Modal>
 
-      {/* Side-by-Side Before & After Comparison Modal */}
+      {/* Advanced Interactive Before & After Modal */}
       <Modal
         title={
-          <Space>
-            <Sparkles size={18} color="#be185d" />
-            <span style={{ fontWeight: 700 }}>
-              مقارنة النتائج السريرية (قبل وبعد) — {selectedCase?.patientName}
-            </span>
-          </Space>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '95%' }}>
+            <Space>
+              <Sparkles size={18} color="#be185d" />
+              <span style={{ fontWeight: 700, fontSize: 16 }}>
+                مقارنة النتائج السريرية التفاعلية — {selectedCase?.patientName}
+              </span>
+            </Space>
+            <Space>
+              <Button
+                size="small"
+                icon={<Share2 size={13} />}
+                style={{ color: '#be185d', borderColor: '#fbcfe8' }}
+                onClick={() => setIsSocialCardOpen(true)}
+              >
+                تصدير كارت السوشيال ميديا
+              </Button>
+            </Space>
+          </div>
         }
         open={isCompareOpen}
         onCancel={() => setIsCompareOpen(false)}
         footer={null}
-        width={820}
+        width={860}
       >
         {selectedCase && (
           <div>
-            <div style={{ marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {/* Header info */}
+            <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
               <div>
                 <Tag color={getCategoryColor(selectedCase.category)} style={{ fontWeight: 700, fontSize: 12 }}>
                   {selectedCase.category}
@@ -545,52 +609,500 @@ export function BeforeAfterView() {
               <Tag color="success" style={{ fontWeight: 700, fontSize: 12 }}>{selectedCase.timeElapsed}</Tag>
             </div>
 
-            <Text type="secondary" style={{ display: 'block', marginBottom: 16 }}>
-              {selectedCase.treatmentDescription}
-            </Text>
+            {/* Controls Bar: Mode selector & Privacy Mask Toggle */}
+            <Card size="small" style={{ marginBottom: 16, background: '#fdf2f8', borderColor: '#fbcfe8', borderRadius: 10 }}>
+              <Row justify="space-between" align="middle" gutter={[12, 12]}>
+                <Col xs={24} md={14}>
+                  <Space size={14}>
+                    <Text strong style={{ fontSize: 13 }}>وضع المقارنة:</Text>
+                    <Segmented
+                      value={compareMode}
+                      onChange={(val) => setCompareMode(val as any)}
+                      options={[
+                        { value: 'split', icon: <Sliders size={14} />, label: 'سلايدر المسح التفاعلي' },
+                        { value: 'side', icon: <Columns size={14} />, label: 'جنباً إلى جنب' },
+                        { value: 'overlay', icon: <Layers size={14} />, label: 'تراكب الشفافية' },
+                      ]}
+                    />
+                  </Space>
+                </Col>
+                <Col xs={24} md={10} style={{ textAlign: 'start' }}>
+                  <Space align="center">
+                    <Switch
+                      checked={privacyMask}
+                      onChange={setPrivacyMask}
+                      checkedChildren={<EyeOff size={13} />}
+                      unCheckedChildren={<Eye size={13} />}
+                    />
+                    <Text style={{ fontSize: 12, fontWeight: 600, color: privacyMask ? '#be185d' : '#475569' }}>
+                      إخفاء الهوية والعيون (Privacy Mask)
+                    </Text>
+                  </Space>
+                </Col>
+              </Row>
+            </Card>
 
-            <Row gutter={20}>
-              <Col span={12}>
-                <Card
-                  title={<span style={{ color: '#B91C1C', fontWeight: 700 }}>🔴 قبل الجلسة (BEFORE)</span>}
-                  size="small"
-                  style={{ borderRadius: 12, border: '1px solid #fecaca' }}
-                  cover={
+            {/* MODE 1: INTERACTIVE SPLIT SLIDER */}
+            {compareMode === 'split' && (
+              <div>
+                <div
+                  ref={sliderContainerRef}
+                  onMouseMove={handleSliderMouseMove}
+                  onTouchMove={handleSliderTouchMove}
+                  style={{
+                    position: 'relative',
+                    width: '100%',
+                    height: 420,
+                    borderRadius: 14,
+                    overflow: 'hidden',
+                    cursor: 'ew-resize',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                    userSelect: 'none',
+                    backgroundColor: '#0f172a',
+                  }}
+                >
+                  {/* Base Layer: AFTER Image */}
+                  <img
+                    src={selectedCase.afterImageUrl}
+                    alt="After"
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                    }}
+                  />
+
+                  {/* Overlaid Layer: BEFORE Image with clip-path */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      overflow: 'hidden',
+                      clipPath: `inset(0 ${100 - sliderPos}% 0 0)`,
+                    }}
+                  >
                     <img
-                      alt="Before treatment"
                       src={selectedCase.beforeImageUrl}
-                      style={{ height: 280, objectFit: 'cover', borderRadius: '12px 12px 0 0' }}
+                      alt="Before"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                      }}
                     />
-                  }
-                >
-                  <div style={{ fontSize: 12, color: '#475569', fontWeight: 500 }}>
-                    {selectedCase.beforeCaption}
                   </div>
-                </Card>
-              </Col>
 
-              <Col span={12}>
-                <Card
-                  title={<span style={{ color: '#047857', fontWeight: 700 }}>🟢 بعد العلاج (AFTER)</span>}
-                  size="small"
-                  style={{ borderRadius: 12, border: '1px solid #a7f3d0' }}
-                  cover={
-                    <img
-                      alt="After treatment"
-                      src={selectedCase.afterImageUrl}
-                      style={{ height: 280, objectFit: 'cover', borderRadius: '12px 12px 0 0' }}
-                    />
-                  }
-                >
-                  <div style={{ fontSize: 12, color: '#047857', fontWeight: 600 }}>
-                    {selectedCase.afterCaption}
+                  {/* Privacy Mask Bar (Applies if enabled) */}
+                  {privacyMask && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '32%',
+                        left: '20%',
+                        width: '60%',
+                        height: '14%',
+                        background: 'rgba(15, 23, 42, 0.95)',
+                        backdropFilter: 'blur(10px)',
+                        borderRadius: 8,
+                        boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#94a3b8',
+                        fontSize: 11,
+                        fontWeight: 700,
+                        letterSpacing: 1,
+                        zIndex: 10,
+                      }}
+                    >
+                      🛡️ PRIVACY PROTECTED • هوية محمية
+                    </div>
+                  )}
+
+                  {/* Divider Handle Line */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      bottom: 0,
+                      left: `${sliderPos}%`,
+                      width: 3,
+                      background: '#ffffff',
+                      boxShadow: '0 0 10px rgba(0,0,0,0.5)',
+                      transform: 'translateX(-50%)',
+                      zIndex: 20,
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 38,
+                        height: 38,
+                        borderRadius: '50%',
+                        background: '#ffffff',
+                        border: '3px solid #be185d',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                      }}
+                    >
+                      <Sliders size={18} color="#be185d" />
+                    </div>
                   </div>
-                </Card>
+
+                  {/* Corner Badges */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 16,
+                      left: 16,
+                      background: 'rgba(185, 28, 28, 0.85)',
+                      backdropFilter: 'blur(6px)',
+                      color: '#ffffff',
+                      padding: '4px 12px',
+                      borderRadius: 20,
+                      fontSize: 12,
+                      fontWeight: 800,
+                      zIndex: 15,
+                    }}
+                  >
+                    🔴 قبل الإجراء (Before)
+                  </div>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 16,
+                      right: 16,
+                      background: 'rgba(4, 120, 87, 0.85)',
+                      backdropFilter: 'blur(6px)',
+                      color: '#ffffff',
+                      padding: '4px 12px',
+                      borderRadius: 20,
+                      fontSize: 12,
+                      fontWeight: 800,
+                      zIndex: 15,
+                    }}
+                  >
+                    🟢 بعد العلاج (After)
+                  </div>
+                </div>
+
+                {/* Range controller helper */}
+                <div style={{ marginTop: 12, padding: '0 12px' }}>
+                  <Row align="middle" gutter={16}>
+                    <Col span={4}>
+                      <Text style={{ fontSize: 12, color: '#B91C1C', fontWeight: 700 }}>قبل ({sliderPos}%)</Text>
+                    </Col>
+                    <Col span={16}>
+                      <Slider
+                        min={0}
+                        max={100}
+                        value={sliderPos}
+                        onChange={setSliderPos}
+                        tooltip={{ formatter: (v) => `${v}% مسح تفاعلي` }}
+                      />
+                    </Col>
+                    <Col span={4} style={{ textAlign: 'left' }}>
+                      <Text style={{ fontSize: 12, color: '#047857', fontWeight: 700 }}>بعد ({100 - sliderPos}%)</Text>
+                    </Col>
+                  </Row>
+                </div>
+              </div>
+            )}
+
+            {/* MODE 2: SIDE BY SIDE */}
+            {compareMode === 'side' && (
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Card
+                    title={<span style={{ color: '#B91C1C', fontWeight: 700 }}>🔴 قبل الجلسة (BEFORE)</span>}
+                    size="small"
+                    style={{ borderRadius: 12, border: '1px solid #fecaca' }}
+                    cover={
+                      <div style={{ position: 'relative', height: 320, overflow: 'hidden' }}>
+                        <img
+                          alt="Before"
+                          src={selectedCase.beforeImageUrl}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                        {privacyMask && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: '32%',
+                              left: '15%',
+                              width: '70%',
+                              height: '14%',
+                              background: 'rgba(15, 23, 42, 0.95)',
+                              backdropFilter: 'blur(8px)',
+                              borderRadius: 6,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: '#94a3b8',
+                              fontSize: 10,
+                              fontWeight: 700,
+                            }}
+                          >
+                            PRIVACY PROTECTED
+                          </div>
+                        )}
+                      </div>
+                    }
+                  >
+                    <div style={{ fontSize: 12, color: '#475569', fontWeight: 500 }}>
+                      {selectedCase.beforeCaption}
+                    </div>
+                  </Card>
+                </Col>
+
+                <Col span={12}>
+                  <Card
+                    title={<span style={{ color: '#047857', fontWeight: 700 }}>🟢 بعد العلاج (AFTER)</span>}
+                    size="small"
+                    style={{ borderRadius: 12, border: '1px solid #a7f3d0' }}
+                    cover={
+                      <div style={{ position: 'relative', height: 320, overflow: 'hidden' }}>
+                        <img
+                          alt="After"
+                          src={selectedCase.afterImageUrl}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                        {privacyMask && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: '32%',
+                              left: '15%',
+                              width: '70%',
+                              height: '14%',
+                              background: 'rgba(15, 23, 42, 0.95)',
+                              backdropFilter: 'blur(8px)',
+                              borderRadius: 6,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: '#94a3b8',
+                              fontSize: 10,
+                              fontWeight: 700,
+                            }}
+                          >
+                            PRIVACY PROTECTED
+                          </div>
+                        )}
+                      </div>
+                    }
+                  >
+                    <div style={{ fontSize: 12, color: '#047857', fontWeight: 600 }}>
+                      {selectedCase.afterCaption}
+                    </div>
+                  </Card>
+                </Col>
+              </Row>
+            )}
+
+            {/* MODE 3: OPACITY OVERLAY */}
+            {compareMode === 'overlay' && (
+              <div>
+                <div
+                  style={{
+                    position: 'relative',
+                    width: '100%',
+                    height: 400,
+                    borderRadius: 14,
+                    overflow: 'hidden',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                    backgroundColor: '#0f172a',
+                  }}
+                >
+                  <img
+                    src={selectedCase.beforeImageUrl}
+                    alt="Before base"
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                    }}
+                  />
+                  <img
+                    src={selectedCase.afterImageUrl}
+                    alt="After overlay"
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      opacity: overlayOpacity / 100,
+                      transition: 'opacity 0.1s ease',
+                    }}
+                  />
+                  {privacyMask && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '32%',
+                        left: '20%',
+                        width: '60%',
+                        height: '14%',
+                        background: 'rgba(15, 23, 42, 0.95)',
+                        backdropFilter: 'blur(10px)',
+                        borderRadius: 8,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#94a3b8',
+                        fontSize: 11,
+                        fontWeight: 700,
+                        zIndex: 10,
+                      }}
+                    >
+                      🛡️ PRIVACY PROTECTED
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ marginTop: 14, padding: '0 12px' }}>
+                  <Row align="middle" gutter={16}>
+                    <Col span={6}>
+                      <Text style={{ fontSize: 12, color: '#B91C1C', fontWeight: 700 }}>قبل (0% بعد)</Text>
+                    </Col>
+                    <Col span={12}>
+                      <Slider
+                        min={0}
+                        max={100}
+                        value={overlayOpacity}
+                        onChange={setOverlayOpacity}
+                        tooltip={{ formatter: (v) => `درجة التحول بعد: ${v}%` }}
+                      />
+                    </Col>
+                    <Col span={6} style={{ textAlign: 'left' }}>
+                      <Text style={{ fontSize: 12, color: '#047857', fontWeight: 700 }}>بعد (100% شفافية)</Text>
+                    </Col>
+                  </Row>
+                </div>
+              </div>
+            )}
+
+            {/* Clinical Footer Details */}
+            <div style={{ marginTop: 16, padding: '12px 16px', background: '#f8fafc', borderRadius: 10, fontSize: 12, color: '#475569', border: '1px solid #e2e8f0' }}>
+              <Row justify="space-between">
+                <Col span={14}>
+                  <div>👨‍⚕️ <strong>الطبيب/ة المعالج/ة:</strong> {selectedCase.doctor}</div>
+                  <div style={{ marginTop: 4 }}>📋 <strong>التفاصيل السريرية:</strong> {selectedCase.treatmentDescription}</div>
+                </Col>
+                <Col span={10} style={{ textAlign: 'start' }}>
+                  <div>📅 <strong>تاريخ التوثيق:</strong> {selectedCase.date}</div>
+                  <div style={{ marginTop: 4 }}>📝 <strong>الملاحظات:</strong> {selectedCase.notes || 'تعافي كامل ونتيجة ممتازة'}</div>
+                </Col>
+              </Row>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Social Media Branded Card Preview Modal */}
+      <Modal
+        title="معاينة كارت السوشيال ميديا وحالة التحول (Social Media Case Study)"
+        open={isSocialCardOpen}
+        onCancel={() => setIsSocialCardOpen(false)}
+        width={680}
+        footer={[
+          <Button key="close" onClick={() => setIsSocialCardOpen(false)}>إغلاق</Button>,
+          <Button
+            key="print"
+            type="primary"
+            icon={<Printer size={14} />}
+            style={{ background: '#be185d', borderColor: '#be185d' }}
+            onClick={() => window.print()}
+          >
+            طباعة وتصدير الكارت
+          </Button>,
+        ]}
+      >
+        {selectedCase && (
+          <div
+            id="social-media-card"
+            style={{
+              padding: 24,
+              borderRadius: 16,
+              background: 'linear-gradient(135deg, #180510 0%, #2e0820 100%)',
+              color: '#ffffff',
+              border: '2px solid #831843',
+              boxShadow: '0 12px 36px rgba(0,0,0,0.4)',
+            }}
+          >
+            {/* Top Brand Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.15)', paddingBottom: 14, marginBottom: 16 }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Sparkles size={20} color="#ec4899" />
+                  <span style={{ fontSize: 18, fontWeight: 800, letterSpacing: 0.5, color: '#fbcfe8' }}>ENTRUSTIC BEAUTY</span>
+                </div>
+                <div style={{ fontSize: 11, color: '#94a3b8' }}>مركز الجلدية والطب التجميلي والليزر المتخصص</div>
+              </div>
+              <Tag color="magenta" style={{ fontWeight: 700, padding: '4px 10px', fontSize: 12 }}>
+                {selectedCase.category}
+              </Tag>
+            </div>
+
+            {/* Title & Area */}
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 17, fontWeight: 700, color: '#ffffff' }}>{selectedCase.title}</div>
+              <div style={{ fontSize: 12, color: '#cbd5e1', marginTop: 4 }}>
+                {selectedCase.treatmentArea} • {selectedCase.timeElapsed}
+              </div>
+            </div>
+
+            {/* Photos Side-by-Side with Privacy */}
+            <Row gutter={14} style={{ marginBottom: 16 }}>
+              <Col span={12}>
+                <div style={{ position: 'relative', height: 260, borderRadius: 10, overflow: 'hidden', border: '1px solid rgba(239, 68, 68, 0.4)' }}>
+                  <img src={selectedCase.beforeImageUrl} alt="Before" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  {privacyMask && (
+                    <div style={{ position: 'absolute', top: '32%', left: '15%', width: '70%', height: '14%', background: 'rgba(0,0,0,0.92)', borderRadius: 4 }} />
+                  )}
+                  <div style={{ position: 'absolute', bottom: 8, left: 8, background: 'rgba(0,0,0,0.7)', padding: '2px 8px', borderRadius: 4, fontSize: 11, color: '#fca5a5' }}>
+                    BEFORE • قبل
+                  </div>
+                </div>
+              </Col>
+              <Col span={12}>
+                <div style={{ position: 'relative', height: 260, borderRadius: 10, overflow: 'hidden', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
+                  <img src={selectedCase.afterImageUrl} alt="After" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  {privacyMask && (
+                    <div style={{ position: 'absolute', top: '32%', left: '15%', width: '70%', height: '14%', background: 'rgba(0,0,0,0.92)', borderRadius: 4 }} />
+                  )}
+                  <div style={{ position: 'absolute', bottom: 8, right: 8, background: 'rgba(0,0,0,0.7)', padding: '2px 8px', borderRadius: 4, fontSize: 11, color: '#6ee7b7' }}>
+                    AFTER • بعد
+                  </div>
+                </div>
               </Col>
             </Row>
 
-            <div style={{ marginTop: 16, padding: '10px 14px', background: '#f8fafc', borderRadius: 8, fontSize: 12, color: '#475569' }}>
-              👨‍⚕️ <strong>الطبيب المعالج:</strong> {selectedCase.doctor} • 📋 <strong>الملاحظات:</strong> {selectedCase.notes || 'لا توجد مضاعفات وتناسق ممتاز'}
+            {/* Footer with doctor and consent badge */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+              <div style={{ fontSize: 12, color: '#f1f5f9' }}>
+                👨‍⚕️ إشراف الطبيب: <strong>{selectedCase.doctor}</strong>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#a7f3d0' }}>
+                <CheckCircle size={14} color="#10b981" />
+                <span>مصرح بالنشر السريري مع حفظ الخصوصية</span>
+              </div>
             </div>
           </div>
         )}

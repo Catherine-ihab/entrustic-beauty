@@ -28,6 +28,8 @@ import { SkinCareSpaCombinedView } from './features/skincare/SkinCareSpaCombined
 import { PackagesManagerView } from './features/packages/PackagesManagerView';
 import { InventoryManager } from './features/inventory/InventoryManager';
 import { DailyReportView } from './features/reports/DailyReportView';
+import { DoctorSettlementsView } from './features/invoices/DoctorSettlementsView';
+import { SmartRetargetingView } from './features/whatsapp/SmartRetargetingView';
 
 import {
   LayoutDashboard,
@@ -48,6 +50,8 @@ import {
   Ticket,
   HeartHandshake,
   BarChart3,
+  Coins,
+  MessageSquare,
 } from 'lucide-react';
 import { ClinicType } from '@clinic/shared-types';
 import { SPECIALTY_LOCK, getSpecialtyModule } from './specialties';
@@ -208,9 +212,19 @@ export function App() {
       label: currentLanguage === 'ar' ? 'المواعيد والحجوزات' : 'Appointments & Calendar',
     },
     {
+      key: 'retargeting',
+      icon: <MessageSquare size={18} />,
+      label: currentLanguage === 'ar' ? 'إعادة الاستهداف الذكي (واتساب)' : 'WhatsApp Retargeting',
+    },
+    {
       key: 'invoices',
       icon: <CreditCard size={18} />,
       label: currentLanguage === 'ar' ? 'الفواتير والمالية والخزينة' : 'Billing & Cashier',
+    },
+    {
+      key: 'commissions',
+      icon: <Coins size={18} />,
+      label: currentLanguage === 'ar' ? 'عمولات ومستحقات الأطباء' : 'Staff Commissions & Payouts',
     },
     {
       key: 'inventory',
@@ -274,13 +288,13 @@ export function App() {
   const filteredMenuItems = menuItems.filter((item) => {
     if (isOwnerOrAdmin) return true;
     if (isDoctor) {
-      return ['dashboard', 'patients', 'laser', 'injectables', 'skincare', 'bodycare', 'spa', 'appointments', 'before-after'].includes(item.key);
+      return ['dashboard', 'patients', 'laser', 'injectables', 'skincare', 'bodycare', 'spa', 'appointments', 'commissions', 'before-after'].includes(item.key);
     }
     if (isReception) {
-      return ['dashboard', 'appointments', 'patients', 'packages', 'invoices', 'reports'].includes(item.key);
+      return ['dashboard', 'appointments', 'retargeting', 'patients', 'packages', 'invoices', 'reports'].includes(item.key);
     }
     if (isCashier) {
-      return ['dashboard', 'invoices', 'reports'].includes(item.key);
+      return ['dashboard', 'invoices', 'commissions', 'reports'].includes(item.key);
     }
     return true;
   });
@@ -318,8 +332,12 @@ export function App() {
         return <DailyReportView />;
       case 'appointments':
         return <AppointmentsView />;
+      case 'retargeting':
+        return <SmartRetargetingView clinicName={clinic?.name || 'Entrustic Beauty'} />;
       case 'invoices':
         return <InvoicesView currency={clinic?.currency || 'EGP'} />;
+      case 'commissions':
+        return <DoctorSettlementsView />;
       case 'before-after':
         return <BeforeAfterView />;
       case 'audit':
