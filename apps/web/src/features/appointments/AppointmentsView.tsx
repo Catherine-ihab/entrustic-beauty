@@ -53,6 +53,7 @@ import { apiClient } from '../../lib/api-client';
 import { getRegisteredPatients, RegisteredPatient } from '../../lib/patientsDirectory';
 import { getClinicPackages, ClinicPackage, subscribeToPackages } from '../../lib/packagesDirectory';
 import { addToQueue, detectServiceCategory } from '../../lib/clinicQueue';
+import { recordDoctorSessionEarning } from '../../lib/doctorEarnings';
 
 const { Title, Text } = Typography;
 
@@ -488,6 +489,26 @@ export function AppointmentsView() {
     const next = appointments.map((a) => (a.id === id ? { ...a, status: newStatus } : a));
     saveAppointments(next);
     message.success('تم تحديث حالة الموعد');
+
+    // Automatically record doctor commission when appointment is marked completed
+    if (newStatus === 'completed') {
+      const appt = appointments.find((a) => a.id === id);
+      if (appt) {
+        recordDoctorSessionEarning({
+          sessionRefId: appt.id,
+          doctorName: appt.doctor,
+          patientName: appt.name,
+          patientId: appt.patientNumber,
+          serviceName: appt.serviceName,
+          serviceCategory: appt.serviceCategory,
+          servicePriceEgp: appt.priceEgp || 1200,
+          date: appt.date,
+          time: appt.time,
+          notes: `${appt.room}${appt.deviceName ? ` — ${appt.deviceName}` : ''}`,
+        });
+      }
+    }
+
     if (id.length > 20 && !id.startsWith('apt-')) {
       const apiStatus = newStatus === 'completed' ? 'completed' : newStatus === 'in_doctor' ? 'in_progress' : newStatus === 'cancelled' ? 'cancelled' : 'scheduled';
       apiClient.patch(`/appointments/${id}`, { status: apiStatus }).catch(() => {});

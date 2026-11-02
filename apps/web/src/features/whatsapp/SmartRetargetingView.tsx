@@ -173,17 +173,87 @@ const INITIAL_CANDIDATES: RetargetCandidate[] = [
 
 const LS_RETARGET_KEY = 'clinic_smart_retargeting_v1';
 
-export function SmartRetargetingView({ clinicName = 'Entrustic Beauty' }: { clinicName?: string }) {
-  const [candidates, setCandidates] = useState<RetargetCandidate[]>(() => {
-    try {
-      const raw = localStorage.getItem(LS_RETARGET_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+function loadUnifiedCandidates(): RetargetCandidate[] {
+  let base: RetargetCandidate[] = [...INITIAL_CANDIDATES];
+  try {
+    const raw = localStorage.getItem(LS_RETARGET_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) base = parsed;
+    }
+  } catch (_) {}
+
+  // Automatically scan appointments to discover new retargeting candidates in real-time
+  try {
+    const rawAppts = localStorage.getItem('clinic_appointments_unified_v3');
+    if (rawAppts) {
+      const appts: any[] = JSON.parse(rawAppts);
+      if (Array.isArray(appts)) {
+        const now = dayjs();
+        appts.forEach((a) => {
+          if (!a.date || a.status === 'cancelled') return;
+          const diffDays = now.diff(dayjs(a.date), 'day');
+          if (diffDays < 14) return; // Skip very recent visits
+
+          const existing = base.find((c) => c.name === a.name || c.phone === a.phone);
+          if (existing) {
+            if (dayjs(a.date).isAfter(dayjs(existing.lastVisitDate))) {
+              existing.contactStatus = 'rebooked';
+            }
+            return;
+          }
+
+          let cat: 'botox' | 'laser' | 'skincare' | 'winback' = 'winback';
+          let catLabel = 'عميلة غائبة';
+          let action = `غائبة منذ ${diffDays} يوماً — إرسال عرض ترحيبي`;
+
+          const serv = `${a.serviceCategory || ''} ${a.serviceName || ''}`;
+          if (serv.includes('بوتوكس') || serv.includes('فيلر')) {
+            if (diffDays >= 90) {
+              cat = 'botox';
+              catLabel = 'تجديد البوتوكس والفيلر';
+              action = `مضى ${diffDays} يوماً — حان وقت تجديد حقن النضارة`;
+            }
+          } else if (serv.includes('ليزر')) {
+            if (diffDays >= 28) {
+              cat = 'laser';
+              catLabel = 'كورس الليزر الدوري';
+              action = `مضى ${diffDays} يوماً — موعد الجلسة الدورية التالية`;
+            }
+          } else if (serv.includes('بشرة') || serv.includes('هيدرافيشل') || serv.includes('تقشير')) {
+            if (diffDays >= 21) {
+              cat = 'skincare';
+              catLabel = 'هيدرافيشل شهري';
+              action = `مضى ${diffDays} يوماً — جلسة تنظيف وترطيب البشرة الشهرية`;
+            }
+          }
+
+          if (cat !== 'winback' || diffDays >= 60) {
+            base.push({
+              id: `dyn-${a.id || Date.now()}`,
+              name: a.name,
+              phone: a.phone || '',
+              patientNumber: a.patientNumber || 'PAT-00000',
+              category: cat,
+              categoryLabel: catLabel,
+              lastProcedure: a.serviceName || a.serviceCategory || 'جلسة عيادة',
+              doctor: a.doctor || 'د. سارة القاضي',
+              lastVisitDate: a.date,
+              daysSinceLastVisit: diffDays,
+              recommendedAction: action,
+              contactStatus: 'pending',
+            });
+          }
+        });
       }
-    } catch (_) {}
-    return INITIAL_CANDIDATES;
-  });
+    }
+  } catch (_) {}
+
+  return base;
+}
+
+export function SmartRetargetingView({ clinicName = 'Entrustic Beauty' }: { clinicName?: string }) {
+  const [candidates, setCandidates] = useState<RetargetCandidate[]>(() => loadUnifiedCandidates());
 
   const [activeCategory, setActiveCategory] = useState<RetargetCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
