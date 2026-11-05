@@ -402,61 +402,16 @@ export const SkinCareWorkspaceView: React.FC = () => {
   };
 
   const LS_SKINCARE_SESSIONS = 'clinic_skincare_sessions_v2';
-  const DEFAULT_SKINCARE_RECORDS: FacialTreatmentRecord[] = [
-    {
-      id: 'ft-01',
-      date: dayjs().subtract(1, 'day').format('YYYY-MM-DD'),
-      patientName: 'مريم الصاوي',
-      patientId: 'PAT-00120',
-      sessionType: 'باقة جاهزة',
-      bundleOrItemsName: 'باكدج هيدرافيشل الملكي وقناع الذهب 24K',
-      selectedMasks: ['ماسك الذهب عيار 24K الفاخر'],
-      selectedDevices: ['جهاز هيدرافيشل سينديو', 'قناع الضوء العلاجي للوجه LED'],
-      totalPriceEgp: 1200,
-      immediateReaction: 'نضارة فورية وتوهج للبشرة',
-      patientComfort: 'مسترخية ومريحة جداً',
-      practitioner: 'د. سارة القاضي',
-      notes: 'جلسة تنظيف عميق ووضع سيروم كولاجين وماسك ذهب مع إغلاق المسام بمطرقة التبريد.',
-    },
-    {
-      id: 'ft-02',
-      date: dayjs().subtract(2, 'day').format('YYYY-MM-DD'),
-      patientName: 'رانيا توفيق',
-      patientId: 'PAT-00055',
-      sessionType: 'باقة جاهزة',
-      bundleOrItemsName: 'باكدج تنقية المسام وعلاج حب الشباب المكثف',
-      selectedMasks: ['ماسك الفحم والطمي البركاني'],
-      selectedDevices: ['جهاز تنظيف المسام بالموجات', 'عصا التردد العالي', 'قناع LED أزرق'],
-      totalPriceEgp: 850,
-      immediateReaction: 'تنظيف كامل للمسام مع حمرة خفيفة عابرة',
-      patientComfort: 'مريحة',
-      practitioner: 'د. مريم فاروق',
-      notes: 'تفريغ مسام منطقة الأنف والجبين بنجاح وتهدئة الجلد بسيروم مهدئ وواقي شمس.',
-    },
-    {
-      id: 'ft-03',
-      date: dayjs().subtract(4, 'day').format('YYYY-MM-DD'),
-      patientName: 'هبة المنشاوي',
-      patientId: 'PAT-00089',
-      sessionType: 'خدمات متفرقة',
-      bundleOrItemsName: 'اختيار متفرق (ماسك الهيدروجيل + ليزر كربوني + مطرقة تبريد)',
-      selectedMasks: ['ماسك الهيدروجيل بحمض الهيالورونيك'],
-      selectedDevices: ['ليزر كربوني نضارة الوجه', 'مطرقة التبريد لغلق المسام'],
-      totalPriceEgp: 1100,
-      immediateReaction: 'تهدئة فورية للبثور وترطيب عميق',
-      patientComfort: 'ممتازة',
-      practitioner: 'د. سارة القاضي',
-      notes: 'تم التقشير بالليزر وتطبيق ماسك الهيدروجيل مع التبريد وواقي الشمس.',
-    },
-  ];
-
-  // Sessions ledger
+    // Sessions ledger
   const [records, setRecords] = useState<FacialTreatmentRecord[]>(() => {
     try {
       const raw = localStorage.getItem(LS_SKINCARE_SESSIONS) || localStorage.getItem('skincare_sessions_history_v2');
-      if (raw) return JSON.parse(raw);
+      if (raw !== null) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      }
     } catch { /* ignore */ }
-    return DEFAULT_SKINCARE_RECORDS;
+    return [];
   });
 
   const saveRecords = (next: FacialTreatmentRecord[]) => {

@@ -116,149 +116,6 @@ export const DEFAULT_DOCTOR_RULES: DoctorCommissionRule[] = [
   },
 ];
 
-const INITIAL_DEMO_EARNINGS: DoctorEarningEntry[] = [
-  {
-    id: 'ern-demo-1',
-    sessionRefId: 'ses-101',
-    doctorId: 'doc-2',
-    doctorName: 'د. هبة رمضان',
-    roleType: 'doctor',
-    itemType: 'session',
-    patientId: 'PAT-00104',
-    patientName: 'لينا الحسن',
-    serviceName: 'حقن فيلر الشفاه Restylane Kysse',
-    serviceCategory: 'بوتوكس وفيلر',
-    servicePriceEgp: 2500,
-    commissionRate: 30,
-    rateType: 'percentage',
-    earnedAmountEgp: 750,
-    date: new Date(Date.now() - 86400000 * 2).toISOString().split('T')[0],
-    time: '14:30',
-    status: 'accrued',
-    notes: 'جلسة حقن 1 مل متناسق',
-  },
-  {
-    id: 'ern-demo-2',
-    sessionRefId: 'ses-102',
-    doctorId: 'doc-1',
-    doctorName: 'د. سارة القاضي',
-    roleType: 'doctor',
-    itemType: 'session',
-    patientId: 'PAT-00140',
-    patientName: 'سارة فهمي',
-    serviceName: 'ليزر كانديلا جنتل ماكس برو ساقين كاملة',
-    serviceCategory: 'ليزر وإزالة شعر',
-    servicePriceEgp: 850,
-    commissionRate: 20,
-    rateType: 'percentage',
-    earnedAmountEgp: 170,
-    date: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-    time: '12:00',
-    status: 'accrued',
-    notes: 'الجلسة الرابعة بالكورس',
-  },
-  {
-    id: 'ern-demo-3',
-    sessionRefId: 'ses-103',
-    doctorId: 'doc-3',
-    doctorName: 'أخصائية البشرة ندى',
-    roleType: 'specialist',
-    itemType: 'session',
-    patientId: 'PAT-00120',
-    patientName: 'مريم الصاوي',
-    serviceName: 'جلسة تنظيف مائي هيدرافيشل وماسك الذهب',
-    serviceCategory: 'عناية بالبشرة وهيدرافيشل',
-    servicePriceEgp: 1200,
-    commissionRate: 15,
-    rateType: 'percentage',
-    earnedAmountEgp: 180,
-    date: new Date().toISOString().split('T')[0],
-    time: '11:15',
-    status: 'accrued',
-    notes: 'تنظيف مسام وماسك كولاجين',
-  },
-  {
-    id: 'ern-demo-4',
-    sessionRefId: 'ses-104',
-    doctorId: 'doc-4',
-    doctorName: 'أخصائية السبا فاطمة',
-    roleType: 'specialist',
-    itemType: 'session',
-    patientId: 'PAT-00095',
-    patientName: 'نوران الشاذلي',
-    serviceName: 'حمام مغربي ملكي بالأعشاب الطبيعية',
-    serviceCategory: 'سبا ومساج وحمام مغربي',
-    servicePriceEgp: 950,
-    commissionRate: 150,
-    rateType: 'fixed_per_session',
-    earnedAmountEgp: 150,
-    date: new Date(Date.now() - 86400000 * 3).toISOString().split('T')[0],
-    time: '16:00',
-    status: 'settled',
-    notes: 'تم صرف المستحقات في تسوية الأسبوع',
-  },
-  {
-    id: 'ern-demo-5',
-    sessionRefId: 'ses-105',
-    doctorId: 'doc-1',
-    doctorName: 'د. سارة القاضي',
-    roleType: 'doctor',
-    itemType: 'session',
-    patientId: 'PAT-00088',
-    patientName: 'دينا مصطفى',
-    serviceName: 'حقن بوتوكس الجبهة والجلابيلا',
-    serviceCategory: 'بوتوكس وفيلر',
-    servicePriceEgp: 1600,
-    commissionRate: 25,
-    rateType: 'percentage',
-    earnedAmountEgp: 400,
-    date: new Date(Date.now() - 86400000 * 4).toISOString().split('T')[0],
-    time: '15:20',
-    status: 'settled',
-    notes: 'تمت التسوية',
-  },
-  {
-    id: 'ern-demo-6',
-    sessionRefId: 'ses-106',
-    doctorId: 'doc-6',
-    doctorName: 'الممرضة آية أحمد',
-    roleType: 'nurse_tech',
-    itemType: 'session',
-    patientId: 'PAT-00140',
-    patientName: 'سارة فهمي',
-    serviceName: 'مساعدة وتحضير جلسة ليزر كانديلا',
-    serviceCategory: 'ليزر وإزالة شعر',
-    servicePriceEgp: 850,
-    commissionRate: 50,
-    rateType: 'fixed_per_session',
-    earnedAmountEgp: 50,
-    date: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-    time: '12:00',
-    status: 'accrued',
-    notes: 'مساعدة تمريضية',
-  },
-  {
-    id: 'ern-demo-7',
-    sessionRefId: 'ses-107',
-    doctorId: 'doc-3',
-    doctorName: 'أخصائية البشرة ندى',
-    roleType: 'specialist',
-    itemType: 'product_sale',
-    patientId: 'PAT-00120',
-    patientName: 'مريم الصاوي',
-    serviceName: 'سيروم هيالورونيك وترطيب La Roche-Posay B5',
-    serviceCategory: 'مبيعات منتجات العناية بالبشرة',
-    servicePriceEgp: 950,
-    commissionRate: 12,
-    rateType: 'percentage',
-    earnedAmountEgp: 114,
-    date: new Date().toISOString().split('T')[0],
-    time: '12:05',
-    status: 'accrued',
-    notes: 'عمولة مبيعات منتجات عناية منزلية',
-  },
-];
-
 // --- Commission Rules Management ---
 export function getDoctorCommissionRules(): DoctorCommissionRule[] {
   try {
@@ -282,13 +139,12 @@ export function saveDoctorCommissionRules(rules: DoctorCommissionRule[]): void {
 export function getDoctorEarnings(): DoctorEarningEntry[] {
   try {
     const raw = localStorage.getItem(LS_EARNINGS_KEY);
-    if (raw) {
+    if (raw !== null) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed)) return parsed;
     }
   } catch (_) {}
-  localStorage.setItem(LS_EARNINGS_KEY, JSON.stringify(INITIAL_DEMO_EARNINGS));
-  return INITIAL_DEMO_EARNINGS;
+  return [];
 }
 
 export function saveDoctorEarnings(entries: DoctorEarningEntry[]): void {

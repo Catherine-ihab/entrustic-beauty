@@ -201,111 +201,6 @@ const STATUS_CONFIG: Record<QueueStatus, { labelAr: string; color: string; bg: s
 
 const STATUS_ORDER: QueueStatus[] = ['waiting', 'in_doctor', 'completed', 'cancelled'];
 
-const INITIAL_APPOINTMENTS: ClinicAppointment[] = [
-  {
-    id: 'apt-1',
-    name: 'منة الله سيد أحمد',
-    phone: '01012345678',
-    patientNumber: 'PAT-00001',
-    serviceCategory: 'ليزر وإزالة شعر',
-    serviceName: 'جلسة ليزر كانديلا كامل الجسم',
-    date: dayjs().format('YYYY-MM-DD'),
-    time: '10:00',
-    doctor: 'د. سارة القاضي',
-    room: 'غرفة ليزر 1 (كانديلا)',
-    deviceId: 'candela_pro',
-    deviceName: 'كانديلا جنتل ماكس برو بلس (Candela Pro Plus)',
-    priceEgp: 1800,
-    status: 'completed',
-  },
-  {
-    id: 'apt-2',
-    name: 'سارة علي السيد',
-    phone: '01098765432',
-    patientNumber: 'PAT-00002',
-    serviceCategory: 'بوتوكس وفيلر',
-    serviceName: 'حقن بوتوكس جبهة وجلابيلا',
-    date: dayjs().format('YYYY-MM-DD'),
-    time: '11:00',
-    doctor: 'د. هبة رمضان',
-    room: 'عيادة الحقن والتجميل',
-    priceEgp: 3500,
-    status: 'in_doctor',
-  },
-  {
-    id: 'apt-3',
-    name: 'نورهان خالد',
-    phone: '01234567890',
-    patientNumber: 'PAT-00003',
-    serviceCategory: 'عناية بالبشرة وهيدرافيشل',
-    serviceName: 'تنظيف عميق هيدرافيشل Syndeo',
-    date: dayjs().format('YYYY-MM-DD'),
-    time: '12:00',
-    doctor: 'أخصائية البشرة ندى',
-    room: 'جناح العناية بالبشرة والهيدرافيشل',
-    deviceId: 'hydrafacial_syndeo',
-    deviceName: 'هيدرافيشل إيليت إم دي سينديو (Hydrafacial Syndeo)',
-    priceEgp: 1500,
-    status: 'waiting',
-  },
-  {
-    id: 'apt-4',
-    name: 'فريدة صبري',
-    phone: '01155566677',
-    patientNumber: 'PAT-00004',
-    serviceCategory: 'سبا ومساج',
-    serviceName: 'حمام مغربي ملكي بالأعشاب',
-    date: dayjs().format('YYYY-MM-DD'),
-    time: '14:00',
-    doctor: 'أخصائية السبا فاطمة',
-    room: 'جناح الحمام المغربي 1',
-    priceEgp: 950,
-    status: 'waiting',
-  },
-  {
-    id: 'apt-5',
-    name: 'مها الشريف',
-    phone: '01599887766',
-    patientNumber: 'PAT-00005',
-    serviceCategory: 'عناية بالجسم وسكراب',
-    serviceName: 'سكراب القهوة العضوية وزبدة الشيا',
-    date: dayjs().add(1, 'day').format('YYYY-MM-DD'),
-    time: '11:30',
-    doctor: 'أخصائية الجسم مريم',
-    room: 'غرفة العناية بالجسم',
-    priceEgp: 550,
-    status: 'waiting',
-  },
-  {
-    id: 'apt-6',
-    name: 'ريم عبد العزيز',
-    phone: '01055443322',
-    patientNumber: 'PAT-00006',
-    serviceCategory: 'ليزر وإزالة شعر',
-    serviceName: 'جلسة ليزر بكيني وتحت الإبط',
-    date: dayjs().format('YYYY-MM-DD'),
-    time: '12:00',
-    doctor: 'د. سارة القاضي',
-    room: 'غرفة ليزر 1',
-    priceEgp: 650,
-    status: 'in_doctor',
-  },
-  {
-    id: 'apt-7',
-    name: 'منى الشافعي',
-    phone: '01222334455',
-    patientNumber: 'PAT-00007',
-    serviceCategory: 'ليزر وإزالة شعر',
-    serviceName: 'جلسة رتوش ليزر وجه كامل',
-    date: dayjs().format('YYYY-MM-DD'),
-    time: '12:45',
-    doctor: 'د. سارة القاضي',
-    room: 'غرفة ليزر 1',
-    priceEgp: 450,
-    status: 'waiting',
-  },
-];
-
 const LS_APPOINTMENTS = 'clinic_appointments_unified_v3';
 const LS_DOCTORS = 'clinic_doctors_profiles_v3';
 
@@ -313,9 +208,12 @@ export function AppointmentsView() {
   const [appointments, setAppointments] = useState<ClinicAppointment[]>(() => {
     try {
       const raw = localStorage.getItem(LS_APPOINTMENTS);
-      if (raw) return JSON.parse(raw);
+      if (raw !== null) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      }
     } catch { /* ignore */ }
-    return INITIAL_APPOINTMENTS;
+    return [];
   });
 
   const [doctors, setDoctors] = useState<DoctorSchedule[]>(() => {

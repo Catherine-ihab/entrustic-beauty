@@ -73,63 +73,6 @@ const INITIAL_DEVICES = [
   'Fotona SP Dynamis Nd:YAG',
 ];
 
-const DEFAULT_SESSIONS: LaserSession[] = [
-  {
-    id: 'ls-01',
-    sessionNumber: 3,
-    date: dayjs().subtract(1, 'day').format('YYYY-MM-DD'),
-    patientName: 'لينا الحسن',
-    patientPhone: '01012345678',
-    bodyArea: 'الساقين كاملة (Full Legs)',
-    device: 'Candela GentleMax Pro Plus (755nm / 1064nm)',
-    wavelength: '755nm Alexandrite',
-    spotSizeMm: 18,
-    fluenceJcm2: 14,
-    pulseWidthMs: 3,
-    pulsesCount: 1450,
-    coolingSetting: 'DCD Cryogen 40/40',
-    sessionType: 'جلسة ضمن باكدج',
-    practitioner: 'د. سارة القاضي',
-    notes: 'استجابة ممتازة، لا توجد أي حساسية أو احمرار مستمر. تم وضع واقي شمس وكريم مهدئ.',
-  },
-  {
-    id: 'ls-02',
-    sessionNumber: 5,
-    date: dayjs().subtract(3, 'day').format('YYYY-MM-DD'),
-    patientName: 'دينا مصطفى',
-    patientPhone: '01098765432',
-    bodyArea: 'البكيني وتحت الإبط (Bikini & Underarms)',
-    device: 'Candela GentleMax Pro Plus (755nm / 1064nm)',
-    wavelength: '1064nm Nd:YAG',
-    spotSizeMm: 15,
-    fluenceJcm2: 24,
-    pulseWidthMs: 10,
-    pulsesCount: 680,
-    coolingSetting: 'DCD Cryogen 50/40',
-    sessionType: 'جلسة ضمن باكدج',
-    practitioner: 'أخصائية الليزر مريم',
-    notes: 'انحسار واضح في كثافة الشعر، البصيلات أصبحت رفيعة جداً وخفيفة.',
-  },
-  {
-    id: 'ls-03',
-    sessionNumber: 1,
-    date: dayjs().subtract(5, 'day').format('YYYY-MM-DD'),
-    patientName: 'مايا نادر',
-    patientPhone: '01223344556',
-    bodyArea: 'الوجه والرقبة (Face & Neck)',
-    device: 'Lumenis LightSheer Quattro (805nm Diode)',
-    wavelength: '805nm Diode',
-    spotSizeMm: 14,
-    fluenceJcm2: 18,
-    pulseWidthMs: 30,
-    pulsesCount: 420,
-    coolingSetting: 'ChillTip Contact 4°C',
-    sessionType: 'جلسة أساسية',
-    practitioner: 'د. سارة القاضي',
-    notes: 'جلسة أولى افتتاحية، فحص حساسية مبدئي ناجح.',
-  },
-];
-
 const LS_SESSIONS = 'laser_sessions_records_v2';
 const LS_AREAS = 'laser_custom_areas_v2';
 const LS_DEVICES = 'laser_custom_devices_v2';
@@ -137,10 +80,13 @@ const LS_DEVICES = 'laser_custom_devices_v2';
 export function LaserWorkspaceView() {
   const [sessions, setSessions] = useState<LaserSession[]>(() => {
     try {
-      const raw = localStorage.getItem(LS_SESSIONS);
-      if (raw) return JSON.parse(raw);
+      const raw = localStorage.getItem(LS_SESSIONS) || localStorage.getItem('laser_sessions_history_v2');
+      if (raw !== null) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      }
     } catch { /* ignore */ }
-    return DEFAULT_SESSIONS;
+    return [];
   });
 
   const [areas, setAreas] = useState<string[]>(() => {

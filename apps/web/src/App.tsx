@@ -106,6 +106,47 @@ export function App() {
   const lockedType = SPECIALTY_LOCK ?? ClinicType.GENERAL_MEDICAL;
 
   useEffect(() => {
+    const WIPE_FLAG = 'clinic_production_wipe_20261105_v6';
+    if (!localStorage.getItem(WIPE_FLAG)) {
+      // 1. Wipe all known clinical, financial, and operational lists
+      const operationalKeys = [
+        'clinic_appointments_unified_v3',
+        'clinic_invoices_v1',
+        'clinic_package_enrollments_v2',
+        'clinic_before_after_gallery_v2',
+        'clinic_smart_retargeting_v1',
+        'clinic_queue_unified_v1',
+        'clinic_inventory_items_v2',
+        'clinic_registered_patients_directory_v1',
+        'clinic_injectables_sessions_v2',
+        'injectables_sessions_history_v2',
+        'laser_sessions_records_v2',
+        'laser_sessions_history_v2',
+        'clinic_skincare_sessions_v2',
+        'skincare_sessions_history_v2',
+        'clinic_bodycare_sessions_v1',
+        'bodycare_sessions_history_v2',
+        'spa_sessions_history_v2',
+        'clinic_doctor_earnings_v1',
+        'clinic_doctor_payouts_v1',
+      ];
+      operationalKeys.forEach((k) => localStorage.setItem(k, '[]'));
+
+      // 2. Remove any patient-specific files, cashier shifts or custom keys
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('patient_files_') || key === 'clinic_cashier_shift')) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach((k) => localStorage.removeItem(k));
+
+      localStorage.setItem(WIPE_FLAG, 'true');
+    }
+  }, []);
+
+  useEffect(() => {
     if (!isAuthenticated) return;
     // Several demo workspaces keep their roster in localStorage. Hydrate it from
     // the real API so packages / invoices / appointments never show invented

@@ -85,63 +85,15 @@ export const InjectablesWorkspaceView: React.FC = () => {
   const { tx } = useLang();
 
   const LS_INJECTABLES_KEY = 'clinic_injectables_sessions_v2';
-  const DEFAULT_TREATMENTS: InjectableTreatment[] = [
-    {
-      id: 'inj-01',
-      date: dayjs().subtract(2, 'day').format('YYYY-MM-DD'),
-      patientName: 'نوران مصطفى',
-      patientId: 'PAT-00042',
-      category: 'Neurotoxin',
-      productName: 'Botox Cosmetic (Allergan)',
-      lotNumber: 'C38491-02',
-      expiryDate: '2027-08-30',
-      targetArea: 'Upper Face (Glabella 20U + Frontalis 10U)',
-      totalDosage: '30 Units',
-      technique: '32G Nano-needle / 5 points Glabella, 4 points Frontalis',
-      practitioner: 'Dr. Heba Ramadan',
-      consentSigned: true,
-      notes: 'No bruising. Patient instructed not to lie down for 4 hours and avoid intense gym sessions for 24h.',
-    },
-    {
-      id: 'inj-02',
-      date: dayjs().subtract(4, 'day').format('YYYY-MM-DD'),
-      patientName: 'Farida Sabry',
-      patientId: 'PAT-00089',
-      category: 'Dermal Filler',
-      productName: 'Juvederm Ultra 4 (Allergan)',
-      lotNumber: 'JV4-88301',
-      expiryDate: '2027-03-15',
-      targetArea: 'Nasolabial Folds & Marionette Lines',
-      totalDosage: '1.0 mL (1 syringe)',
-      technique: '25G 50mm TSK Cannula / Deep subcutaneous bolus and retrograde linear threading',
-      practitioner: 'Dr. Mariam Farouk',
-      consentSigned: true,
-      notes: 'Capillary refill time < 1.5s verified bilaterally. Hyaluronidase protocol ready on-site.',
-    },
-    {
-      id: 'inj-03',
-      date: dayjs().subtract(6, 'day').format('YYYY-MM-DD'),
-      patientName: 'Heba Amin',
-      patientId: 'PAT-00115',
-      category: 'Dermal Filler',
-      productName: 'Restylane Kysse (Galderma)',
-      lotNumber: 'KYS-77210',
-      expiryDate: '2026-11-20',
-      targetArea: 'Lip Vermilion Border & Body',
-      totalDosage: '1.0 mL',
-      technique: '30G Needle / Micro-droplet contouring',
-      practitioner: 'Dr. Heba Ramadan',
-      consentSigned: true,
-      notes: 'Cold compress applied immediately. Mild anticipated swelling. Post-care instructions dispatched via WhatsApp.',
-    },
-  ];
-
-  const [treatments, setTreatments] = useState<InjectableTreatment[]>(() => {
+    const [treatments, setTreatments] = useState<InjectableTreatment[]>(() => {
     try {
       const raw = localStorage.getItem(LS_INJECTABLES_KEY) || localStorage.getItem('injectables_sessions_history_v2');
-      if (raw) return JSON.parse(raw);
+      if (raw !== null) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      }
     } catch { /* ignore */ }
-    return DEFAULT_TREATMENTS;
+    return [];
   });
 
   const saveTreatments = (next: InjectableTreatment[]) => {

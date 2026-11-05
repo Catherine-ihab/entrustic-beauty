@@ -65,104 +65,16 @@ export interface BeforeAfterCase {
 
 const LS_BA_KEY = 'clinic_before_after_gallery_v2';
 
-const INITIAL_CASES: BeforeAfterCase[] = [
-  {
-    id: 'ba-1',
-    patientName: 'لينا الحسن',
-    patientId: 'PAT-00104',
-    category: 'حقن وبوتوكس وفيلر',
-    title: 'تحديد وامتلاء الشفاه الطبيعي بحقن الفيلر (Lip Augmentation)',
-    treatmentArea: 'الشفاه وتحديد خط الكنتور (Vermilion Border)',
-    treatmentDescription: 'حقن 1.0 mL فيلر Restylane Kysse بتقنية Micro-droplet لاستعادة الامتلاء والتناسق',
-    timeElapsed: 'النتيجة بعد 14 يوماً من الجلسة',
-    date: dayjs().subtract(14, 'day').format('YYYY-MM-DD'),
-    doctor: 'د. هبة رمضان',
-    notes: 'تحسن ملحوظ في تحديد قوس كيوبيد مع نعومة ومرونة طبيعية بدون أي تكتل أو كدمات.',
-    beforeImageUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=700&q=80',
-    afterImageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=700&q=80',
-    beforeCaption: 'قبل الجلسة: خطوط جفاف رفيعة مع عدم تماثل في الشفة العليا',
-    afterCaption: 'بعد أسبوعين: امتلاء متناسق وترطيب عميق واستقامة الحواف',
-  },
-  {
-    id: 'ba-2',
-    patientName: 'دينا مصطفى',
-    patientId: 'PAT-00088',
-    category: 'حقن وبوتوكس وفيلر',
-    title: 'علاج الخطوط التعبيرية للجبهة والجلابيلا بالبوتوكس (Upper Face Botox)',
-    treatmentArea: 'الجلابيلا بين الحاجبين والجبهة (Glabella & Forehead)',
-    treatmentDescription: 'حقن 26 وحدة Allergan Botox لتنعيم خطوط التعبس مع الحفاظ على الحركة الطبيعية للحواجب',
-    timeElapsed: 'النتيجة بعد 10 أيام',
-    date: dayjs().subtract(20, 'day').format('YYYY-MM-DD'),
-    doctor: 'د. هبة رمضان',
-    notes: 'اختفاء كامل لخطوط 11 بين الحاجبين عند الضحك أو الغضب مع ثبات مظهر طبيعي مريح.',
-    beforeImageUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=700&q=80',
-    afterImageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=700&q=80',
-    beforeCaption: 'قبل الحقن: خطوط حركية عميقة بالجبهة والجلابيلا أثناء التعبير',
-    afterCaption: 'بعد 10 أيام: نعومة تامة واسترخاء العضلات مع بقاء حركة الحاجب طبيعية',
-  },
-  {
-    id: 'ba-3',
-    patientName: 'مريم الصاوي',
-    patientId: 'PAT-00120',
-    category: 'عناية بالبشرة وهيدرافيشل',
-    title: 'تنظيف مائي هيدرافيشل سينديو مع ماسك الذهب 24K (HydraGlow)',
-    treatmentArea: 'كامل الوجه والرقبة (Face & Neck T-Zone)',
-    treatmentDescription: 'شفط الرؤوس السوداء والتنظيف المائي بحمض الساليسيليك ثم ترطيب بماسك الذهب 24K',
-    timeElapsed: 'النتيجة فورية بعد انتهاء الجلسة',
-    date: dayjs().subtract(5, 'day').format('YYYY-MM-DD'),
-    doctor: 'أخصائية البشرة ندى',
-    notes: 'تضييق فوري للمسام الواسعة وإزالة الرؤوس السوداء مع لمعان وتوهج زجاجي للبشرة.',
-    beforeImageUrl: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=700&q=80',
-    afterImageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=700&q=80',
-    beforeCaption: 'قبل الجلسة: مسام متسعة ورؤوس سوداء وجفاف بمنطقة الوجنتين',
-    afterCaption: 'بعد الجلسة مباشرة: بشرة نظيفة تماماً، مسام منقبضة وتوهج نضارة واضح',
-  },
-  {
-    id: 'ba-4',
-    patientName: 'سارة فهمي',
-    patientId: 'PAT-00140',
-    category: 'ليزر وإزالة شعر',
-    title: 'بروتوكول ليزر كانديلا جنتل ماكس برو لإزالة الشعر (Full Legs)',
-    treatmentArea: 'الساقين كاملة (Full Legs Candela Laser)',
-    treatmentDescription: 'ليزر الكسندريت 755nm بتبريد DCD ديناميكي بعد 4 جلسات منتظمة',
-    timeElapsed: 'بعد 4 جلسات ليزر',
-    date: dayjs().subtract(30, 'day').format('YYYY-MM-DD'),
-    doctor: 'د. سارة القاضي',
-    notes: 'انخفاض كثافة الشعر بنسبة 85% مع اختفاء جلد الوزة والالتهابات السابقة.',
-    beforeImageUrl: 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?auto=format&fit=crop&w=700&q=80',
-    afterImageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=80',
-    beforeCaption: 'قبل البدء: شعر كثيف وسريع النمو مع انسداد المسام',
-    afterCaption: 'بعد 4 جلسات: نعومة فائقة وخلو كامل من التصبغات والشعر النامي تحت الجلد',
-  },
-  {
-    id: 'ba-5',
-    patientName: 'فريدة صبري',
-    patientId: 'PAT-00089',
-    category: 'عناية بالجسم وسكراب',
-    title: 'بروتوكول تفتيح وتنعيم الركب والأكواع بسكراب القهوة والبانثينول',
-    treatmentArea: 'الركبتين والأكواع (Knees & Elbows)',
-    treatmentDescription: 'سنفرة القهوة العضوية مع جلسة تقشير أحماض خفيفة وترطيب مكثف بالبانثينول',
-    timeElapsed: 'بعد 3 جلسات علاجية',
-    date: dayjs().subtract(12, 'day').format('YYYY-MM-DD'),
-    doctor: 'أخصائية الجسم مريم',
-    notes: 'توحيد لون الجلد وإزالة الخشونة الناتجة عن الاحتكاك.',
-    beforeImageUrl: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=700&q=80',
-    afterImageUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=700&q=80',
-    beforeCaption: 'قبل العلاج: تصبغات داكنة وخشونة بمفصل الركبة',
-    afterCaption: 'بعد 3 جلسات: تفتيح واضح ودرجة متناسقة مع لون الجسم الطبيعي',
-  },
-];
-
 export function BeforeAfterView() {
   const [cases, setCases] = useState<BeforeAfterCase[]>(() => {
     try {
       const raw = localStorage.getItem(LS_BA_KEY);
-      if (raw) {
+      if (raw !== null) {
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (_) {}
-    return INITIAL_CASES;
+    return [];
   });
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -474,7 +386,7 @@ export function BeforeAfterView() {
               </Form.Item>
             </Col>
             <Col span={10}>
-              <Form.Item name="patientId" label="كود الملف الطبي (MRN)" initialValue="PAT-00104">
+              <Form.Item name="patientId" label="كود الملف الطبي (MRN)" >
                 <Input placeholder="e.g. PAT-00104" />
               </Form.Item>
             </Col>

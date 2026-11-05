@@ -14,15 +14,7 @@ export interface RegisteredPatient {
  * The real directory is loaded from the API at login (see `ensurePatientsSynced`)
  * so screens never show patient numbers that do not exist in the database.
  */
-export const DEFAULT_REGISTERED_PATIENTS: RegisteredPatient[] = [
-  {
-    id: 'p-loading',
-    patientNumber: '—',
-    name: 'جارٍ تحميل دليل الحالات…',
-    phone: '',
-    gender: 'أنثى',
-  },
-];
+export const DEFAULT_REGISTERED_PATIENTS: RegisteredPatient[] = [];
 
 const LS_PATIENTS_DIRECTORY = 'clinic_registered_patients_directory_v1';
 export const PATIENTS_EVENT_NAME = 'clinic_patients_directory_updated';
@@ -32,7 +24,7 @@ export function getRegisteredPatients(): RegisteredPatient[] {
     const stored = localStorage.getItem(LS_PATIENTS_DIRECTORY);
     if (stored) {
       const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed)) return parsed;
     }
   } catch (e) {
     console.error('Error loading patients directory:', e);
@@ -104,7 +96,6 @@ export function syncPatientsFromApi(): Promise<RegisteredPatient[]> {
             ? payload.items
             : [];
       const mapped = rows.map(mapApiRow).filter((p) => p.name && p.patientNumber !== '—');
-      if (!mapped.length) return getRegisteredPatients();
       saveRegisteredPatients(mapped);
       return mapped;
     })

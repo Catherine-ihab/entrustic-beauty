@@ -28,7 +28,6 @@ import {
   Zap,
   Syringe,
 } from 'lucide-react';
-import dayjs from 'dayjs';
 import {
   openWhatsAppDirect,
   templateRetargetingBotoxFiller,
@@ -56,199 +55,17 @@ export interface RetargetCandidate {
   contactStatus: 'pending' | 'sent' | 'rebooked';
 }
 
-const INITIAL_CANDIDATES: RetargetCandidate[] = [
-  {
-    id: 'ret-1',
-    name: 'دينا مصطفى',
-    phone: '01098765432',
-    patientNumber: 'PAT-00088',
-    category: 'botox',
-    categoryLabel: 'تجديد البوتوكس',
-    lastProcedure: 'حقن بوتوكس الجبهة والجلابيلا (26 وحدة)',
-    doctor: 'د. هبة رمضان',
-    lastVisitDate: dayjs().subtract(130, 'day').format('YYYY-MM-DD'),
-    daysSinceLastVisit: 130,
-    recommendedAction: 'تجديد حقن التوكسين قبل زوال استرخاء العضلات (4.5 أشهر)',
-    contactStatus: 'pending',
-  },
-  {
-    id: 'ret-2',
-    name: 'ياسمين عبد العزيز',
-    phone: '01123456789',
-    patientNumber: 'PAT-00072',
-    category: 'botox',
-    categoryLabel: 'تجديد الفيلر',
-    lastProcedure: 'فيلر شفايف Restylane Kysse',
-    doctor: 'د. هبة رمضان',
-    lastVisitDate: dayjs().subtract(155, 'day').format('YYYY-MM-DD'),
-    daysSinceLastVisit: 155,
-    recommendedAction: 'جلسة رتوش ونضارة الشفاه السنوية (5 أشهر)',
-    contactStatus: 'pending',
-  },
-  {
-    id: 'ret-3',
-    name: 'سارة فهمي',
-    phone: '01011223344',
-    patientNumber: 'PAT-00140',
-    category: 'laser',
-    categoryLabel: 'كورس الليزر الدوري',
-    lastProcedure: 'جلسة ليزر كانديلا (ساقين كاملة)',
-    doctor: 'د. سارة القاضي',
-    lastVisitDate: dayjs().subtract(29, 'day').format('YYYY-MM-DD'),
-    daysSinceLastVisit: 29,
-    recommendedAction: 'حان موعد الجلسة الخامسة (مرور 4 أسابيع على الجلسة السابقة)',
-    contactStatus: 'pending',
-  },
-  {
-    id: 'ret-4',
-    name: 'منى الشاذلي',
-    phone: '01234567801',
-    patientNumber: 'PAT-00045',
-    category: 'laser',
-    categoryLabel: 'كورس الليزر الدوري',
-    lastProcedure: 'ليزر كانديلا (بكينى وأندر آرم)',
-    doctor: 'د. سارة القاضي',
-    lastVisitDate: dayjs().subtract(35, 'day').format('YYYY-MM-DD'),
-    daysSinceLastVisit: 35,
-    recommendedAction: 'تأخرت أسبوعاً عن موعد الجلسة الدورية لاستهداف طور Anagen',
-    contactStatus: 'sent',
-  },
-  {
-    id: 'ret-5',
-    name: 'مريم الصاوي',
-    phone: '01555667788',
-    patientNumber: 'PAT-00120',
-    category: 'skincare',
-    categoryLabel: 'هيدرافيشل شهري',
-    lastProcedure: 'تنظيف عميق هيدرافيشل سينديو وماسك الذهب',
-    doctor: 'أخصائية البشرة ندى',
-    lastVisitDate: dayjs().subtract(26, 'day').format('YYYY-MM-DD'),
-    daysSinceLastVisit: 26,
-    recommendedAction: 'جلسة النضارة الشهرية وتجديد نضارة خلايا البشرة',
-    contactStatus: 'pending',
-  },
-  {
-    id: 'ret-6',
-    name: 'رنا السيد',
-    phone: '01055443322',
-    patientNumber: 'PAT-00099',
-    category: 'skincare',
-    categoryLabel: 'تقشير أحماض',
-    lastProcedure: 'جلسة تقشير كيميائي تفتيح ونضارة',
-    doctor: 'أخصائية البشرة ندى',
-    lastVisitDate: dayjs().subtract(30, 'day').format('YYYY-MM-DD'),
-    daysSinceLastVisit: 30,
-    recommendedAction: 'جلسة الترطيب والتقشير الثانية لاستكمال التفتيح',
-    contactStatus: 'pending',
-  },
-  {
-    id: 'ret-7',
-    name: 'هند حسام',
-    phone: '01199887766',
-    patientNumber: 'PAT-00030',
-    category: 'winback',
-    categoryLabel: 'عميلة غائبة',
-    lastProcedure: 'حمام مغربي ومساج ملكي',
-    doctor: 'أخصائية السبا فاطمة',
-    lastVisitDate: dayjs().subtract(75, 'day').format('YYYY-MM-DD'),
-    daysSinceLastVisit: 75,
-    recommendedAction: 'غائبة منذ 75 يوماً — تقديم كود خصم 15% لاستعادتها',
-    contactStatus: 'pending',
-  },
-  {
-    id: 'ret-8',
-    name: 'نادين حسني',
-    phone: '01288776655',
-    patientNumber: 'PAT-00022',
-    category: 'winback',
-    categoryLabel: 'عميلة غائبة',
-    lastProcedure: 'جلسة هيدرافيشل وسيروم',
-    doctor: 'أخصائية البشرة ندى',
-    lastVisitDate: dayjs().subtract(90, 'day').format('YYYY-MM-DD'),
-    daysSinceLastVisit: 90,
-    recommendedAction: 'غائبة منذ 3 أشهر — إرسال دعوة جلسة نضارة مجانية أو خصم',
-    contactStatus: 'rebooked',
-  },
-];
-
 const LS_RETARGET_KEY = 'clinic_smart_retargeting_v1';
 
 function loadUnifiedCandidates(): RetargetCandidate[] {
-  let base: RetargetCandidate[] = [...INITIAL_CANDIDATES];
+  let base: RetargetCandidate[] = [];
   try {
     const raw = localStorage.getItem(LS_RETARGET_KEY);
-    if (raw) {
+    if (raw !== null) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) base = parsed;
+      if (Array.isArray(parsed)) base = parsed;
     }
   } catch (_) {}
-
-  // Automatically scan appointments to discover new retargeting candidates in real-time
-  try {
-    const rawAppts = localStorage.getItem('clinic_appointments_unified_v3');
-    if (rawAppts) {
-      const appts: any[] = JSON.parse(rawAppts);
-      if (Array.isArray(appts)) {
-        const now = dayjs();
-        appts.forEach((a) => {
-          if (!a.date || a.status === 'cancelled') return;
-          const diffDays = now.diff(dayjs(a.date), 'day');
-          if (diffDays < 14) return; // Skip very recent visits
-
-          const existing = base.find((c) => c.name === a.name || c.phone === a.phone);
-          if (existing) {
-            if (dayjs(a.date).isAfter(dayjs(existing.lastVisitDate))) {
-              existing.contactStatus = 'rebooked';
-            }
-            return;
-          }
-
-          let cat: 'botox' | 'laser' | 'skincare' | 'winback' = 'winback';
-          let catLabel = 'عميلة غائبة';
-          let action = `غائبة منذ ${diffDays} يوماً — إرسال عرض ترحيبي`;
-
-          const serv = `${a.serviceCategory || ''} ${a.serviceName || ''}`;
-          if (serv.includes('بوتوكس') || serv.includes('فيلر')) {
-            if (diffDays >= 90) {
-              cat = 'botox';
-              catLabel = 'تجديد البوتوكس والفيلر';
-              action = `مضى ${diffDays} يوماً — حان وقت تجديد حقن النضارة`;
-            }
-          } else if (serv.includes('ليزر')) {
-            if (diffDays >= 28) {
-              cat = 'laser';
-              catLabel = 'كورس الليزر الدوري';
-              action = `مضى ${diffDays} يوماً — موعد الجلسة الدورية التالية`;
-            }
-          } else if (serv.includes('بشرة') || serv.includes('هيدرافيشل') || serv.includes('تقشير')) {
-            if (diffDays >= 21) {
-              cat = 'skincare';
-              catLabel = 'هيدرافيشل شهري';
-              action = `مضى ${diffDays} يوماً — جلسة تنظيف وترطيب البشرة الشهرية`;
-            }
-          }
-
-          if (cat !== 'winback' || diffDays >= 60) {
-            base.push({
-              id: `dyn-${a.id || Date.now()}`,
-              name: a.name,
-              phone: a.phone || '',
-              patientNumber: a.patientNumber || 'PAT-00000',
-              category: cat,
-              categoryLabel: catLabel,
-              lastProcedure: a.serviceName || a.serviceCategory || 'جلسة عيادة',
-              doctor: a.doctor || 'د. سارة القاضي',
-              lastVisitDate: a.date,
-              daysSinceLastVisit: diffDays,
-              recommendedAction: action,
-              contactStatus: 'pending',
-            });
-          }
-        });
-      }
-    }
-  } catch (_) {}
-
   return base;
 }
 
@@ -603,8 +420,16 @@ export function SmartRetargetingView({ clinicName = 'Entrustic Beauty' }: { clin
 
       {/* Filter and Category Switcher */}
       <Card size="small" style={{ borderRadius: 10 }}>
-        <Row justify="space-between" align="middle" gutter={[12, 12]}>
-          <Col xs={24} md={14}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 12,
+          }}
+        >
+          <div style={{ overflowX: 'auto', maxWidth: '100%', WebkitOverflowScrolling: 'touch', paddingBottom: 2 }}>
             <Segmented
               value={activeCategory}
               onChange={(val) => setActiveCategory(val as any)}
@@ -616,31 +441,29 @@ export function SmartRetargetingView({ clinicName = 'Entrustic Beauty' }: { clin
                 { value: 'winback', label: '🌸 عميلات غائبات (60+ يوم)' },
               ]}
             />
-          </Col>
-          <Col xs={24} md={10} style={{ textAlign: 'start' }}>
-            <Space wrap>
-              <Input
-                placeholder="بحث بالاسم أو الهاتف..."
-                prefix={<Search size={14} color="#94a3b8" />}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ width: 170 }}
-                allowClear
-              />
-              <Select
-                value={statusFilter}
-                onChange={setStatusFilter}
-                style={{ width: 130 }}
-                options={[
-                  { value: 'all', label: 'كل الحالات' },
-                  { value: 'pending', label: '⏳ معلق' },
-                  { value: 'sent', label: '📲 تم الإرسال' },
-                  { value: 'rebooked', label: '✅ تم الحجز' },
-                ]}
-              />
-            </Space>
-          </Col>
-        </Row>
+          </div>
+          <Space wrap size={10} style={{ flexShrink: 0 }}>
+            <Input
+              placeholder="بحث بالاسم أو الهاتف..."
+              prefix={<Search size={14} color="#94a3b8" />}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ width: 180 }}
+              allowClear
+            />
+            <Select
+              value={statusFilter}
+              onChange={setStatusFilter}
+              style={{ width: 130 }}
+              options={[
+                { value: 'all', label: 'كل الحالات' },
+                { value: 'pending', label: '⏳ معلق' },
+                { value: 'sent', label: '📲 تم الإرسال' },
+                { value: 'rebooked', label: '✅ تم الحجز' },
+              ]}
+            />
+          </Space>
+        </div>
       </Card>
 
       {/* Candidates Table */}

@@ -47,33 +47,7 @@ function formatBytes(bytes: number) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
 
-const DEFAULT_DEMO_FILES: PatientFile[] = [
-  {
-    id: 'f-1',
-    file_name: 'Dental_Panoramic_OPG_XRay.jpg',
-    mime_type: 'image/jpeg',
-    size_bytes: 2450000,
-    category: 'radiology',
-    description: 'أشعة بانوراما كاملة للفكين قبل بدء خطة العلاج',
-    tags: ['OPG', 'Dental', 'Jaw'],
-    is_archived: false,
-    visit_id: null,
-    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-    url: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: 'f-2',
-    file_name: 'CBC_Comprehensive_Blood_Test.pdf',
-    mime_type: 'application/pdf',
-    size_bytes: 840000,
-    category: 'lab',
-    description: 'تحليل دم كامل وسكر تراكمي HbA1c',
-    tags: ['CBC', 'HbA1c', 'Lab'],
-    is_archived: false,
-    visit_id: null,
-    created_at: new Date(Date.now() - 86400000 * 5).toISOString(),
-  },
-];
+const DEFAULT_DEMO_FILES: PatientFile[] = [];
 
 interface FilesTabProps {
   patientId: string;
