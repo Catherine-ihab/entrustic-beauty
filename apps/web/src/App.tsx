@@ -106,7 +106,7 @@ export function App() {
   const lockedType = SPECIALTY_LOCK ?? ClinicType.GENERAL_MEDICAL;
 
   useEffect(() => {
-    const WIPE_FLAG = 'clinic_production_wipe_20261105_v6';
+    const WIPE_FLAG = 'clinic_production_wipe_20261106_v12';
     if (!localStorage.getItem(WIPE_FLAG)) {
       // 1. Wipe all known clinical, financial, and operational lists
       const operationalKeys = [

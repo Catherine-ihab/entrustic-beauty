@@ -55,8 +55,8 @@ export interface InjectableTreatment {
 
 export const InjectablesWorkspaceView: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<string>('Botox Cosmetic (Allergan)');
-  const [lotNumber, setLotNumber] = useState<string>('C38491-02');
-  const [expiryDate, setExpiryDate] = useState<string>('2027-08-30');
+  const [lotNumber, setLotNumber] = useState<string>('');
+  const [expiryDate, setExpiryDate] = useState<string>('');
   const [reconstitution, setReconstitution] = useState<string>('2.5 mL 0.9% NaCl (4U per 0.1 mL)');
 
   // Facial zone dosage distribution
@@ -85,12 +85,27 @@ export const InjectablesWorkspaceView: React.FC = () => {
   const { tx } = useLang();
 
   const LS_INJECTABLES_KEY = 'clinic_injectables_sessions_v2';
-    const [treatments, setTreatments] = useState<InjectableTreatment[]>(() => {
+  const DUMMY_NAMES = ['دينا مصطفى', 'لينا الحسن', 'فريدة صبري', 'نوران مصطفى', 'Farida Sabry', 'Heba Amin'];
+  const DUMMY_IDS = ['PAT-00042', 'PAT-00088', 'PAT-00089', 'PAT-00104', 'PAT-00115'];
+
+  const [treatments, setTreatments] = useState<InjectableTreatment[]>(() => {
     try {
       const raw = localStorage.getItem(LS_INJECTABLES_KEY) || localStorage.getItem('injectables_sessions_history_v2');
       if (raw !== null) {
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed)) {
+          const clean = parsed.filter(
+            (t: any) =>
+              !DUMMY_NAMES.includes(t.patientName) &&
+              !DUMMY_IDS.includes(t.patientId) &&
+              !['inj-01', 'inj-02', 'inj-03'].includes(t.id)
+          );
+          if (clean.length !== parsed.length) {
+            localStorage.setItem(LS_INJECTABLES_KEY, JSON.stringify(clean));
+            localStorage.setItem('injectables_sessions_history_v2', JSON.stringify(clean));
+          }
+          return clean;
+        }
       }
     } catch { /* ignore */ }
     return [];
@@ -335,16 +350,7 @@ export const InjectablesWorkspaceView: React.FC = () => {
                     value={selectedProduct}
                     onChange={(val) => {
                       setSelectedProduct(val);
-                      if (val.includes('Juvederm')) {
-                        setLotNumber('JV4-88301');
-                        setExpiryDate('2027-03-15');
-                      } else if (val.includes('Restylane')) {
-                        setLotNumber('KYS-77210');
-                        setExpiryDate('2026-11-20');
-                      } else {
-                        setLotNumber('C38491-02');
-                        setExpiryDate('2027-08-30');
-                      }
+                      // No hardcoded lot numbers
                     }}
                     options={[
                       { value: 'Botox Cosmetic (Allergan 100U)', label: 'Botox Cosmetic 100U (OnabotulinumtoxinA)' },
