@@ -2,84 +2,91 @@
   {
     "id": "01",
     "file": "scene-01.html",
-    "dur": 8.1,
+    "dur": 13.68,
     "kind": "hero",
     "media": null
   },
   {
     "id": "02",
     "file": "scene-02.html",
-    "dur": 8.94,
+    "dur": 8.83,
     "kind": "split",
     "media": "dashboard.png"
   },
   {
     "id": "03",
     "file": "scene-03.html",
-    "dur": 8.34,
+    "dur": 9.02,
     "kind": "split",
     "media": "patients.png"
   },
   {
     "id": "04",
     "file": "scene-04.html",
-    "dur": 7.38,
+    "dur": 8.16,
     "kind": "split",
     "media": "laser.mp4"
   },
   {
     "id": "05",
     "file": "scene-05.html",
-    "dur": 7.64,
+    "dur": 7.68,
     "kind": "split",
     "media": "injectables.mp4"
   },
   {
     "id": "06",
     "file": "scene-06.html",
-    "dur": 9.47,
+    "dur": 7.97,
     "kind": "split",
     "media": "skincare.mp4"
   },
   {
     "id": "07",
     "file": "scene-07.html",
-    "dur": 9.13,
+    "dur": 6.72,
     "kind": "split",
     "media": "packages.png"
   },
   {
     "id": "08",
     "file": "scene-08.html",
-    "dur": 8.46,
+    "dur": 7.9,
     "kind": "split",
     "media": "appointments.mp4"
   },
   {
     "id": "09",
     "file": "scene-09.html",
-    "dur": 8,
+    "dur": 7.7,
     "kind": "split",
     "media": "invoices.mp4"
   },
   {
     "id": "10",
     "file": "scene-10.html",
-    "dur": 7.02,
+    "dur": 7.73,
     "kind": "split",
     "media": "inventory.png"
   },
   {
     "id": "11",
     "file": "scene-11.html",
-    "dur": 8.34,
+    "dur": 7.82,
     "kind": "duo",
     "media": "reports.mp4+audit.png"
   },
   {
     "id": "12",
     "file": "scene-12.html",
-    "dur": 7.4,
+    "dur": 7.61,
+    "kind": "split",
+    "media": "commissions.png"
+  },
+  {
+    "id": "13",
+    "file": "scene-13.html",
+    "dur": 9.89,
     "kind": "outro",
     "media": null
   }

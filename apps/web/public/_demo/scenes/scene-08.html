@@ -127,7 +127,7 @@ body{width:1920px;height:1080px;overflow:hidden;
 /* ---------- hero / outro ---------- */
 .hero{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;padding:0 120px;
-  animation:heroPush 8.46s linear both}
+  animation:heroPush 7.9s linear both}
 /* a very slow push-in: the frame is never truly still, even when the text has
    finished appearing (this is what separates a "slide" from a video) */
 @keyframes heroPush{from{transform:scale(1)}to{transform:scale(1.05)}}
@@ -157,9 +157,9 @@ body{width:1920px;height:1080px;overflow:hidden;
   border:1px solid rgba(255,255,255,.14);box-shadow:0 50px 90px -40px #000}
 .sidescreen img{width:100%;height:100%;object-fit:cover;display:block}
 .sidescreen.l{width:560px;height:315px;left:-190px;top:120px;opacity:.5;filter:blur(2px) saturate(.9);
-  animation:ssL 8.46s ease-in-out both}
+  animation:ssL 7.9s ease-in-out both}
 .sidescreen.r{width:620px;height:349px;right:-220px;bottom:70px;opacity:.55;filter:blur(2px) saturate(.9);
-  animation:ssR 8.46s ease-in-out both}
+  animation:ssR 7.9s ease-in-out both}
 @keyframes ssL{from{transform:rotate(-7deg) translate3d(0,0,0)}to{transform:rotate(-5deg) translate3d(34px,-26px,0)}}
 @keyframes ssR{from{transform:rotate(6deg) translate3d(0,0,0)}to{transform:rotate(4deg) translate3d(-30px,20px,0)}}
 
@@ -174,16 +174,16 @@ body{width:1920px;height:1080px;overflow:hidden;
 .track{position:absolute;left:0;right:0;bottom:0;height:4px;z-index:8;background:rgba(255,255,255,.10)}
 .track i{display:block;height:100%;width:var(--p0);
   background:linear-gradient(90deg,var(--rose),#FFB4D8,var(--gold));
-  box-shadow:0 0 18px rgba(236,72,153,.9);animation:prog 8.46s linear both}
+  box-shadow:0 0 18px rgba(236,72,153,.9);animation:prog 7.9s linear both}
 
 /* ---------- hard cut wipe between scenes ---------- */
 .wipe{position:absolute;inset:0;z-index:20;pointer-events:none;
   background:linear-gradient(100deg,#1A0A22 0%,#2B0D33 45%,#1A0A22 100%);
   animation:wipe .42s cubic-bezier(.65,0,.35,1) both}
 
-.track i{--p0:60.069%;--p1:68.683%}</style></head>
+.track i{--p0:56.056%;--p1:63.192%}</style></head>
 <body><div id="scene"><div class="orb a"></div><div class="orb b"></div><div class="topbar"><div class="logochip"><img src="../logo.png" alt="Entrustic"></div>
-  <div class="step"><b>08</b><span class="sep">/</span><span>12</span></div>
+  <div class="step"><b>08</b><span class="sep">/</span><span>13</span></div>
 </div>
      <div class="split">
        <div class="text">
@@ -203,7 +203,7 @@ body{width:1920px;height:1080px;overflow:hidden;
     </div>
   </div>
      </div>
-     <div class="footer"><div class="fbrand"><span class="d"></span>Entrustic Beauty</div><div class="dots"><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div></div>
+     <div class="footer"><div class="fbrand"><span class="d"></span>Entrustic Beauty</div><div class="dots"><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div></div>
   <div class="track"><i></i></div>
   <div class="wipe"></div>
 </div>

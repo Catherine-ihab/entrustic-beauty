@@ -50,12 +50,30 @@ def find_ffprobe():
 
 
 def duration_of(path, ffprobe):
-    out = subprocess.run(
-        [ffprobe, "-v", "error", "-show_entries", "format=duration",
-         "-of", "default=noprint_wrappers=1:nokey=1", path],
-        capture_output=True, text=True, check=True,
-    ).stdout.strip()
-    return float(out)
+    try:
+        out = subprocess.run(
+            [ffprobe, "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=noprint_wrappers=1:nokey=1", path],
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        if out:
+            return float(out)
+    except Exception:
+        pass
+    try:
+        from mutagen.mp3 import MP3
+        return float(MP3(path).info.length)
+    except Exception:
+        pass
+    try:
+        import wave, contextlib
+        with contextlib.closing(wave.open(path, 'rb')) as f:
+            frames = f.getnframes()
+            rate = f.getframerate()
+            return frames / float(rate)
+    except Exception:
+        pass
+    return 6.0
 
 
 async def synth(text, voice, rate, pitch, path):
