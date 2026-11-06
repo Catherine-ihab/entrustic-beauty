@@ -75,7 +75,7 @@ function main() {
       const seg = path.join(WORK, `a-${t.id}.wav`);
       run([
         '-i', narr,
-        '-af', `adelay=${leadMs}|${leadMs},apad=whole_dur=${t.dur}`,
+        '-af', `adelay=${leadMs}|${leadMs},apad`,
         '-t', String(t.dur), '-ar', '48000', '-ac', '2', seg,
       ]);
       parts.push(seg);
@@ -94,9 +94,10 @@ function main() {
         '-i', BED,
         '-filter_complex',
         [
-          '[1:a]volume=0.85,atrim=0:' + total.toFixed(2) + ',asetpts=N/SR/TB[bed]',
-          '[bed][0:a]sidechaincompress=threshold=0.035:ratio=7:attack=6:release=380[duck]',
-          '[0:a][duck]amix=inputs=2:duration=first:normalize=0[mix]',
+          '[0:a]aformat=channel_layouts=stereo:sample_fmts=fltp:sample_rates=48000,asplit=2[v_duck][v_mix]',
+          '[1:a]volume=0.85,atrim=0:' + total.toFixed(2) + ',asetpts=N/SR/TB,aformat=channel_layouts=stereo:sample_fmts=fltp:sample_rates=48000[bed]',
+          '[bed][v_duck]sidechaincompress=threshold=0.035:ratio=7:attack=6:release=380[duck]',
+          '[v_mix][duck]amix=inputs=2:duration=first:dropout_transition=2[mix]',
           '[mix]loudnorm=I=-16:TP=-1.5:LRA=11[a]',
         ].join(';'),
         '-map', '[a]', '-ar', '48000', '-ac', '2', mixed,
